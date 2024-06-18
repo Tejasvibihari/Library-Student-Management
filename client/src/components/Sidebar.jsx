@@ -18,6 +18,9 @@ import MailIcon from '@mui/icons-material/Mail';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AppBar from '@mui/material/AppBar';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import Profile from './Profile';
+
 
 const drawerWidth = 240;
 
@@ -29,10 +32,20 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
+const AppBarContainer = styled(AppBar)(({ theme, isMobile, open }) => ({
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  width: isMobile ? '100%' : `calc(100% - ${open ? drawerWidth : 0}px)`,
+  marginLeft: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
+}));
+
 export default function SideBar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [open, setOpen] = useState(!isMobile);
+    const [open, setOpen] = useState(!isMobile);
+  
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -40,7 +53,9 @@ export default function SideBar() {
 
   const handleDrawerClose = () => {
     setOpen(false);
-  };
+    };
+    
+  
 
   useEffect(() => {
     setOpen(!isMobile);
@@ -49,17 +64,7 @@ export default function SideBar() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          width: isMobile ? '100%' : `calc(100% - ${open ? drawerWidth : 0}px)`,
-          ml: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
-          transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
-        }}
-      >
+      <AppBarContainer position="fixed" isMobile={isMobile} open={open}>
         <Toolbar>
           {isMobile && (
             <IconButton
@@ -73,10 +78,11 @@ export default function SideBar() {
             </IconButton>
           )}
           <Typography variant="h6" noWrap component="div">
-            My Application
-          </Typography>
+            Library Management
+                  </Typography>
+             <Profile/>
         </Toolbar>
-      </AppBar>
+      </AppBarContainer>
       <Drawer
         sx={{
           width: drawerWidth,
@@ -99,21 +105,19 @@ export default function SideBar() {
           </DrawerHeader>
         )}
         <Divider />
+        {/* Header */}
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {/* Library name and notification icon */}
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemText primary="Library Management" />
+              <NotificationsNoneOutlinedIcon />
+            </ListItemButton>
+          </ListItem>
         </List>
         <Divider />
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
+          {['Student Admission', 'Student Detail', 'Announcment', 'Setting'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
