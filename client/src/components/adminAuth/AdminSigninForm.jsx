@@ -3,6 +3,7 @@ import { EyeOff, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import client from '../../services/axiosClient';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { signInFailure, signInStart, signInSuccess } from '../../models/admin/adminAuthSlice';
 import CircularLoading from '../ui/CircularLoading';
 import Snackbar from '@mui/material/Snackbar';
@@ -11,7 +12,10 @@ import Alert from '@mui/material/Alert';
 
 export default function SigninForm() {
     const loading = useSelector(state => state.admin.loading)
-    console.log(loading)
+    const error = useSelector(state => state.admin.error)
+    const navigate = useNavigate()
+
+    console.log(error)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -43,7 +47,7 @@ export default function SigninForm() {
             const response = await client.post('/api/admin/auth/signin', formData)
             console.log(response.data.result)
             dispatch(signInSuccess(response.data.result))
-            handleSnackOpen()
+            navigate('/')
         } catch (error) {
 
             if (error.response && error.response.data) {
@@ -62,13 +66,13 @@ export default function SigninForm() {
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
                 <Alert
                     onClose={handleSnackClose}
-                    severity="success"
+                    severity={error === "User not found" || error === "Invalid credentials" ? "warning" : "error"}
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
-                    This is a success Alert inside a Snackbar!
+                    {error}
                 </Alert>
-            </Snackbar>
+            </Snackbar >
             <div className='bg-gray-200 h-screen'>
                 <div className='p-10'>
                     <div className='text-center mb-10'>Bihari Library</div>

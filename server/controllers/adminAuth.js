@@ -63,3 +63,61 @@ export const SignIn = async (req, res) => {
         return res.status(500).json({ message: "Something went wrong" });
     }
 }
+
+
+// Send Otp Controller
+
+
+
+export const sendOtp = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        const otpExpiry = Date.now() + 1000 * 60 * 15; // OTP expires after 15 minutes
+
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        admin.otp = otp;
+        admin.otpexpiry = otpExpiry;
+        await admin.save();
+
+        // TODO: Send OTP to admin's email
+        sendMail({
+            to: email,
+            subject: "Password Reset",
+            body: `Your OTP is ${otp}`
+        });
+
+        res.status(200).json({ message: 'OTP sent successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error sending OTP' });
+    }
+}
+export const verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        if (admin.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        if (Date.now() > admin.otpexpiry) {
+            return res.status(400).json({ message: 'OTP expired' });
+        }
+
+        // TODO: Handle successful OTP verification
+
+        res.status(200).json({ message: 'OTP verified successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error verifying OTP' });
+    }
+}

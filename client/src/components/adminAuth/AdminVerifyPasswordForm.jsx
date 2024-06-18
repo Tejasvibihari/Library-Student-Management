@@ -1,8 +1,19 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import client from '../../services/axiosClient'
 export default function VerifyPasswordForm() {
-    const [email, setEmail] = useState('')
+    const [otp, setOtp] = useState('')
 
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try {
+            const response = await client.post('/api/admin/auth/verifyotp')
+            console.log(response)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <>
@@ -12,9 +23,9 @@ export default function VerifyPasswordForm() {
                     <div className='border rounded-md max-w-md md:max-w-sm mx-auto p-7 bg-white'>
                         <h3 className='mt-7 text-[#1b2c3f] text-center font-bold text-xl'>Enter OTP</h3>
                         <p className='text-[#818995] text-center mt-4 text-sm mb-4'>
-                            Welcome & Join us by creating a free account !
+                            OTP Sent to Your Email Id
                         </p>
-                        <div>
+                        <from onSubmit={handleSubmit}>
                             <div>
                                 <label className='text-[#1b2c3f] text-sm mb-2'>
                                     OTP
@@ -22,9 +33,8 @@ export default function VerifyPasswordForm() {
                                 <input
                                     type="text"
                                     placeholder="Enter 6 Digit OTP"
-                                    value={email}
-                                    onChange={(e) => { setEmail(e.target.value) }}
-                                    label="Email"
+                                    value={otp}
+                                    onChange={(e) => { setOtp(e.target.value) }}
                                     className='w-full border p-2 rounded mb-2'
                                 />
                             </div>
@@ -36,7 +46,7 @@ export default function VerifyPasswordForm() {
                             {/* <div className='flex justify-center items-center text-sm text-[#818995] mt-2'>
                                 Remembered your password ? <Link to='/signin' className='px-2 text-[#8e54e9] underline cursor-pointer'>Login</Link>
                             </div> */}
-                        </div>
+                        </from>
                     </div>
                 </div>
             </div>
