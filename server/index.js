@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 
 import adminRouter from './router/adminAuth.js'
+import studentRouter from './router/studentRouter.js'
 
 import dotenv from 'dotenv';
 
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 })
 
 app.use('/api/admin/auth/', adminRouter);
+app.use('/api/student/', studentRouter);
 
 app.listen(port, (req, res) => {
     console.log(`Connected to PORT ${port}...`)
