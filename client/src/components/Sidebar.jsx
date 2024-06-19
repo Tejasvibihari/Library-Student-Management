@@ -13,16 +13,15 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AppBar from '@mui/material/AppBar';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import { Mail, BookUser } from 'lucide-react';
 import Profile from './Profile';
 import SearchIcon from '@mui/icons-material/Search';
-
-
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -48,7 +47,6 @@ export default function SideBar({ children }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(!isMobile);
 
-
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -57,17 +55,17 @@ export default function SideBar({ children }) {
     setOpen(false);
   };
 
-
-
   useEffect(() => {
     setOpen(!isMobile);
   }, [isMobile]);
 
   return (
+    <> 
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBarContainer position="fixed" isMobile={isMobile} open={open}>
         <Toolbar>
+          
           {isMobile && (
             <IconButton
               color="inherit"
@@ -80,11 +78,14 @@ export default function SideBar({ children }) {
             </IconButton>
           )}
           {/* Search input */}
-          <div className=' flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500'>
-            <input type="text" placeholder="Search....." className="px-3 py-1  text-neutral-900 border-none min-w-[350px] focus:outline-none  bg-transparent " />
-            <SearchIcon className='w-6 h-6 text-neutral-900' />
+          <div className="flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
+            <input
+              type="text"
+              placeholder="Search....."
+              className="px-3 py-1 text-neutral-900 border-none min-w-[350px] focus:outline-none bg-transparent"
+            />
+            <SearchIcon className="w-6 h-6 text-neutral-900" />
           </div>
-
           <Profile />
         </Toolbar>
       </AppBarContainer>
@@ -102,43 +103,60 @@ export default function SideBar({ children }) {
         open={open}
         onClose={handleDrawerClose}
       >
-        {isMobile && (
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronLeftIcon />}
+        
+          <DrawerHeader className='w-full px-2'>
+         
+            <p> Library Management</p>
+           
+               <IconButton onClick={handleDrawerClose}>
+              <ChevronLeftIcon />
             </IconButton>
-          </DrawerHeader>
-        )}
-        <Divider />
-        {/* Header */}
-        <List>
-          {/* Library name and notification icon */}
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Library Management" />
-              <NotificationsNoneOutlinedIcon />
-            </ListItemButton>
-          </ListItem>
-        </List>
-        <Divider />
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-          </ListItem>
-        </List>
+            </DrawerHeader>
+            <Divider />
+            <List>
+            <Link to="/">
+             <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <DashboardIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard" />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to="/admission">
+            <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <LibraryBooksIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Student Admission" />
+                </ListItemButton>
+              </ListItem></Link>
+            <Link to="/student-detail">
+                <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    < BookUser />
+                  </ListItemIcon>
+                  <ListItemText primary="Student Detail" />
+                </ListItemButton>
+              </ListItem>
+              </Link>
+            <Link to="/announcement">
+               <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <Mail />
+                  </ListItemIcon>
+                  <ListItemText primary="Announcement" />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            
+            </List>
+      
+        
       </Drawer>
       <Box
         component="main"
@@ -150,12 +168,13 @@ export default function SideBar({ children }) {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          // marginLeft: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
+       
         }}
       >
         <DrawerHeader />
         <Typography paragraph>{children}</Typography>
       </Box>
-    </Box>
+      </Box>
+      </>
   );
 }
