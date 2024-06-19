@@ -43,7 +43,7 @@ const AppBarContainer = styled(AppBar)(({ theme, isMobile, open }) => ({
   marginLeft: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
 }));
 
-export default function SideBar() {
+export default function SideBar({ children }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(!isMobile);
@@ -122,16 +122,22 @@ export default function SideBar() {
         </List>
         <Divider />
         <List>
-          {['Student Admission', 'Student Detail', 'Announcment', 'Setting'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
       <Box
@@ -144,11 +150,11 @@ export default function SideBar() {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          marginLeft: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
+          // marginLeft: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
         }}
       >
         <DrawerHeader />
-        <Typography paragraph>Content goes here.</Typography>
+        <Typography paragraph>{children}</Typography>
       </Box>
     </Box>
   );
