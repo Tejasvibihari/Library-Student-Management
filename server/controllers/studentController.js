@@ -40,3 +40,41 @@ export const createStudent = async (req, res) => {
         console.log(error)
     }
 }
+
+// Update Student Detail
+
+export const updateStudent = async (req, res) => {
+    const { sid } = req.params;
+    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shift, pincode, village, block, district, image, admin } = req.body;
+    try {
+        const student = await Student.findById(sid);
+        if (!student) {
+            return res.status(404).json({ message: "No student found with this ID" });
+        }
+
+        student.name = name;
+        student.dob = dob;
+        student.email = email;
+        student.mobile = mobile;
+        student.aadhar = aadhar;
+        student.father = father;
+        student.guardian = guardian;
+        student.gender = gender;
+        student.preparingFor = preparingFor;
+        student.admissionDate = admissionDate;
+        student.shift = shift;
+        student.pincode = pincode;
+        student.village = village;
+        student.block = block;
+        student.district = district;
+        student.image = image;
+        student.admin = admin;
+
+        await student.save();
+
+        return res.status(200).json({ message: "Student details updated successfully" });
+
+    } catch (error) {
+        console.log(error)
+    }
+}
