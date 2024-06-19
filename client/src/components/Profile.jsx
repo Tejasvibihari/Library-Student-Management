@@ -25,7 +25,7 @@ function Profile() {
         aria-controls="basic-menu"
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        className="flex items-center justify-center  ring-2 px-2 py-4 focus:ring-opacity-40 "
+        className="flex items-center justify-center  ring-1  px-2 py-4 focus:ring-opacity-40 "
         onClick={handleClick }
       ><div className='flex items-center justify-center px-3'>
           <div className='p-1 rounded-full  '>
@@ -41,37 +41,32 @@ function Profile() {
          </div>
         </div>
       </button>
-         <Menu
-        id="basic-menu"
+        <Menu
+        id="profile-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'basic-button',
+          'aria-labelledby': 'profile-button',
+        }}
+        PaperProps={{
+          className: 'mt-2 rounded-lg shadow-lg border border-gray-200',
         }}
       >
- <div className='mx-2 px-2 '>
-    <MenuItem onClick={handleClose} className="hover:bg-gray-200 mx-2">
-        
-          <span>  <PersonOutlineIcon className='w-4 h-4 mr-2' /></span>
-               <span className='text-center'>Profile</span>
-      </MenuItem>
-</div>
-        <Divider/>
-<MenuItem onClick={handleClose} className="hover:bg-gray-200">
-  <div className='flex items-center'>
-    <HelpOutlineIcon className='w-6 h-6 mr-2'/>
-    <span>Help</span>
-  </div>
+        <MenuItem onClick={handleClose} className="hover:bg-gray-100 px-4 py-2 flex items-center">
+          <PersonOutlineIcon className="w-6 h-6 mr-2 text-gray-700" />
+          <span className="text-gray-700">Profile</span>
         </MenuItem>
-        <Divider/>
-<MenuItem onClick={handleClose} className="hover:bg-gray-200">
-  <div className='flex items-center'>
-    <LogoutIcon className='w-6 h-6 mr-2'/>
-    <span>Logout</span>
-  </div>
+        <Divider />
+        <MenuItem onClick={handleClose} className="hover:bg-gray-100 px-4 py-2 flex items-center">
+          <HelpOutlineIcon className="w-6 h-6 mr-2 text-gray-700" />
+          <span className="text-gray-700">Help</span>
         </MenuItem>
-     
+        <Divider />
+        <MenuItem onClick={handleClose} className="hover:bg-gray-100 px-4 py-2 flex items-center">
+          <LogoutIcon className="w-6 h-6 mr-2 text-gray-700" />
+          <span className="text-gray-700">Logout</span>
+        </MenuItem>
       </Menu>
      </div>
   );
