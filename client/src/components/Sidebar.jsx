@@ -20,6 +20,8 @@ import AppBar from '@mui/material/AppBar';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import Profile from './Profile';
+import SearchIcon from '@mui/icons-material/Search';
+
 
 
 const drawerWidth = 240;
@@ -77,9 +79,12 @@ export default function SideBar() {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography variant="h6" noWrap component="div">
-            Library Management
-                  </Typography>
+                  {/* Search input */}
+                  <div className=' flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500'>
+                      <input type="text" placeholder="Search....." className="px-3 py-1  text-neutral-900 border-none min-w-[350px] focus:outline-none  bg-transparent " />
+                      <SearchIcon className='w-6 h-6 text-neutral-900'/>
+                  </div>
+                  
              <Profile/>
         </Toolbar>
       </AppBarContainer>
