@@ -1,53 +1,79 @@
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+
 import Avatar from '@mui/material/Avatar';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Divider from '@mui/material/Divider';
 
 function Profile() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+ 
 
   return (
-    <div className="relative ml-auto">
+    <div className="relative ml-auto ">
       <button
-        className="flex items-center justify-center py-2 px-3 border rounded-2xl  shadow-md"
-        onClick={toggleDropdown}
-      >
-        <div className="flex items-center space-x-2">
-          {/* Avatar */}
-          <Avatar alt="Profile Avatar" src="/Avatar.png" />
-          {/* Username */}
-          <div className="text-sm font-semibold">John Doe</div>
-        </div>
-        {/* Dropdown icon */}
-        <ChevronDown className="ml-2" />
-      </button>
-
-      {/* Dropdown menu */}
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-48  rounded-md shadow-lg border border-neutral-200">
-          <div className="py-1">
-                      {/* Profile option */}
-            <button className="block w-full text-left px-4 py-2 text-sm text-neutral-900 hover:text-primary-500">
-             <span> <PersonOutlineIcon className='w-6 h-6'/></span> Profile
-            </button>
-            {/* Help option */}
-            <button className="block w-full text-left px-4 py-2 text-sm text-neutral-900 hover:text-primary-500">
-             <span>< HelpOutlineIcon className='w-6 h-6' /></span> Help
-            </button>
-            {/* Logout option */}
-            <button className="block w-full text-left px-4 py-2 text-sm text-neutral-900 hover:text-primary-500">
-             <span>< LogoutIcon className='w-6 h-6' /></span> Logout
-            </button>
+        aria-controls="basic-menu"
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        className="flex items-center justify-center  ring-2 px-2 py-4 focus:ring-opacity-40 "
+        onClick={handleClick }
+      ><div className='flex items-center justify-center px-3'>
+          <div className='p-1 rounded-full  '>
+            <Avatar className='w-6 h-6'>
+            
+            </Avatar>
           </div>
+          <div className='flex flex-col justify-start'>
+             <div className='text-sm font-[inter] font-semibold'>
+              Jhone Doe
+            </div>
+              <div className='text-slate-100 text-left'>Student </div>
+         </div>
         </div>
-      )}
-    </div>
+      </button>
+         <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+ <div className='mx-2 px-2 '>
+    <MenuItem onClick={handleClose} className="hover:bg-gray-200 mx-2">
+        
+          <span>  <PersonOutlineIcon className='w-4 h-4 mr-2' /></span>
+               <span className='text-center'>Profile</span>
+      </MenuItem>
+</div>
+        <Divider/>
+<MenuItem onClick={handleClose} className="hover:bg-gray-200">
+  <div className='flex items-center'>
+    <HelpOutlineIcon className='w-6 h-6 mr-2'/>
+    <span>Help</span>
+  </div>
+        </MenuItem>
+        <Divider/>
+<MenuItem onClick={handleClose} className="hover:bg-gray-200">
+  <div className='flex items-center'>
+    <LogoutIcon className='w-6 h-6 mr-2'/>
+    <span>Logout</span>
+  </div>
+        </MenuItem>
+     
+      </Menu>
+     </div>
   );
 }
 
