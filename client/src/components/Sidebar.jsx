@@ -115,7 +115,7 @@ export default function SideBar({ children }) {
           <Divider />
           <List>
             <Link to="/">
-              <ListItem disablePadding>
+              <ListItem disablePadding className='hover:border-l-2 hover:border-yellow-600'>
                 <ListItemButton>
                   <ListItemIcon>
                     <DashboardIcon />
@@ -125,7 +125,7 @@ export default function SideBar({ children }) {
               </ListItem>
             </Link>
             <Link to="/admission">
-              <ListItem disablePadding>
+              <ListItem disablePadding className='hover:border-l-2 hover:border-red-600'>
                 <ListItemButton>
                   <ListItemIcon>
                     <LibraryBooksIcon />
@@ -134,7 +134,7 @@ export default function SideBar({ children }) {
                 </ListItemButton>
               </ListItem></Link>
             <Link to="/student-detail">
-              <ListItem disablePadding>
+              <ListItem disablePadding className='hover:border-l-2 hover:border-blue-600'>
                 <ListItemButton>
                   <ListItemIcon>
                     < BookUser />
@@ -144,7 +144,7 @@ export default function SideBar({ children }) {
               </ListItem>
             </Link>
             <Link to="/email">
-              <ListItem disablePadding>
+              <ListItem disablePadding className='hover:border-l-2 hover:border-green-600'>
                 <ListItemButton>
                   <ListItemIcon>
                     <Mail />
@@ -175,7 +175,7 @@ export default function SideBar({ children }) {
           <DrawerHeader />
           <div>{children}</div>
         </Box>
-      </Box>
+      </Box >
     </>
   );
 }
