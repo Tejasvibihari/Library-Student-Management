@@ -159,10 +159,11 @@ export default function SideBar({ children }) {
 
         </Drawer>
         <Box
+          className='bg-gray-50'
           component="main"
           sx={{
             flexGrow: 1,
-            bgcolor: 'background.default',
+            // bgcolor: 'background.default',
             p: 3,
             transition: theme.transitions.create('margin', {
               easing: theme.transitions.easing.sharp,
@@ -172,7 +173,7 @@ export default function SideBar({ children }) {
           }}
         >
           <DrawerHeader />
-          <Typography paragraph>{children}</Typography>
+          <div>{children}</div>
         </Box>
       </Box>
     </>
