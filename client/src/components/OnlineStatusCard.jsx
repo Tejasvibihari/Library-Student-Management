@@ -37,12 +37,12 @@ export default function OnlineStatusCard() {
     }));
     return (
         <>
-            <div className='w-full border shadow-sm'>
+            <div className='w-full rounded-md shadow-sm bg-white h-[37rem] overflow-auto'>
                 <div>
                     <div className='flex justify-between items-center p-3 border-b'>
                         <h1 className='text-lg font-semibold border-l-4 pl-1 border-green-800 font-[inter]'>Online Student</h1>
                     </div>
-                    <div className='p-3 border-b'>
+                    <div className='p-3 border-b hover:bg-gray-50 hover:border-l-2 hover:border-l-green-500'>
                         <div className='flex items-center'>
                             <div>
                                 <StyledBadge

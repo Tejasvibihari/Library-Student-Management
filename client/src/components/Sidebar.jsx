@@ -124,7 +124,7 @@ export default function SideBar({ children }) {
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to="/admission">
+            <Link to="/student-admission">
               <ListItem disablePadding className='hover:border-l-2 hover:border-red-600'>
                 <ListItemButton>
                   <ListItemIcon>
