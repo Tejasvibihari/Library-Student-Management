@@ -60,62 +60,62 @@ export default function SideBar({ children }) {
   }, [isMobile]);
 
   return (
-    <> 
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBarContainer position="fixed" isMobile={isMobile} open={open}>
-        <Toolbar>
-          
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerOpen}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-          {/* Search input */}
-          <div className="flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
-            <input
-              type="text"
-              placeholder="Search....."
-              className="px-3 py-1 text-neutral-900 border-none min-w-[350px] focus:outline-none bg-transparent"
-            />
-            <SearchIcon className="w-6 h-6 text-neutral-900" />
-          </div>
-          <Profile />
-        </Toolbar>
-      </AppBarContainer>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
+    <>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBarContainer position="fixed" isMobile={isMobile} open={open}>
+          <Toolbar>
+
+            {isMobile && (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerOpen}
+                sx={{ mr: 2 }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
+            {/* Search input */}
+            <div className="flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
+              <input
+                type="text"
+                placeholder="Search....."
+                className="px-3 py-1 text-neutral-900 border-none min-w-[350px] focus:outline-none bg-transparent"
+              />
+              <SearchIcon className="w-6 h-6 text-neutral-900" />
+            </div>
+            <Profile />
+          </Toolbar>
+        </AppBarContainer>
+        <Drawer
+          sx={{
             width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant={isMobile ? 'temporary' : 'permanent'}
-        anchor="left"
-        open={open}
-        onClose={handleDrawerClose}
-      >
-        
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant={isMobile ? 'temporary' : 'permanent'}
+          anchor="left"
+          open={open}
+          onClose={handleDrawerClose}
+        >
+
           <DrawerHeader className='w-full px-2'>
-         
+
             <p> Library Management</p>
-           
-               <IconButton onClick={handleDrawerClose}>
+
+            <IconButton onClick={handleDrawerClose}>
               <ChevronLeftIcon />
             </IconButton>
-            </DrawerHeader>
-            <Divider />
-            <List>
+          </DrawerHeader>
+          <Divider />
+          <List>
             <Link to="/">
-             <ListItem disablePadding>
+              <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     <DashboardIcon />
@@ -125,7 +125,7 @@ export default function SideBar({ children }) {
               </ListItem>
             </Link>
             <Link to="/admission">
-            <ListItem disablePadding>
+              <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     <LibraryBooksIcon />
@@ -134,7 +134,7 @@ export default function SideBar({ children }) {
                 </ListItemButton>
               </ListItem></Link>
             <Link to="/student-detail">
-                <ListItem disablePadding>
+              <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     < BookUser />
@@ -142,39 +142,39 @@ export default function SideBar({ children }) {
                   <ListItemText primary="Student Detail" />
                 </ListItemButton>
               </ListItem>
-              </Link>
-            <Link to="/announcement">
-               <ListItem disablePadding>
+            </Link>
+            <Link to="/email">
+              <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     <Mail />
                   </ListItemIcon>
-                  <ListItemText primary="Announcement" />
+                  <ListItemText primary="Email" />
                 </ListItemButton>
               </ListItem>
             </Link>
-            
-            </List>
-      
-        
-      </Drawer>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          bgcolor: 'background.default',
-          p: 3,
-          transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
-       
-        }}
-      >
-        <DrawerHeader />
-        <Typography paragraph>{children}</Typography>
+
+          </List>
+
+
+        </Drawer>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: 'background.default',
+            p: 3,
+            transition: theme.transitions.create('margin', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
+
+          }}
+        >
+          <DrawerHeader />
+          <Typography paragraph>{children}</Typography>
+        </Box>
       </Box>
-      </Box>
-      </>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ResetPasswordForm from './components/adminAuth/AdminResetPasswordForm'
 import VerifyPasswordForm from './components/adminAuth/AdminVerifyPasswordForm'
 import Home from './pages/Home'
+import Email from './pages/Email'
 
 
 
@@ -19,7 +20,11 @@ export default function App() {
           <Route path="/resetpassword" element={<ResetPasswordForm />} />
           <Route path="/verifypassword" element={<VerifyPasswordForm />} />
           {/* Admin Authentication End */}
+          {/* Sidebar menu Start  */}
           <Route path="/" element={<Home />} />
+          <Route path="/email" element={<Email />} />
+          {/* Sidebar menu End */}
+
 
         </Routes>
       </BrowserRouter>
