@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 
 import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
@@ -25,8 +26,9 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+
 app.use('/uploads', express.static('uploads'));
 
 app.get("/", (req, res) => {

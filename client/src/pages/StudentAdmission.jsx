@@ -6,13 +6,10 @@ export default function StudentAdmission() {
     return (
         <>
             <SideBar>
-                <div className='grid grid-cols-3 gap-4'>
-                    <div className='col-span-2'>
-                        <StudentAdmissionForm />
-                    </div>
-                    <div>
-                        Hello
-                    </div>
+                <div>
+
+                    <StudentAdmissionForm />
+
                 </div>
             </SideBar>
         </>

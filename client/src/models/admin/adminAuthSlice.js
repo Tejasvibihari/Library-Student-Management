@@ -4,8 +4,8 @@ const initialState = {
     loading: false,
     error: null,
     token: null,
-    isAuthenticated: !!tokenFromStorage,
-    currentAdmin: null
+    isAuthenticated: false,
+    currentAdmin: null,
 }
 
 export const adminSlice = createSlice({
@@ -31,7 +31,7 @@ export const adminSlice = createSlice({
         },
         signInSuccess: (state, action) => {
             state.loading = false;
-            state.currentAdmin = action.payload.admin;
+            state.currentAdmin = action.payload;
             state.isAuthenticated = true;
             state.token = action.payload.token;
 

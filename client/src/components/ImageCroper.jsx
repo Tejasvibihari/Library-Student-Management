@@ -7,16 +7,16 @@ import setCanvasPreview from "./setCanvasPreview"; // Assume this function exist
 const ASPECT_RATIO = 1;
 const MIN_WIDTH = 200;
 
-export default function ImageCroper({ onImageCrop }) {
+export default function ImageCroper({ onImageCrop, closecroper }) {
     const imgRef = useRef(null);
     const previewCanvasRef = useRef(null);
     const [imgSrc, setImageSrc] = useState('');
     const [crop, setCrop] = useState(null);
 
-    const handleCroppedImage = (imageDataUrl) => {
-        setCroppedImage(imageDataUrl);
-        console.log("Received cropped image:", imageDataUrl);
-    };
+    // const handleCroppedImage = (imageDataUrl) => {
+    //     setCroppedImage(imageDataUrl);
+    //     console.log("Received cropped image:", imageDataUrl);
+    // };
 
     const onSelectFile = (e) => {
         const file = e.target.files?.[0];
@@ -52,6 +52,7 @@ export default function ImageCroper({ onImageCrop }) {
 
             const dataUrl = canvas.toDataURL();
             onImageCrop(dataUrl);
+            closecroper()
         }
     };
 

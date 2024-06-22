@@ -14,8 +14,6 @@ export default function SigninForm() {
     const loading = useSelector(state => state.admin.loading)
     const error = useSelector(state => state.admin.error)
     const navigate = useNavigate()
-
-    console.log(error)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)

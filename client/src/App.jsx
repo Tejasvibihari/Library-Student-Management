@@ -7,6 +7,9 @@ import Home from './pages/Home'
 import Email from './pages/Email'
 import EmailEditor from './components/EmailEditor'
 import StudentAdmission from './pages/StudentAdmission'
+import ProtectedRoute from './pages/AdminProtectedRoute'
+import AdminProtectedRoute from './pages/AdminProtectedRoute'
+import StudentId from './pages/StudentId'
 
 
 
@@ -23,10 +26,17 @@ export default function App() {
           <Route path="/verifypassword" element={<VerifyPasswordForm />} />
           {/* Admin Authentication End */}
           {/* Sidebar menu Start  */}
-          <Route path="/" element={<Home />} />
-          <Route path="/student-admission" element={<StudentAdmission />} />
-          <Route path="/email" element={<Email />} />
-          <Route path="/sendemail" element={<EmailEditor />} />
+          <Route element={<AdminProtectedRoute />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/student-admission" element={<StudentAdmission />} />
+            <Route path="/email" element={<Email />} />
+            <Route path="/sendemail" element={<EmailEditor />} />
+          </Route>
+          <Route element={<AdminProtectedRoute />}>
+            <Route path="/studentId" element={<StudentId />} />
+          </Route>
+
+
           {/* Sidebar menu End */}
 
 

@@ -49,31 +49,13 @@ const StudentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    shift: {
-        fromHour: {
-            type: Number,
-            required: true
-        },
-        fromMinute: {
-            type: Number,
-            required: true
-        },
-        fromPeriod: {
-            type: String,
-            required: true
-        },
-        toHour: {
-            type: Number,
-            required: true
-        },
-        toMinute: {
-            type: Number,
-            required: true
-        },
-        toPeriod: {
-            type: String,
-            required: true
-        }
+    shiftFrom: {
+        type: String,
+        required: true
+    },
+    shiftTo: {
+        type: String,
+        required: true
     },
     pincode: {
         type: Number,

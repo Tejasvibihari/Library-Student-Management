@@ -2,10 +2,15 @@ import Student from '../models/studentModel.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { sendMail } from '../utils/mailer.js';
+import fs from 'fs';
+import path from 'path';
 
 export const createStudent = async (req, res) => {
-    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shift, pincode, village, block, district, image, admin } = req.body;
+    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin } = req.body;
+
     try {
+        const imageBuffer = Buffer.from(image.split(",")[1], 'base64');
+
         const password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4))
 
         const existingStudent = await Student.findOne({ email })
@@ -22,11 +27,15 @@ export const createStudent = async (req, res) => {
         } else {
             newSid = lastStudent[0].sid + 1
         }
+        // Generate a unique filename for the image
+        const imageFilename = `${newSid}.jpeg`;
+        // Write the image to a file
+        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
         const createStudent = await Student.create({
             sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
-            gender, preparingFor, admissionDate, shift, pincode, village, block, district,
-            image, admin
+            gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district,
+            image: imageFilename, admin
         })
         sendMail({
             to: email,
