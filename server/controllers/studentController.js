@@ -50,6 +50,51 @@ export const createStudent = async (req, res) => {
     }
 }
 
+// Login Student 
+export const StudentLogin = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await Student.findOne({ email });
+
+        if (user && user.password === password) {
+            user.isOnline = true;
+            await user.save();
+            res.status(200).json(user);
+        } else {
+            res.status(401).json({ message: 'Invalid credentials' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+// LogOut Student 
+export const StudentLogOut = async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+        const user = await Student.findById(userId);
+        if (user) {
+            user.isOnline = false;
+            await user.save();
+            res.status(200).json({ message: 'User logged out' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+// Get online users
+export const getOnlineUser = async (req, res) => {
+    try {
+        const onlineUsers = await Student.find({ isOnline: true });
+        res.status(200).json(onlineUsers);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 // Update Student Detail
 
 export const updateStudent = async (req, res) => {

@@ -80,7 +80,9 @@ const StudentSchema = new mongoose.Schema({
     admin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin',
-    }
+    },
+    isOnline: { type: Boolean, default: false },
+
 });
 
 const Student = mongoose.model('Student', StudentSchema);
