@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-
+import socketIo from ('socket.io');
 import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
 
@@ -17,6 +17,13 @@ const port = 3000;
 mongoose.connect("mongodb://localhost:27017/studentLibrary")
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => console.error(`Could not connect to MongoDB... + ${err}`));
+
+const io = socketIo(server, {
+    cors: {
+        origin: "*", // Adjust as needed for security
+        methods: ["GET", "POST"]
+    }
+});
 
 app.use(cors({
     // origin: 'https://bihari-traders.vercel.app',
@@ -37,6 +44,10 @@ app.get("/", (req, res) => {
 
 app.use('/api/admin/auth/', adminRouter);
 app.use('/api/student/', studentRouter);
+
+
+
+
 
 app.listen(port, (req, res) => {
     console.log(`Connected to PORT ${port}...`)

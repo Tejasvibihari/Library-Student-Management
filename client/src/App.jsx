@@ -10,6 +10,7 @@ import StudentAdmission from './pages/StudentAdmission'
 import ProtectedRoute from './pages/AdminProtectedRoute'
 import AdminProtectedRoute from './pages/AdminProtectedRoute'
 import StudentId from './pages/StudentId'
+import StudentDetail from './pages/StudentDetail'
 
 
 
@@ -25,13 +26,17 @@ export default function App() {
           <Route path="/resetpassword" element={<ResetPasswordForm />} />
           <Route path="/verifypassword" element={<VerifyPasswordForm />} />
           {/* Admin Authentication End */}
+
+
           {/* Sidebar menu Start  */}
           <Route element={<AdminProtectedRoute />}>
             <Route path="/" element={<Home />} />
             <Route path="/student-admission" element={<StudentAdmission />} />
             <Route path="/email" element={<Email />} />
             <Route path="/sendemail" element={<EmailEditor />} />
+            <Route path="/student-detail" element={<StudentDetail />} />
           </Route>
+
           <Route element={<AdminProtectedRoute />}>
             <Route path="/studentId" element={<StudentId />} />
           </Route>

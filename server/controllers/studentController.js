@@ -86,7 +86,7 @@ export const StudentLogOut = async (req, res) => {
     }
 }
 // Get online users
-export const getOnlineUser = async (req, res) => {
+export const GetOnlineStudent = async (req, res) => {
     try {
         const onlineUsers = await Student.find({ isOnline: true });
         res.status(200).json(onlineUsers);
