@@ -75,13 +75,23 @@ const StudentSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        required: true
+        // required: true
     },
     admin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin',
     },
     isOnline: { type: Boolean, default: false },
+    lastPayment: {
+        type: Date,
+    },
+    paymentDate: {
+        type: Date,
+    },
+    status: {
+        type: String,
+        default: "Pending"
+    },
 
 });
 

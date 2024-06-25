@@ -2,10 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import socketIo from ('socket.io');
 import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
-
+import './utils/scheduler/PaymentStatus.js'
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -18,12 +17,6 @@ mongoose.connect("mongodb://localhost:27017/studentLibrary")
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => console.error(`Could not connect to MongoDB... + ${err}`));
 
-const io = socketIo(server, {
-    cors: {
-        origin: "*", // Adjust as needed for security
-        methods: ["GET", "POST"]
-    }
-});
 
 app.use(cors({
     // origin: 'https://bihari-traders.vercel.app',

@@ -11,6 +11,7 @@ import ProtectedRoute from './pages/AdminProtectedRoute'
 import AdminProtectedRoute from './pages/AdminProtectedRoute'
 import StudentId from './pages/StudentId'
 import StudentDetail from './pages/StudentDetail'
+import StudentUpdate from './pages/StudentUpdate'
 
 
 
@@ -32,6 +33,7 @@ export default function App() {
           <Route element={<AdminProtectedRoute />}>
             <Route path="/" element={<Home />} />
             <Route path="/student-admission" element={<StudentAdmission />} />
+            <Route path="/student-update" element={<StudentUpdate />} />
             <Route path="/email" element={<Email />} />
             <Route path="/sendemail" element={<EmailEditor />} />
             <Route path="/student-detail" element={<StudentDetail />} />

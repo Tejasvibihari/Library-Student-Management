@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 export const createStudent = async (req, res) => {
-    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin } = req.body;
+    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin, lastPayment } = req.body;
 
     try {
         const imageBuffer = Buffer.from(image.split(",")[1], 'base64');
@@ -35,7 +35,7 @@ export const createStudent = async (req, res) => {
         const createStudent = await Student.create({
             sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
             gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district,
-            image: imageFilename, admin
+            image: imageFilename, admin, lastPayment
         })
         sendMail({
             to: email,
@@ -50,6 +50,15 @@ export const createStudent = async (req, res) => {
     }
 }
 
+export const GetAllStudent = async (req, res) => {
+    const adminId = req.query.admin
+    try {
+        const student = await Student.find({ admin: adminId })
+        res.status(200).json(student)
+    } catch (error) {
+        console.log(error)
+    }
+}
 // Login Student 
 export const StudentLogin = async (req, res) => {
     const { email, password } = req.body;

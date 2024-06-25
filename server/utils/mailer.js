@@ -22,7 +22,7 @@ export const sendMail = async ({ to, subject, body }) => {
         }
 
         const info = await transporter.sendMail(emailFormat)
-        console.log(info)
+        console.log(info.messageId)
 
     } catch (error) {
         console.log(error)

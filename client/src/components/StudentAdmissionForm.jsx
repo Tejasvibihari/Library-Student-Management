@@ -238,9 +238,9 @@ export default function StudentAdmissionForm() {
                                     <label htmlFor="aadhar">Gender</label>
                                     <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
                                         <option value="" disabled selected>Select One</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="prefer-not-to-say">Prefer Not To Say</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Not to Say">Prefer Not To Say</option>
                                     </select>
                                 </div>
                             </div>
@@ -266,71 +266,12 @@ export default function StudentAdmissionForm() {
                                         <label htmlFor="fromHour">From</label>
                                         <div className='flex gap-2'>
                                             <input type='time' value={shiftFrom} onChange={(e) => setShiftFrom(e.target.value)} className="p-2 border rounded-md w-full" />
-                                            {/* <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="fromHour"
-                                                placeholder="Hour"
-                                                value={fromHour}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setFromHour(e.target.value)
-                                                }}
-                                            />
-                                            <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="fromMinute"
-                                                placeholder="Minute"
-                                                value={fromMinute}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setFromMinute(e.target.value)
-                                                }}
-                                            /> */}
-                                            {/* <select required className='p-2 border rounded-md' value={fromamPm} onChange={(e) => setFromAmPm(e.target.value)} style={{ width: '180px' }} >
-                                                <option value="" disabled>AM/PM</option>
-                                                <option value="am">AM</option>
-                                                <option value="pm">PM</option>
-                                            </select> */}
                                         </div>
                                     </div>
                                     <div className='flex flex-col'>
                                         <label htmlFor="toHour">To</label>
                                         <div className='flex gap-2'>
                                             <input type='time' value={shiftTo} onChange={(e) => setShiftTo(e.target.value)} className="p-2 border rounded-md w-full" />
-
-                                            {/* <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="toHour"
-                                                placeholder="Hour"
-                                                value={toHour}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setToHour(e.target.value)
-                                                }}
-                                            />
-                                            <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="fromMinute"
-                                                placeholder="Minute"
-                                                value={toMinute}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setToMinute(e.target.value)
-                                                }}
-                                            />
-                                            <select required className='p-2 border rounded-md' value={toamPm} onChange={(e) => setToAmPm(e.target.value)} style={{ width: '180px' }} >
-                                                <option value="" disabled>AM/PM</option>
-                                                <option value="am">AM</option>
-                                                <option value="pm">PM</option>
-                                            </select> */}
                                         </div>
                                     </div>
                                 </div>
