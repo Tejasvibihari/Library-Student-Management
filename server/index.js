@@ -4,6 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
+import mailRouter from './router/mailRouter.js'
 import './utils/scheduler/PaymentStatus.js'
 import dotenv from 'dotenv';
 
@@ -37,6 +38,7 @@ app.get("/", (req, res) => {
 
 app.use('/api/admin/auth/', adminRouter);
 app.use('/api/student/', studentRouter);
+app.use('/api/mail/', mailRouter);
 
 
 

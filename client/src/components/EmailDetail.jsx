@@ -4,15 +4,17 @@ import Avatar from '@mui/material/Avatar';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Make sure to install axios
 import client from '../services/axiosClient';
+import { useSelector } from 'react-redux';
 
 
 export default function EmailDetail() {
     const [emailDetails, setEmailDetails] = useState(null);
-
+    const adminId = useSelector(state => state.admin.currentAdmin._id)
+    console.log(adminId)
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await client.get('/api/mail/getemail'); // Adjust the URL as needed
+                const response = await client.get('/api/mail/getmail', { params: { adminId } }); // Adjust the URL as needed
                 setEmailDetails(response.data);
                 console.log(response)
             } catch (error) {

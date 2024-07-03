@@ -126,18 +126,50 @@ export const GetOnlineStudent = async (req, res) => {
 };
 
 // Update Student Detail
-
 export const updateStudent = async (req, res) => {
-    const { sid } = req.params;
-    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shift, pincode, village, block, district, image, admin } = req.body;
-    try {
-        const student = await Student.findById(sid);
-        if (!student) {
-            return res.status(404).json({ message: "No student found with this ID" });
-        }
+    const {
+        sid,
+        name,
+        email,
+        mobile,
+        aadhar,
+        father,
+        guardian,
+        gender,
+        preparingFor,
+        dob,
+        admissionDate,
+        shiftFrom,
+        shiftTo,
+        pincode,
+        village,
+        block,
+        district,
+        instagram,
+        facebook,
+        youtube,
+        status,
+        lastPayment,
+        paymentAmount,
+        paymentMode,
+        image,
+        admin
+    } = req.body;
 
+    try {
+        const imageBuffer = Buffer.from(image.split(",")[1], 'base64');
+
+        // Assuming 'sid' or 'email' can uniquely identify a student
+        const student = await Student.findOne({ $or: [{ sid }, { email }] });
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+        // Generate a unique filename for the image
+        const imageFilename = `${sid}.jpeg`;
+        // Write the image to a file
+        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+        // Update student details
         student.name = name;
-        student.dob = dob;
         student.email = email;
         student.mobile = mobile;
         student.aadhar = aadhar;
@@ -145,20 +177,29 @@ export const updateStudent = async (req, res) => {
         student.guardian = guardian;
         student.gender = gender;
         student.preparingFor = preparingFor;
+        student.dob = dob;
         student.admissionDate = admissionDate;
-        student.shift = shift;
+        student.shiftFrom = shiftFrom;
+        student.shiftTo = shiftTo;
         student.pincode = pincode;
         student.village = village;
         student.block = block;
         student.district = district;
-        student.image = image;
+        student.instagram = instagram;
+        student.facebook = facebook;
+        student.youtube = youtube;
+        student.status = status;
+        student.lastPayment = lastPayment;
+        student.paymentAmount = paymentAmount;
+        student.paymentMode = paymentMode;
+        student.image = imageFilename;
         student.admin = admin;
 
         await student.save();
 
-        return res.status(200).json({ message: "Student details updated successfully" });
-
+        res.status(200).json({ message: "Student details updated successfully" });
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while updating the student details", error: error.message });
     }
-}
+};

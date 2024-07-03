@@ -223,7 +223,7 @@ export default function StudentUpdateForm() {
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
                 <Alert
                     onClose={handleSnackClose}
-                    severity={alertStatus === "Student updated successfully" ? "success" : "error"}
+                    severity={alertStatus === "Student details updated successfully" ? "success" : "error"}
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
