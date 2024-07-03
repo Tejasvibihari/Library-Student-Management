@@ -68,6 +68,18 @@ export const GetAllStudent = async (req, res) => {
         res.status(500).json({ message: 'An error occurred', error });
     }
 };
+export const GetStudent = async (req, res) => {
+    const { _id } = req.query;
+    try {
+        // Use the constructed query object to filter data
+        const students = await Student.findOne({ _id });
+        res.status(200).json(students);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred', error });
+    }
+};
+
 // Login Student 
 export const StudentLogin = async (req, res) => {
     const { email, password } = req.body;
