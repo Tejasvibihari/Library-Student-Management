@@ -26,8 +26,8 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json({ limit: '50mb' })); // For JSON requests
+app.use(express.urlencoded({ limit: '50mb', extended: true })); // For URL-encoded requests
 
 app.use('/uploads', express.static('uploads'));
 

@@ -49,16 +49,25 @@ export const createStudent = async (req, res) => {
         console.log(error)
     }
 }
-
 export const GetAllStudent = async (req, res) => {
-    const adminId = req.query.admin
+    const { sid, name, admin, status } = req.query;
+    console.log(status)
+    // Construct a dynamic query object
+    let query = {};
+    if (admin) query.admin = admin;
+    if (sid) query.sid = sid;
+    if (name) query.name = name;
+    if (status) query.status = status;
+
     try {
-        const student = await Student.find({ admin: adminId })
-        res.status(200).json(student)
+        // Use the constructed query object to filter data
+        const students = await Student.find(query);
+        res.status(200).json(students);
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred', error });
     }
-}
+};
 // Login Student 
 export const StudentLogin = async (req, res) => {
     const { email, password } = req.body;

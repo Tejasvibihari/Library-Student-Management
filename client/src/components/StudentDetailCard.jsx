@@ -1,15 +1,13 @@
-import { Instagram, } from 'lucide-react';
+import { CrossIcon, Instagram, } from 'lucide-react';
 import { Youtube } from 'lucide-react';
 import { Facebook } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { UserCog } from 'lucide-react';
-
+import ReportIcon from '@mui/icons-material/Report';
+import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
-export default function StudentDetailTable({ sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shiftFrom, shiftTo, dob, aadhar, village, block, dist, pincode, lastPayment }) {
-
-
-    // Output: 24/June/2023
+export default function StudentDetailCard({ studentId, sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shiftFrom, shiftTo, dob, aadhar, village, block, dist, pincode, lastPayment }) {
 
 
     return (
@@ -27,10 +25,10 @@ export default function StudentDetailTable({ sid, src, status, facebookLink, ins
                                 <span className='font-semibold font-[inter] text-sm leading-6'>Last Payment:- <span className='font-normal text-gray-100'>{formatDate(lastPayment)}</span></span>
                             </div>
                             <div className='mt-4'>
-                                <div className='border rounded-full p-1 text-center border-green-600 bg-green-800 flex items-center justify-center '>
+                                <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                     {status}
                                     <span className='ml-2 mr-2'>
-                                        <DoneIcon />
+                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}
                                     </span>
                                 </div>
                             </div>
@@ -129,7 +127,7 @@ export default function StudentDetailTable({ sid, src, status, facebookLink, ins
                     {/* Presonal detail end Here   */}
                     <div className='flex justify-end mt-2'>
                         <div className='mx-1'>
-                            <Link to="/student-update">
+                            <Link to={`/student-update/${studentId}`}>
                                 <button className='p-2 w-full  rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
                                     <UserCog size={17} className='mr-2' />Update Student
                                 </button>
@@ -144,7 +142,7 @@ export default function StudentDetailTable({ sid, src, status, facebookLink, ins
                     </div>
                 </div>
 
-            </div>
+            </div >
         </>
     )
 }

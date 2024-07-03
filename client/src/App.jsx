@@ -12,6 +12,8 @@ import AdminProtectedRoute from './pages/AdminProtectedRoute'
 import StudentId from './pages/StudentId'
 import StudentDetail from './pages/StudentDetail'
 import StudentUpdate from './pages/StudentUpdate'
+import MakePayment from './pages/MakePayment'
+import IndividualPayment from './pages/IndividualPayment'
 
 
 
@@ -33,10 +35,12 @@ export default function App() {
           <Route element={<AdminProtectedRoute />}>
             <Route path="/" element={<Home />} />
             <Route path="/student-admission" element={<StudentAdmission />} />
-            <Route path="/student-update" element={<StudentUpdate />} />
+            <Route path="/student-update/:_id" element={<StudentUpdate />} />
             <Route path="/email" element={<Email />} />
             <Route path="/sendemail" element={<EmailEditor />} />
             <Route path="/student-detail" element={<StudentDetail />} />
+            <Route path="/make-payment" element={<MakePayment />} />
+            <Route path="/make-payment/:_id" element={<IndividualPayment />} />
           </Route>
 
           <Route element={<AdminProtectedRoute />}>

@@ -22,7 +22,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { Link } from 'react-router-dom';
-
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 const drawerWidth = 240;
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -150,6 +150,16 @@ export default function SideBar({ children }) {
                     <Mail />
                   </ListItemIcon>
                   <ListItemText primary="Email" />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to="/make-payment">
+              <ListItem disablePadding className='hover:border-l-2 hover:border-green-600'>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <CurrencyRupeeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Make Payment" />
                 </ListItemButton>
               </ListItem>
             </Link>

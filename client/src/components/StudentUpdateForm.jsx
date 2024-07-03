@@ -15,7 +15,8 @@ import CircularLoading from './ui/CircularLoading';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import StudentIdCard from './StudentIdCard';
-
+import { useParams } from 'react-router-dom';
+import InstagramIcon from '@mui/icons-material/Instagram';
 
 
 
@@ -26,13 +27,20 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function StudentUpdateForm() {
     const userId = useSelector(state => state.admin.currentAdmin)
+
     const [addressArray, setAddressArray] = useState([])
     const [open, setOpen] = React.useState(false);
     const [loading, setLoading] = useState(false);
     const [snackOpen, setSnackOpen] = React.useState(false);
     const [alertStatus, setAlertStatus] = useState('')
+    const [form, setForm] = useState('')
+
+
+
+    const { _id } = useParams()
 
     // Form State 
+    const [sid, setSid] = useState('')
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
@@ -43,22 +51,21 @@ export default function StudentUpdateForm() {
     const [preparingFor, setPreparingFor] = useState("");
     const [dob, setDob] = useState("");
     const [admissionDate, setAdmissionDate] = useState("");
-    // const [fromHour, setFromHour] = useState("");
-    // const [fromMinute, setFromMinute] = useState("");
-    // const [fromamPm, setFromAmPm] = useState("");
-    // const [toHour, setToHour] = useState("");
-    // const [toMinute, setToMinute] = useState("");
-    // const [toamPm, setToAmPm] = useState("");
     const [shiftFrom, setShiftFrom] = useState("");
     const [shiftTo, setShiftTo] = useState("");
-
     const [pincode, setPincode] = useState("");
     const [village, setVillage] = useState("");
     const [block, setBlock] = useState("");
     const [district, setDistrict] = useState("");
     const [croppedImage, setCroppedImage] = useState(null);
+    const [instagram, setInstagram] = useState("")
+    const [facebook, setFacebook] = useState("")
+    const [youtube, setYoutube] = useState("")
+    const [status, setStatus] = useState('')
+    const [lastPayment, setLastPayment] = useState('')
+    const [paymentAmount, setPaymentAmount] = useState('')
+    const [paymentMode, setPaymentMode] = useState('')
     const [formData, setFormData] = useState({})
-    console.log(croppedImage)
 
     // Alert Snackbar 
     const handleSnackOpen = () => {
@@ -72,6 +79,8 @@ export default function StudentUpdateForm() {
 
         setSnackOpen(false);
     };
+    // Store The Croped Image to State 
+
     const handleCroppedImage = (imageDataUrl) => {
         setCroppedImage(imageDataUrl);
         console.log("Received cropped image:", imageDataUrl);
@@ -83,7 +92,7 @@ export default function StudentUpdateForm() {
     const handleClose = () => {
         setOpen(false);
     };
-
+    // Get Address With Pin Code 
     const handleOnBlur = async () => {
         try {
             const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`)
@@ -100,8 +109,54 @@ export default function StudentUpdateForm() {
     }, []);
 
     useEffect(() => {
+        const getStudent = async () => {
+            try {
+                const response = await client.get("/api/student/getstudent", {
+                    params: { admin: userId._id, _id }
+                })
+
+                setSid(response.data.sid)
+                setName(response.data.name)
+                setEmail(response.data.email)
+                setMobile(response.data.mobile)
+                setAadhar(response.data.aadhar)
+                setFather(response.data.father)
+                setGuardian(response.data.guardian)
+                setGender(response.data.gender)
+                setPreparingFor(response.data.preparingFor)
+                setShiftFrom(response.data.shiftFrom)
+                setShiftTo(response.data.shiftTo)
+                setPincode(response.data.pincode)
+                setVillage(response.data.village)
+                setBlock(response.data.block)
+                setDistrict(response.data.district)
+                setCroppedImage(response.data.image)
+                setStatus(response.data.status)
+                setPaymentAmount(response.data.paymentAmount)
+                setPaymentMode(response.data.paymentMode)
+                setInstagram(response.data.instagram)
+                setFacebook(response.data.facebook)
+                setYoutube(response.data.youtube)
+
+
+                const formattedDob = new Date(response.data.dob).toISOString().split('T')[0];
+                const formattedAddmissionDate = new Date(response.data.admissionDate).toISOString().split('T')[0];
+                const formattedLastPayment = new Date(response.data.lastPayment).toISOString().split('T')[0];
+                setDob(formattedDob);
+                setAdmissionDate(formattedAddmissionDate)
+                setLastPayment(formattedLastPayment)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getStudent()
+
+    }, [userId._id, _id])
+
+    useEffect(() => {
         const handleChange = () => {
             setFormData({
+                sid,
                 name,
                 email,
                 mobile,
@@ -112,65 +167,41 @@ export default function StudentUpdateForm() {
                 preparingFor,
                 dob,
                 admissionDate,
-                // fromHour,
-                // fromMinute,
-                // fromamPm,
-                // toHour,
-                // toMinute,
-                // toamPm,
                 shiftFrom,
                 shiftTo,
                 pincode,
                 village,
                 block,
                 district,
+                instagram,
+                facebook,
+                youtube,
+                status,
+                lastPayment,
+                paymentAmount,
+                paymentMode,
                 image: croppedImage,
                 admin: userId
             })
         }
-        console.log(shiftTo)
-        console.log(shiftFrom)
         setDistrict(addressArray.length > 0 && addressArray[0].District
             ? addressArray[0].District
             : null)
         handleChange()
-    }, [name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
+    }, [sid, name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
         admissionDate, shiftFrom, shiftTo,
-        pincode, village, block, district, croppedImage, userId, addressArray])
+        pincode, village, block, district, croppedImage, userId, addressArray, instagram, facebook, youtube, status, lastPayment, paymentMode, paymentAmount])
 
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             setLoading(true)
-            const response = await client.post("/api/student/createstudent", formData)
+            const response = await client.post("/api/student/updatestudent", formData)
             console.log(response.data.message)
             setLoading(false)
             handleSnackOpen()
             setAlertStatus(response.data.message)
-            setName("")
-            setEmail("")
-            setMobile("")
-            setAadhar("")
-            setFather("")
-            setGuardian("")
-            setGender("")
-            setPreparingFor("")
-            setDob("")
-            setAdmissionDate("")
-            // setFromHour("")
-            // setFromMinute("")
-            // setFromAmPm("")
-            // setToHour("")
-            // setToMinute("")
-            setShiftFrom("")
-            setShiftTo("")
-            // setToAmPm("")
-            setPincode("")
-            setVillage("")
-            setBlock("")
-            setDistrict("")
-            setCroppedImage("")
         } catch (error) {
             setLoading(false)
             if (error.response && error.response.data && error.response.data.message) {
@@ -186,13 +217,13 @@ export default function StudentUpdateForm() {
 
         }
     }
-
+    console.log(formData)
     return (
         <>
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
                 <Alert
                     onClose={handleSnackClose}
-                    severity={alertStatus === "Addmission Success" ? "success" : "error"}
+                    severity={alertStatus === "Student updated successfully" ? "success" : "error"}
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
@@ -222,7 +253,7 @@ export default function StudentUpdateForm() {
                                         <input required className="p-2 border rounded-md w-full" value={mobile} onChange={(e) => setMobile(e.target.value)} type="number" id="mobile" placeholder="Mobile" />
                                     </div>
                                     <div>
-                                        <label htmlFor="aadhar">Aadhar No</label>
+                                        <label >Aadhar No</label>
                                         <input required className="p-2 border rounded-md w-full" value={aadhar} onChange={(e) => setAadhar(e.target.value)} type="number" id="number" placeholder="Aadhar No" />
                                     </div>
                                 </div>
@@ -237,11 +268,11 @@ export default function StudentUpdateForm() {
                                         <input required className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
                                     </div>
                                     <div>
-                                        <label htmlFor="aadhar">Gender</label>
+                                        <label>Gender</label>
                                         <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
                                             <option value="" disabled selected>Select One</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
                                             <option value="prefer-not-to-say">Prefer Not To Say</option>
                                         </select>
                                     </div>
@@ -249,7 +280,7 @@ export default function StudentUpdateForm() {
 
                                 <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
                                     <div>
-                                        <label htmlFor="aadhar">Preparing For</label>
+                                        <label >Preparing For</label>
                                         <input required className="p-2 border rounded-md w-full" value={preparingFor} onChange={(e) => setPreparingFor(e.target.value)} type="text" id="preparingFor" placeholder="Preparing For" />
                                     </div>
                                     <div>
@@ -257,7 +288,7 @@ export default function StudentUpdateForm() {
                                         <input required className="p-2 border rounded-md w-full" value={dob} onChange={(e) => setDob(e.target.value)} type="date" id="dob" placeholder="Date of Birth" />
                                     </div>
                                     <div>
-                                        <label htmlFor="aadhar">Addmission Date</label>
+                                        <label >Addmission Date</label>
                                         <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
                                     </div>
                                 </div>
@@ -268,35 +299,6 @@ export default function StudentUpdateForm() {
                                             <label htmlFor="fromHour">From</label>
                                             <div className='flex gap-2'>
                                                 <input type='time' value={shiftFrom} onChange={(e) => setShiftFrom(e.target.value)} className="p-2 border rounded-md w-full" />
-                                                {/* <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="fromHour"
-                                                placeholder="Hour"
-                                                value={fromHour}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setFromHour(e.target.value)
-                                                }}
-                                            />
-                                            <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="fromMinute"
-                                                placeholder="Minute"
-                                                value={fromMinute}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setFromMinute(e.target.value)
-                                                }}
-                                            /> */}
-                                                {/* <select required className='p-2 border rounded-md' value={fromamPm} onChange={(e) => setFromAmPm(e.target.value)} style={{ width: '180px' }} >
-                                                <option value="" disabled>AM/PM</option>
-                                                <option value="am">AM</option>
-                                                <option value="pm">PM</option>
-                                            </select> */}
                                             </div>
                                         </div>
                                         <div className='flex flex-col'>
@@ -304,49 +306,20 @@ export default function StudentUpdateForm() {
                                             <div className='flex gap-2'>
                                                 <input type='time' value={shiftTo} onChange={(e) => setShiftTo(e.target.value)} className="p-2 border rounded-md w-full" />
 
-                                                {/* <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="toHour"
-                                                placeholder="Hour"
-                                                value={toHour}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setToHour(e.target.value)
-                                                }}
-                                            />
-                                            <input required className="p-2 border rounded-md w-full"
-                                                type="number"
-                                                id="fromMinute"
-                                                placeholder="Minute"
-                                                value={toMinute}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (value < 1) e.target.value = '1';
-                                                    if (value > 12) e.target.value = '12';
-                                                    setToMinute(e.target.value)
-                                                }}
-                                            />
-                                            <select required className='p-2 border rounded-md' value={toamPm} onChange={(e) => setToAmPm(e.target.value)} style={{ width: '180px' }} >
-                                                <option value="" disabled>AM/PM</option>
-                                                <option value="am">AM</option>
-                                                <option value="pm">PM</option>
-                                            </select> */}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
                                     <div>
-                                        <label htmlFor="aadhar">Pincode</label>
+                                        <label>Pincode</label>
                                         <input required className="p-2 border rounded-md w-full" type="number" id="number" placeholder="Pincode"
                                             value={pincode}
                                             onChange={(e) => setPincode(e.target.value)}
                                             onBlur={handleOnBlur} />
                                     </div>
                                     <div>
-                                        <label htmlFor="aadhar">Village</label>
+                                        <label >Village</label>
                                         <select required className="p-2 border rounded-md w-full" value={village} onChange={(e) => setVillage(e.target.value)}>
                                             <option value="" disabled>Village</option>
                                             {addressArray && addressArray.map((name, index) => (
@@ -355,7 +328,7 @@ export default function StudentUpdateForm() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label htmlFor="aadhar">Block</label>
+                                        <label >Block</label>
                                         <select required className="p-2 border rounded-md w-full" value={block} onChange={(e) => setBlock(e.target.value)}>
                                             <option value="" disabled>Block</option>
                                             {uniqueBlocks && uniqueBlocks.map((name, index) => (
@@ -364,9 +337,43 @@ export default function StudentUpdateForm() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label htmlFor="aadhar">District</label>
+                                        <label >District</label>
                                         <input required className="p-2 border rounded-md w-full" type="text"
                                             value={district} id="district" placeholder="District" />
+                                    </div>
+                                </div>
+                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
+                                    <div>
+                                        <label >Instagram</label>
+                                        <input
+
+                                            className="p-2 border rounded-md w-full"
+                                            type="text"
+                                            placeholder="Instagram Link"
+                                            value={instagram}
+                                            onChange={(e) => setInstagram(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label >Facebook</label>
+                                        <input
+
+                                            className="p-2 border rounded-md w-full"
+                                            type="text"
+                                            placeholder="Facebook Link"
+                                            value={facebook}
+                                            onChange={(e) => setFacebook(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label >Youtube</label>
+                                        <input
+                                            className="p-2 border rounded-md w-full"
+                                            type="text"
+                                            placeholder="Youtube Link"
+                                            value={youtube}
+                                            onChange={(e) => setYoutube(e.target.value)}
+                                        />
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-3'>
@@ -382,7 +389,7 @@ export default function StudentUpdateForm() {
 
                                         {loading ? <div className='flex items-center justify-center'><span className='mr-2'>Please Wait..</span><CircularLoading size={25} /></div> :
                                             <div className='flex items-center'>
-                                                <UserPlus size={17} className='mr-2' />Add Student</div>}
+                                                <UserPlus size={17} className='mr-2' />Update Student</div>}
                                     </button>
                                 </div>
                             </div>
@@ -392,38 +399,54 @@ export default function StudentUpdateForm() {
                         <div className='shadow-md rounded-md p-2 bg-white'>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
                                 <div>
-                                    <label htmlFor="aadhar">Payment Status</label>
-                                    <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
+                                    <label>Payment Status</label>
+                                    <select className="p-2 border rounded-md w-full" value={status} onChange={(e) => setStatus(e.target.value)}>
                                         <option value="" disabled selected>Select One</option>
-                                        <option value="active">Active</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="decative">Deactive</option>
+                                        <option value="Deactive">Deactive</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Pending">Pending</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label htmlFor="aadhar">Last Payment</label>
-                                    <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
+                                    <label >Last Payment</label>
+                                    <input className="p-2 border rounded-md w-full" value={lastPayment} onChange={(e) => setLastPayment(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
                                 </div>
                             </div>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
                                 <div>
-                                    <label htmlFor="aadhar">Payment Amount</label>
-                                    <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="number" id="number" placeholder="Aadhar No" />
+                                    <label >Payment Amount</label>
+                                    <input
+                                        className="p-2 border rounded-md w-full"
+                                        value={paymentAmount}
+                                        onChange={(e) => setPaymentAmount(e.target.value)}
+                                        type="number" placeholder="Payment Amount" />
                                 </div>
                                 <div>
-                                    <label htmlFor="aadhar">Payment Mode</label>
-                                    <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
+                                    <label >Payment Mode</label>
+                                    <select className="p-2 border rounded-md w-full" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
                                         <option value="" disabled selected>Select One</option>
-                                        <option value="cash">Cash</option>
-                                        <option value="online">Online</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Online">Online</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div>
+                                <StudentIdCard
+                                    name={name}
+                                    father={father}
+                                    mobile={mobile}
+                                    village={village}
+                                    preparingFor={preparingFor}
+                                    addmissionDate={admissionDate}
+                                    image={croppedImage === `${sid}.jpeg` ? `http://localhost:3000/uploads/${croppedImage}` : croppedImage}
+                                />
                             </div>
 
                         </div>
                     </div>
                 </div>
             </form>
+
             <Dialog
                 open={open}
                 TransitionComponent={Transition}

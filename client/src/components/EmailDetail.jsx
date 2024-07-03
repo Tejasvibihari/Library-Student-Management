@@ -1,10 +1,29 @@
-import { MailPlus } from 'lucide-react';
-import { Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { MailPlus, Search } from 'lucide-react';
 import Avatar from '@mui/material/Avatar';
-import EmailEditor from './EmailEditor';
 import { Link } from 'react-router-dom';
+import axios from 'axios'; // Make sure to install axios
+import client from '../services/axiosClient';
+
 
 export default function EmailDetail() {
+    const [emailDetails, setEmailDetails] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await client.get('/api/mail/getemail'); // Adjust the URL as needed
+                setEmailDetails(response.data);
+                console.log(response)
+            } catch (error) {
+                console.error('Error fetching email details:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (!emailDetails) return <div>Loading...</div>;
     return (
         <>
 
@@ -32,31 +51,32 @@ export default function EmailDetail() {
                                 </div>
                             </div>
                             <div className='overflow-auto h-[26rem]'>
-                                <div className='border-b'>
-                                    <div className='grid grid-cols-4 py-2'>
-                                        <div className='flex justify-center'>
-                                            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                                        </div>
-                                        <div className='col-span-3'>
-                                            <div className='flex justify-between'>
-                                                <p className='text-sm'>
-                                                    Sujika
-                                                </p>
-                                                <span className='text-sm text-gray-500'>
-                                                    1:32PM
-                                                </span>
+                                {emailDetails.map((data, i) => {
+                                    return (
+                                        <div key={i} className='border-b'>
+                                            <div className='grid grid-cols-1 py-2'>
+                                                <div className=''>
+                                                    <div className='flex justify-between'>
+                                                        <p className='text-sm'>
+                                                            {data.name}
+                                                        </p>
+                                                        <span className='text-sm text-gray-500'>
+                                                            {/* {data.sentAt} */}
+                                                        </span>
+                                                    </div>
+                                                    <div className='flex flex-col justify-between mt-1'>
+                                                        <p className='text-sm font-semibold'>
+                                                            {data.subject}
+                                                        </p>
+                                                        {/* <span className='text-xs text-gray-500'>
+                                                            {data.message}
+                                                        </span> */}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className='flex flex-col justify-between mt-1'>
-                                                <p className='text-sm font-semibold'>
-                                                    New Project Detail
-                                                </p>
-                                                <span className='text-xs text-gray-500'>
-                                                    Lorem ipsum dolor sit amet consectetur adipisicing elit
-                                                </span>
-                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>

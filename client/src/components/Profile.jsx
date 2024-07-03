@@ -17,7 +17,7 @@ function Profile() {
   const handleClose = () => {
     setAnchorEl(null);
   };
- 
+
 
   return (
     <div className="relative ml-auto ">
@@ -25,23 +25,21 @@ function Profile() {
         aria-controls="basic-menu"
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        className="flex items-center justify-center  ring-1  px-2 py-4 focus:ring-opacity-40 "
-        onClick={handleClick }
+        className="flex items-center justify-center  ring-1  px-2 py-2 focus:ring-opacity-40 "
+        onClick={handleClick}
       ><div className='flex items-center justify-center px-3'>
           <div className='p-1 rounded-full  '>
-            <Avatar className='w-6 h-6'>
-            
-            </Avatar>
+            <Avatar className='w-6 h-6' />
           </div>
           <div className='flex flex-col justify-start'>
-             <div className='text-sm font-[inter] font-semibold'>
+            <div className='text-sm font-[inter] font-semibold'>
               Jhone Doe
             </div>
-              <div className='text-slate-100 text-left'>Student </div>
-         </div>
+            <div className='text-slate-100 text-sm text-left'>Student </div>
+          </div>
         </div>
-      </button>
-        <Menu
+      </button >
+      <Menu
         id="profile-menu"
         anchorEl={anchorEl}
         open={open}
@@ -68,7 +66,7 @@ function Profile() {
           <span className="text-gray-700">Logout</span>
         </MenuItem>
       </Menu>
-     </div>
+    </div >
   );
 }
 
