@@ -9,15 +9,15 @@ const mailSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    email: {
-        type: String,
-        required: true
-    },
     body: {
         type: String,
         required: true
     },
-    adminId: {
+    subject: {
+        type: String,
+        required: true
+    },
+    admin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin', // Assuming you have an Admin model
         required: true // Set to true if every mail must be associated with an admin, otherwise remove this line

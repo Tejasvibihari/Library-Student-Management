@@ -24,7 +24,7 @@ export default function EmailEditor() {
 
     const handleEditorChange = (newContent) => {
         editorContent = newContent;
-
+        console.log(editorContent)
     };
 
     // Alert Snackbar 
@@ -43,7 +43,7 @@ export default function EmailEditor() {
     useEffect(() => {
         const getStudentEmail = async () => {
             try {
-                const response = await client.get('/api/student/getstudentemail', { params: { adminId } })
+                const response = await client.get('/api/mail/getstudentemail', { params: { adminId } })
                 setEmails(response.data.studentEmails)
             } catch (error) {
                 console.log(error)
@@ -54,15 +54,17 @@ export default function EmailEditor() {
     }, [adminId])
 
     // Send Email
-
+  
     const handleClick = async (e) => {
         e.preventDefault()
-        setContent(editorContent)
+        // setContent(editorContent)
         const updatedMailData = {
             to,
             subject,
-            body: editorContent // Use the latest editor content directly
+            body: editorContent,
+            admin: adminId// Use the latest editor content directly
         };
+        console.log(updatedMailData.body)
         try {
             setLoading(true)
             const response = await client.post('/api/mail/sendemail', updatedMailData)
@@ -70,6 +72,7 @@ export default function EmailEditor() {
             setTo('')
             setSubject('')
             setContent('')
+            editorContent = ''
             handleSnackOpen()
             setAlertStatus(response.data.message)
             setLoading(false)
