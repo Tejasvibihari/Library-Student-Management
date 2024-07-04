@@ -79,7 +79,8 @@ export const sendEmail = async (req, res) => {
                 subject,
                 body,
                 admin,
-                name: student.name // Use the found student's name
+                name: student.name, // Use the found student's name
+                image: student.image // Use the found student's name
             });
 
             // Save the Mail document

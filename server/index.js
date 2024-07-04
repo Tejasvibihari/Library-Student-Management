@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
 import mailRouter from './router/mailRouter.js'
-import './utils/scheduler/PaymentStatus.js'
+// import './utils/scheduler/PaymentStatus.js'
 import dotenv from 'dotenv';
 
 dotenv.config();

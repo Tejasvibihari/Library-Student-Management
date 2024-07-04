@@ -17,6 +17,9 @@ const mailSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    image: {
+        type: String
+    },
     admin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin', // Assuming you have an Admin model

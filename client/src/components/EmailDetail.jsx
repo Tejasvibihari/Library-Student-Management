@@ -53,11 +53,12 @@ export default function EmailDetail() {
                                 </div>
                             </div>
                             <div className='overflow-auto h-[26rem]'>
-                                {emailDetails.map((data, i) => {
+                                {emailDetails.reverse().map((data, i) => {
                                     return (
                                         <div key={i} className='border-b'>
-                                            <div className='grid grid-cols-1 py-2'>
-                                                <div className=''>
+                                            <div className='grid grid-cols-5 py-2 cursor-pointer'>
+                                                <Avatar alt={data.name} src={`http://localhost:3000/uploads/${data.image}`} />
+                                                <div className='col-span-4'>
                                                     <div className='flex justify-between'>
                                                         <p className='text-sm'>
                                                             {data.name}
@@ -70,9 +71,6 @@ export default function EmailDetail() {
                                                         <p className='text-sm font-semibold'>
                                                             {data.subject}
                                                         </p>
-                                                        {/* <span className='text-xs text-gray-500'>
-                                                            {data.message}
-                                                        </span> */}
                                                     </div>
                                                 </div>
                                             </div>
