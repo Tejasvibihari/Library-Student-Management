@@ -14,9 +14,12 @@ const app = express();
 const port = 3000;
 
 // mongoose.connect("mongodb+srv://tejasvibihari2000:z1VS5wWSKyakzfds@bihari.kup0kde.mongodb.net/?retryWrites=true&w=majority")
-mongoose.connect("mongodb://localhost:27017/studentLibrary")
+mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+// mongoose.connect("mongodb://localhost:27017/studentLibrary")
     .then(() => console.log('Connected to MongoDB...'))
-    .catch(err => console.error(`Could not connect to MongoDB... + ${err}`));
+    .catch(err => {
+        console.error(`Could not connect to MongoDB... + ${err}`);
+    });
 
 
 app.use(cors({

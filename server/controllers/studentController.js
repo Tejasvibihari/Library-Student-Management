@@ -39,9 +39,22 @@ export const createStudent = async (req, res) => {
         })
         sendMail({
             to: email,
-            subject: "Addmission Success",
-            body: `Your account has been created successfully.<br/>
-             Your ID is ${newSid} <br/>Your password is ${password}`
+            subject: "Welcome to Bihari Library - Admission Confirmation",
+            body: `<p>Dear ${name},</p>
+<p>&nbsp;</p>
+<p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
+<p>&nbsp;</p>
+<p><strong>Student ID:</strong> ${newSid}</p>
+<p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shiftFrom} - ${shiftTo}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${village}, ${block}, ${district} - ${pincode} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
+<p>&nbsp;</p>
+<p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
+<p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
+<p>Once again, congratulations on your admission. We look forward to welcoming you to our campus.</p>
+<p>Best regards,</p>
+<p>&nbsp;</p>
+<p><strong><em>Bihari Library</em></strong></p>
+<p><strong><em>9608888400, 9905424292</em></strong></p>
+<p>&nbsp;</p>`
         })
         return res.status(201).json({ message: "Addmission Success" });
 

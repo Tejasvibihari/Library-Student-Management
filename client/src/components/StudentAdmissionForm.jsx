@@ -130,7 +130,7 @@ export default function StudentAdmissionForm() {
         }
         console.log(shiftTo)
         console.log(shiftFrom)
-        setDistrict(addressArray.length > 0 && addressArray[0].District
+        setDistrict(Array.isArray(addressArray) && addressArray.length > 0 && addressArray[0].District
             ? addressArray[0].District
             : null)
         handleChange()
