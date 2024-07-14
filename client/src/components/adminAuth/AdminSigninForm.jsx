@@ -45,7 +45,9 @@ export default function SigninForm() {
             const response = await client.post('/api/admin/auth/signin', formData)
             console.log(response.data.result)
             dispatch(signInSuccess(response.data.result))
+            console.log('navigate')
             navigate('/')
+            console.log('navigate2222')
         } catch (error) {
 
             if (error.response && error.response.data) {
@@ -120,7 +122,7 @@ export default function SigninForm() {
                             </div>
                             <div>
                                 <button type='submit' className='bg-[#8e54e9] hover:bg-[#8e54e9e6] text-white w-full mt-4 rounded-md p-3 font-semibold'>
-                                    {loading ? <CircularLoading size={28} /> : "Create Account"}
+                                    {loading ? <CircularLoading size={28} /> : "Login"}
                                 </button>
                             </div>
                         </form>

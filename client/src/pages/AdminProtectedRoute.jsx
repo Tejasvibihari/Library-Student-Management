@@ -3,9 +3,9 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom';
 
 export default function AdminProtectedRoute() {
     const { isAuthenticated, currentAdmin } = useSelector(state => state.admin);
-
+// console.log(currentAdmin.role)
 
     return (
-        currentAdmin === null && isAuthenticated ? <Outlet /> : <Navigate to="/signup" />
+       isAuthenticated === true ? <Outlet /> : <Navigate to="/signup" />
     )
 }
