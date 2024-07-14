@@ -32,19 +32,25 @@ const columns = [
     {
         id: 'shift',
         label: 'Shift',
-        minWidth: 170,
+        minWidth: 100,
         align: 'center',
     },
     {
         id: 'lastPayment',
         label: 'Last Payment',
-        minWidth: 170,
+        minWidth: 150,
         align: 'center',
     },
     {
         id: 'paymentDate',
         label: 'Payment Date',
-        minWidth: 170,
+        minWidth: 150,
+        align: 'center',
+    },
+    {
+        id: 'status',
+        label: 'Status',
+        minWidth: 100,
         align: 'center',
     },
     {
@@ -139,6 +145,11 @@ export default function PaymentStudentTable() {
                                     </TableCell>
                                     <TableCell align="center">
                                         {data.paymentDate ? (data.paymentDate.toString()).slice(0, 10) : 'N/A'}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${data.status === "Active" ? "border-green-600 bg-green-800" : data.status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
+                                            {data.status}
+                                        </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className='flex justify-end'>

@@ -4,7 +4,8 @@ import StudentDetailCard from '../components/StudentDetailCard'
 import client from '../services/axiosClient'
 import { useSelector } from 'react-redux'
 import Breadcrumbs from '../components/Breadcrumbs'
-
+import CircularLoading from '../components/ui/CircularLoading'
+import { UserPlus } from 'lucide-react';
 export default function StudentDetail() {
     const adminId = useSelector(state => state.admin.currentAdmin._id)
     const [allStudent, setAllStudent] = useState([])
@@ -13,6 +14,8 @@ export default function StudentDetail() {
     const [active, setActive] = useState(false)
     const [pending, setPending] = useState(false)
     const [deactive, setDeactive] = useState(false)
+
+    const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
@@ -29,6 +32,7 @@ export default function StudentDetail() {
         getAllStudent()
     }, [adminId])
     const handleFilter = async () => {
+        setLoading(true)
         try {
             const response = await client.get("/api/student/getallstudent", {
                 params: {
@@ -40,8 +44,10 @@ export default function StudentDetail() {
             })
             console.log(response)
             setAllStudent(response.data)
+            setLoading(false)
         } catch (error) {
             console.log(error)
+            setLoading(false)
         }
     }
     return (
@@ -74,9 +80,12 @@ export default function StudentDetail() {
                             </div>
                         </div>
                         <button
-                            onClick={handleFilter}
-                            className='px-5 py-2 border rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50'>
-                            Search
+                         onClick={handleFilter}
+                        className='p-2 w-md border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
+
+                            {loading ? <div className='flex items-center justify-center'><span className='mr-2'></span><CircularLoading size={25} /></div> :
+                                <div className='flex items-center'>
+                                    <UserPlus size={17} className='mr-2' />Search</div>}
                         </button>
                     </fieldset>
                 </div>

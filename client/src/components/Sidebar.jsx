@@ -63,7 +63,14 @@ export default function SideBar({ children }) {
     <>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBarContainer position="fixed" isMobile={isMobile} open={open}>
+        <AppBarContainer
+          position="fixed"
+          isMobile={isMobile}
+          open={open}
+          style={{
+            backgroundImage: 'linear-gradient(to right, #0d6efd, #6610f2, #6f42c1)'
+          }}
+        >
           <Toolbar>
 
             {isMobile && (
@@ -78,18 +85,19 @@ export default function SideBar({ children }) {
               </IconButton>
             )}
             {/* Search input */}
-            <div className="flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
+            {/* <div className="flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
               <input
                 type="text"
                 placeholder="Search....."
                 className="px-3 py-1 text-neutral-900 border-none min-w-[350px] focus:outline-none bg-transparent"
               />
               <SearchIcon className="w-6 h-6 text-neutral-900" />
-            </div>
+            </div> */}
             <Profile />
           </Toolbar>
         </AppBarContainer>
         <Drawer
+        
           sx={{
             width: drawerWidth,
             flexShrink: 0,
@@ -102,9 +110,10 @@ export default function SideBar({ children }) {
           anchor="left"
           open={open}
           onClose={handleDrawerClose}
+          className='bg-[#1c2c3f] text-white'
         >
 
-          <DrawerHeader className='w-full px-2'>
+          <DrawerHeader className='w-full px-2 bg-[#6f42c1] text-white'>
 
             <p> Library Management</p>
 
@@ -113,7 +122,7 @@ export default function SideBar({ children }) {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <List>
+          <List className='bg-[#1c2c3f] text-white'>
             <Link to="/">
               <ListItem disablePadding className='hover:border-l-2 hover:border-yellow-600'>
                 <ListItemButton>
