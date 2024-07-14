@@ -22,11 +22,18 @@ mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi
     });
 
 
+const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.vercel.app'];
+
 app.use(cors({
-    // origin: 'https://biharilibrary.vercel.app',
-    origin: 'http://localhost:5173' || 'https://biharilibrary.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add OPTIONS to methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 
