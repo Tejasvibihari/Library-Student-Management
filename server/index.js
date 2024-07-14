@@ -24,7 +24,7 @@ mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi
 
 app.use(cors({
     // origin: 'https://biharilibrary.vercel.app',
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173' || 'https://biharilibrary.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add OPTIONS to methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
     credentials: true
