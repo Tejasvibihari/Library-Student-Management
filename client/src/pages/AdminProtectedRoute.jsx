@@ -6,6 +6,6 @@ export default function AdminProtectedRoute() {
 
 
     return (
-        currentAdmin.role === "admin" && isAuthenticated ? <Outlet /> : <Navigate to="/signup" />
+        currentAdmin === null && isAuthenticated ? <Outlet /> : <Navigate to="/signup" />
     )
 }
