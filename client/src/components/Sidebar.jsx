@@ -1,200 +1,75 @@
 import { useState, useEffect } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import AppBar from '@mui/material/AppBar';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { Mail, BookUser } from 'lucide-react';
-import Profile from './Profile';
-import SearchIcon from '@mui/icons-material/Search';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import { Link } from 'react-router-dom';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-const drawerWidth = 240;
+import { Menu, X, User, MailPlus, LayoutDashboard, UserPlus, IndianRupee } from 'lucide-react';
+import Profile from './Profile'; // Adjust the import based on your file structure
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
-}));
+const SideBar = ({ children }) => {
+  const [open, setOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-const AppBarContainer = styled(AppBar)(({ theme, isMobile, open }) => ({
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  width: isMobile ? '100%' : `calc(100% - ${open ? drawerWidth : 0}px)`,
-  marginLeft: isMobile ? 0 : `${open ? drawerWidth : 0}px`,
-}));
-
-export default function SideBar({ children }) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [open, setOpen] = useState(!isMobile);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const handleToggle = () => {
+    setOpen(!open);
   };
 
   useEffect(() => {
-    setOpen(!isMobile);
-  }, [isMobile]);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setOpen(window.innerWidth >= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <AppBarContainer
-          position="fixed"
-          isMobile={isMobile}
-          open={open}
-          style={{
-            backgroundImage: 'linear-gradient(to right, #0d6efd, #6610f2, #6f42c1)'
-          }}
-        >
-          <Toolbar>
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <div className={`bg-[#1c2c3f] text-white ${open ? 'w-64' : 'w-17'} transition-all duration-300`}>
+        <div className="flex justify-between items-center p-4">
+          <span className={`${open ? 'block' : 'hidden'} font-bold text-xl font-[inter]`}>Library Management</span>
+          <button onClick={handleToggle} className="md:hidden">
+            {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+        <hr />
+        <nav className="flex flex-col p-2 font-[inter]">
+          <Link to="/" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-green-950">
+            <LayoutDashboard className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Dashboard</span>
+          </Link>
+          <Link to="/student-admission" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-red-950">
+            <UserPlus className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Student Admission</span>
+          </Link>
+          <Link to="/student-detail" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-yellow-400">
+            <User className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Student Detail</span>
+          </Link>
+          <Link to="/email" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-lime-400">
+            <MailPlus className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Email</span>
+          </Link>
+          <Link to="/make-payment" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-purple-950">
+            <IndianRupee className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Make Payment</span>
+          </Link>
+        </nav>
+      </div>
 
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerOpen}
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
-            {/* Search input */}
-            {/* <div className="flex items-center rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
-              <input
-                type="text"
-                placeholder="Search....."
-                className="px-3 py-1 text-neutral-900 border-none min-w-[350px] focus:outline-none bg-transparent"
-              />
-              <SearchIcon className="w-6 h-6 text-neutral-900" />
-            </div> */}
-            <Profile />
-          </Toolbar>
-        </AppBarContainer>
-        <Drawer
-        
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-            },
-          }}
-          variant={isMobile ? 'temporary' : 'permanent'}
-          anchor="left"
-          open={open}
-          onClose={handleDrawerClose}
-          className='bg-[#1c2c3f] text-white'
-        >
-
-          <DrawerHeader className='w-full px-2 bg-[#6f42c1] text-white'>
-
-            <p> Library Management</p>
-
-            <IconButton onClick={handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List className='bg-[#1c2c3f] text-white'>
-            <Link to="/">
-              <ListItem disablePadding className='hover:border-l-2 hover:border-yellow-600'>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <DashboardIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Dashboard" />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-            <Link to="/student-admission">
-              <ListItem disablePadding className='hover:border-l-2 hover:border-red-600'>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <LibraryBooksIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Student Admission" />
-                </ListItemButton>
-              </ListItem></Link>
-            <Link to="/student-detail">
-              <ListItem disablePadding className='hover:border-l-2 hover:border-blue-600'>
-                <ListItemButton>
-                  <ListItemIcon>
-                    < BookUser />
-                  </ListItemIcon>
-                  <ListItemText primary="Student Detail" />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-            <Link to="/email">
-              <ListItem disablePadding className='hover:border-l-2 hover:border-green-600'>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <Mail />
-                  </ListItemIcon>
-                  <ListItemText primary="Email" />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-            <Link to="/make-payment">
-              <ListItem disablePadding className='hover:border-l-2 hover:border-green-600'>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <CurrencyRupeeIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Make Payment" />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-
-          </List>
-
-
-        </Drawer>
-        <Box
-          className='bg-gray-50'
-          component="main"
-          sx={{
-            flexGrow: 1,
-            // bgcolor: 'background.default',
-            p: 3,
-            transition: theme.transitions.create('margin', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.leavingScreen,
-            }),
-
-          }}
-        >
-          <DrawerHeader />
-          <div>{children}</div>
-        </Box>
-      </Box >
-    </>
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <header className="flex justify-between items-center bg-[#8e54e9] p-1 shadow-md">
+          {/* <button onClick={handleToggle} className="md:hidden">
+            <Menu className="w-6 h-6" />
+          </button> */}
+          <Profile />
+        </header>
+        <main className="p-4">
+          {children}
+        </main>
+      </div>
+    </div>
   );
-}
+};
+
+export default SideBar;

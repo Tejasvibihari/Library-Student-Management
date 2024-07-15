@@ -25,7 +25,7 @@ function Profile() {
         aria-controls="basic-menu"
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        className="flex items-center justify-center  ring-1  px-2 py-2 focus:ring-opacity-40 "
+        className="flex items-center justify-center  ring-1 ring-gray-200  px-2 py-[2px] focus:ring-opacity-40 "
         onClick={handleClick}
       ><div className='flex items-center justify-center px-3'>
           <div className='p-1 rounded-full  '>
@@ -35,7 +35,7 @@ function Profile() {
             <div className='text-sm font-[inter] font-semibold'>
               Jhone Doe
             </div>
-            <div className='text-slate-100 text-sm text-left'>Student </div>
+            <div className='text-slate-100 text-xs text-left'>Student </div>
           </div>
         </div>
       </button >
