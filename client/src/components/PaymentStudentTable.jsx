@@ -11,7 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import { useSelector } from 'react-redux';
 import client from '../services/axiosClient';
 import Avatar from '@mui/material/Avatar';
-import { UserPlus } from 'lucide-react';
+import { IndianRupee } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 const columns = [
@@ -158,7 +158,7 @@ export default function PaymentStudentTable() {
 
                                                     {loading ? <div className='flex items-center justify-center'><span className='mr-2'>Please Wait..</span><CircularLoading size={25} /></div> :
                                                         <div className='flex items-center'>
-                                                            <UserPlus size={17} className='mr-2' />Make Payment</div>}
+                                                            <IndianRupee size={17} className='mr-2' />Make Payment</div>}
                                                 </button>
                                             </Link>
                                         </div>

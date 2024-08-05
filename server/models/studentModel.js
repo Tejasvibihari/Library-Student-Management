@@ -4,6 +4,7 @@ const StudentSchema = new mongoose.Schema({
     sid: { type: Number, required: true, unique: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     mobile: { type: String, required: true },
     aadhar: { type: String, required: true },
     father: { type: String, required: true },

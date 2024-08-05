@@ -4,8 +4,10 @@ import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import adminAuthReducer from './admin/adminAuthSlice'
+import studentAuthReducer from './student/studentAuthSlice'
 const rootReducer = combineReducers({
     admin: adminAuthReducer,
+    student: studentAuthReducer,
 });
 
 const persistConfig = {

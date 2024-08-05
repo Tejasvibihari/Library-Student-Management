@@ -1,12 +1,14 @@
-import Student from "../models/studentModel";
+import Student from "../models/studentModel.js";
 import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken';
-import { sendMail } from '../utils/mailer';
+// import jwt from 'jsonwebtoken';
+// import { sendMail } from '../utils/mailer';
 
 export const SignIn = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(email, password)
         const existingStudent = await Student.findOne({ email })
+        console.log(existingStudent)
         if (!existingStudent) {
             return res.status(404).json({ message: 'Student does not exist' })
         }

@@ -4,6 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
+import studentAuthRouter from './router/studentAuthRouter.js'
 import mailRouter from './router/mailRouter.js'
 // import './utils/scheduler/PaymentStatus.js'
 import dotenv from 'dotenv';
@@ -15,7 +16,7 @@ const port = 3000;
 
 // mongoose.connect("mongodb+srv://tejasvibihari2000:z1VS5wWSKyakzfds@bihari.kup0kde.mongodb.net/?retryWrites=true&w=majority")
 mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-// mongoose.connect("mongodb://localhost:27017/studentLibrary")
+    // mongoose.connect("mongodb://localhost:27017/studentLibrary")
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => {
         console.error(`Could not connect to MongoDB... + ${err}`);
@@ -48,6 +49,7 @@ app.get("/", (req, res) => {
 
 app.use('/api/admin/auth/', adminRouter);
 app.use('/api/student/', studentRouter);
+app.use('/api/student/auth', studentAuthRouter);
 app.use('/api/mail/', mailRouter);
 
 

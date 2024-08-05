@@ -83,6 +83,7 @@ export const GetAllStudent = async (req, res) => {
 };
 export const GetStudent = async (req, res) => {
     const { _id } = req.query;
+
     try {
         // Use the constructed query object to filter data
         const students = await Student.findOne({ _id });

@@ -15,6 +15,9 @@ import StudentUpdate from './pages/StudentUpdate'
 import MakePayment from './pages/MakePayment'
 import IndividualPayment from './pages/IndividualPayment'
 
+import StudentSignin from './pages/StudentSignin'
+import Student from './pages/Student'
+
 
 
 export default function App() {
@@ -30,6 +33,8 @@ export default function App() {
           <Route path="/verifypassword" element={<VerifyPasswordForm />} />
           {/* Admin Authentication End */}
 
+          <Route path="/student-signin" element={<StudentSignin />} />
+          <Route path="/student-dashboard" element={<Student />} />
 
           {/* Sidebar menu Start  */}
           <Route element={<AdminProtectedRoute />}>

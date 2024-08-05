@@ -107,7 +107,10 @@ export default function StudentUpdateForm() {
             ? [...unique, item]
             : unique;
     }, []);
-
+    function safeFormatDate(dateInput) {
+        const date = new Date(dateInput);
+        return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+    }
     useEffect(() => {
         const getStudent = async () => {
             try {
@@ -138,13 +141,28 @@ export default function StudentUpdateForm() {
                 setFacebook(response.data.facebook)
                 setYoutube(response.data.youtube)
 
+                // Helper function to safely format date
 
-                const formattedDob = new Date(response.data.dob).toISOString().split('T')[0];
-                const formattedAddmissionDate = new Date(response.data.admissionDate).toISOString().split('T')[0];
-                const formattedLastPayment = new Date(response.data.lastPayment).toISOString().split('T')[0];
-                setDob(formattedDob);
-                setAdmissionDate(formattedAddmissionDate)
-                setLastPayment(formattedLastPayment)
+
+                try {
+                    // Safely format dates using the helper function
+                    const formattedDob = safeFormatDate(response.data.dob);
+                    const formattedAdmissionDate = safeFormatDate(response.data.admissionDate);
+                    const formattedLastPayment = safeFormatDate(response.data.lastPayment);
+
+                    // Set state with the safely formatted dates or fallback values
+                    setDob(formattedDob);
+                    setAdmissionDate(formattedAdmissionDate);
+                    setLastPayment(formattedLastPayment);
+                } catch (error) {
+                    console.log(error);
+                }
+                // const formattedDob = new Date(response.data.dob).toISOString().split('T')[0];
+                // const formattedAddmissionDate = new Date(response.data.admissionDate).toISOString().split('T')[0];
+                // const formattedLastPayment = new Date(response.data.lastPayment).toISOString().split('T')[0];
+                // setDob(formattedDob);
+                // setAdmissionDate(formattedAddmissionDate)
+                // setLastPayment(formattedLastPayment)
             } catch (error) {
                 console.log(error)
             }
