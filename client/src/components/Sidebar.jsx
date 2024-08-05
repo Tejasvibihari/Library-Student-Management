@@ -64,7 +64,7 @@ const SideBar = ({ children }) => {
           </button> */}
           <Profile />
         </header>
-        <main className="p-4">
+        <main className="p-4 bg-gray-100">
           {children}
         </main>
       </div>
