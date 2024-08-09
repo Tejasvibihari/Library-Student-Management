@@ -24,35 +24,44 @@ export const createStudent = async (req, res) => {
         address,
         image, admin, lastPayment
     } = req.body
+    console.log(image)
     try {
-        const imageBuffer = Buffer.from(image.split(",")[1], 'base64');
+        let imageFilename = null;
 
-        const password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4))
+        if (image && typeof image === 'string') {
+            const base64String = image.split(",")[1];
+            if (base64String) {
+                const imageBuffer = Buffer.from(base64String, 'base64');
+                // Generate a unique filename for the image
+                const lastStudent = await Student.find().sort({ sid: -1 }).limit(1);
 
-        const existingStudent = await Student.findOne({ email })
-        if (existingStudent) {
-            return res.status(400).json({ message: 'Student already exists', studentId: existingStudent.sid })
-        }
-        const hashedPassword = await bcrypt.hash(password, 12)
+                if (lastStudent.length === 0) {
+                    newSid = 1001;
+                } else {
+                    newSid = lastStudent[0].sid + 1;
+                }
+                imageFilename = `${newSid}.jpeg`;
+                // Write the image to a file
+                fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+                const password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4))
 
-        //  Generate Sid by first finding the last sid in data base and increment by one and add to sid
-        const lastStudent = await Student.find().sort({ sid: -1 }).limit(1)
-        let newSid = 0
-        if (lastStudent.length === 0) {
-            newSid = 1001
+                const existingStudent = await Student.findOne({ email })
+                if (existingStudent) {
+                    return res.status(400).json({ message: 'Student already exists', studentId: existingStudent.sid })
+                }
+                const hashedPassword = await bcrypt.hash(password, 12)
+                const createStudent = await Student.create({
+                    sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
+                    gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                    image: imageFilename, admin, lastPayment
+                })
+            } else {
+                console.error("Invalid image format: base64 string is missing.");
+            }
         } else {
-            newSid = lastStudent[0].sid + 1
+            console.error("Invalid image: image is either undefined or not a string.");
         }
-        // Generate a unique filename for the image
-        const imageFilename = `${newSid}.jpeg`;
-        // Write the image to a file
-        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
-        const createStudent = await Student.create({
-            sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
-            gender, preparingFor, admissionDate, shift, time, paymentAmount, address, 
-            image: imageFilename, admin, lastPayment
-        })
         sendMail({
             to: email,
             subject: "Welcome to Bihari Library - Admission Confirmation",

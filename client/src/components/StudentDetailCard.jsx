@@ -7,22 +7,27 @@ import ReportIcon from '@mui/icons-material/Report';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
-export default function StudentDetailCard({ studentId, sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment }) {
+export default function StudentDetailCard({ studentId, sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount }) {
 
 
     return (
         <>
             <div className='border shadow-md rounded-md w-full hello'>
                 <div className='text-white p-4'>
-                    <div className='flex justify-between items-center'>
+                    <div className='flex flex-col md:flex-row justify-between items-center'>
                         {/* Proile Image  */}
                         <div>
-                            <img src={`http://localhost:3000/uploads/${src}`} className='w-32 rounded-full shadow-sm shadow-white border' />
+                            {/* <img src={`http://localhost:3000/uploads/${src}`} className='w-32 rounded-full shadow-sm shadow-white border' /> */}
+                            <img src={`${src}`} className='w-32 rounded-full shadow-sm shadow-white border' />
                             <div className='text-center'>{sid}</div>
                         </div>
                         <div className='flex flex-col border border-gray-500 shadow-md rounded-md p-2'>
                             <div>
                                 <span className='font-semibold font-[inter] text-sm leading-6'>Last Payment:- <span className='font-normal text-gray-100'>{formatDate(lastPayment)}</span></span>
+                            </div>
+                            <div>
+                                <span className='font-semibold font-[inter] text-sm leading-6'>Amount:- <span className='font-normal text-gray-100'>{paymentAmount}</span></span>
+
                             </div>
                             <div className='mt-4'>
                                 <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
@@ -68,7 +73,7 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                     {/* Top Section With frofile End  */}
                     {/* Personal Detail Start Here  */}
                     <div className='border border-gray-500 p-2 rounded-md shadow-md mt-2'>
-                        <div className='flex justify-between'>
+                        <div className='flex flex-col md:flex-row justify-between'>
                             <div className='flex flex-col'>
                                 <span className='font-semibold font-[inter] text-sm leading-6'>
                                     Name:-
