@@ -18,7 +18,7 @@ export default function Home() {
                 <div className="">
 
                     <DashboardCard />
-                    <Chart />
+                    {/* <Chart /> */}
                     <PaymentStudentTable />
                 </div>
             </SideBar >
