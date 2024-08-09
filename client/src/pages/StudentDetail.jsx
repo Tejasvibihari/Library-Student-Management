@@ -105,10 +105,11 @@ export default function StudentDetail() {
                             gender={student.gender}
                             preparingFor={student.preparingFor}
                             addmissionDate={student.admissionDate}
-                            shiftFrom={student.shiftFrom}
+                            shift={student.shift}
                             shiftTo={student.shiftTo}
                             pincode={student.pincode}
-                            village={student.village}
+                            address={student.address}
+                            time={student.time}
                             dist={student.district}
                             block={student.block}
                             src={student.image}

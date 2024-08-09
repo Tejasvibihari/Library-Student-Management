@@ -42,15 +42,9 @@ export default function StudentAdmissionForm() {
     const [preparingFor, setPreparingFor] = useState("");
     const [dob, setDob] = useState("");
     const [admissionDate, setAdmissionDate] = useState("");
-    // const [fromHour, setFromHour] = useState("");
-    // const [fromMinute, setFromMinute] = useState("");
-    // const [fromamPm, setFromAmPm] = useState("");
-    // const [toHour, setToHour] = useState("");
-    // const [toMinute, setToMinute] = useState("");
-    // const [toamPm, setToAmPm] = useState("");
-    const [shiftFrom, setShiftFrom] = useState("");
-    const [shiftTo, setShiftTo] = useState("");
-
+    const [shift, setShift] = useState("");
+    const [time, setTime] = useState("");
+    const [paymentAmount, setPaymentAmount] = useState()
     const [address, setAddress] = useState("");
     const [croppedImage, setCroppedImage] = useState(null);
     const [formData, setFormData] = useState({})
@@ -94,8 +88,9 @@ export default function StudentAdmissionForm() {
                 preparingFor,
                 dob,
                 admissionDate,
-                shiftFrom,
-                shiftTo,
+                shift,
+                time,
+                paymentAmount,
                 address,
                 image: croppedImage,
                 admin: userId
@@ -104,7 +99,7 @@ export default function StudentAdmissionForm() {
 
         handleChange()
     }, [name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
-        admissionDate, shiftFrom, shiftTo,
+        admissionDate, shift, time, paymentAmount,
         address, croppedImage, userId])
 
 
@@ -127,13 +122,8 @@ export default function StudentAdmissionForm() {
             setPreparingFor("")
             setDob("")
             setAdmissionDate("")
-            // setFromHour("")
-            // setFromMinute("")
-            // setFromAmPm("")
-            // setToHour("")
-            // setToMinute("")
-            setShiftFrom("")
-            setShiftTo("")
+            setShift("")
+            setTime('')
             // setToAmPm("")
             setAddress("")
             setCroppedImage("")
@@ -152,6 +142,34 @@ export default function StudentAdmissionForm() {
 
         }
     }
+    const handleTimeChange = (e) => {
+        const selectedTime = e.target.value;
+        setTime(selectedTime);
+
+        // Logic to set paymentAmount based on selectedTime
+        let amount = 0;
+        switch (selectedTime) {
+            case "07:00AM - 11:00AM":
+            case "11:00AM - 03:00PM":
+            case "03:00PM - 07:00PM":
+            case "07:00PM - 11:00PM":
+                amount = 300; // Example amount for these time slots
+                break;
+            case "07:00PM - 07:00AM":
+                amount = 500; // Example amount for this time slot
+                break;
+            case "07:00AM - 03:00PM":
+            case "11:00AM - 07:00PM":
+                amount = 500; // Example amount for these time slots
+                break;
+            case "24 Hours":
+                amount = 1000; // Example amount for 24 Hours
+                break;
+            default:
+                amount = 0;
+        }
+        setPaymentAmount(amount);
+    };
 
     return (
         <>
@@ -198,7 +216,7 @@ export default function StudentAdmissionForm() {
                                 </div>
                                 <div>
                                     <label htmlFor="mother">Guardian's Mobile No.</label>
-                                    <input required className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
+                                    <input className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
                                 </div>
                                 <div>
                                     <label htmlFor="aadhar">Gender</label>
@@ -227,32 +245,36 @@ export default function StudentAdmissionForm() {
                             </div>
                             <div className='border p-2 rounded-sm'>
                                 <h3>Shift</h3>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
+                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
                                     <div className='flex flex-col'>
                                         <label>Shift</label>
-                                        <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
+                                        <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
                                             <option value="" disabled selected>Select One</option>
                                             <option value="Morning">Morning</option>
                                             <option value="Afternoon">Afternoon</option>
                                             <option value="Evening">Evening</option>
                                             <option value="Night">Night</option>
                                             <option value="Double">Double</option>
+                                            <option value="24 Hours">24 Hours</option>
                                         </select>
                                     </div>
                                     <div className='flex flex-col'>
-                                        <label htmlFor="aadhar">Time</label>
-                                        <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
+                                        <label htmlFor="time">Time</label>
+                                        <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
                                             <option value="" disabled selected>Select One</option>
-                                            <option value="Morning">07:00AM - 11:00AM</option>
-                                            <option value="Afternoon">11:00AM - 03:00PM</option>
-                                            <option value="Afternoon">03:00PM - 07:00PM</option>
-                                            <option value="Afternoon">07:00PM - 11:00PM</option>
-                                            <option value="Afternoon">07:00PM - 07:00PM</option>
-                                            <option value="Afternoon">07:00AM - 03:00PM</option>
-                                            <option value="Afternoon">11:00AM - 07:00PM</option>
-                                            <option value="Afternoon">24 Hours</option>
-
+                                            {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
+                                            {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
+                                            {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
+                                            {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}
+                                            {shift === "Night" && <option value="07:00PM - 07:00AM">07:00PM - 07:00AM</option>}
+                                            {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
+                                            {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
+                                            {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
                                         </select>
+                                    </div>
+                                    <div>
+                                        <label>Amount Chargable</label>
+                                        <input required className="p-2 border rounded-md w-full" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} type="number" placeholder="Amount Chargable" />
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +292,7 @@ export default function StudentAdmissionForm() {
                                     onClick={handleClickOpen}
                                     className='flex flex-col items-center border-dashed border-slate-300 border-[1px] p-4 bg-slate-200 cursor-pointer'>
                                     <ImagePlus className='mb-2' size={32} />
-                                    Uplaod Image
+                                    Uplaod Profile Image
                                 </div>
                             </div>
                             <div className='flex justify-end'>

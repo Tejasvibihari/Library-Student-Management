@@ -7,7 +7,7 @@ import ReportIcon from '@mui/icons-material/Report';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
-export default function StudentDetailCard({ studentId, sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shiftFrom, shiftTo, dob, aadhar, village, block, dist, pincode, lastPayment }) {
+export default function StudentDetailCard({ studentId, sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment }) {
 
 
     return (
@@ -37,8 +37,8 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                             {/* Dates Section  */}
                             <span className='font-semibold font-[inter] text-sm leading-6'>Addmission Date:- <span className='font-normal text-gray-100'>{formatDate(addmissionDate)}</span></span>
                             <span className='font-semibold font-[inter] text-sm leading-6'>Preparing For:- <span className='font-normal text-gray-100'>{preparingFor}</span></span>
-                            <span className='font-semibold font-[inter] text-sm leading-6'>DOB:- <span className='font-normal text-gray-100'>{formatDate(dob)} </span></span>
-                            <span className='font-semibold font-[inter] text-sm leading-6'>Shift:- <span className='font-normal text-gray-100'>{shiftFrom} - {shiftTo}</span></span>
+                            <span className='font-semibold font-[inter] text-sm leading-6'>Time:- <span className='font-normal text-gray-100'>{time} </span></span>
+                            <span className='font-semibold font-[inter] text-sm leading-6'>Shift:- <span className='font-normal text-gray-100'>{shift}</span></span>
                             {/* Social Media Link Section Start  */}
                             <div className="flex justify-around items-center w-60 border border-gray-500 shadow-md p-2 rounded-md">
                                 <Link to={`https://www.instagram.com/${facebookLink}`}>
@@ -109,6 +109,8 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                                         {gender}
                                     </span>
                                 </span>
+                                <span className='font-semibold font-[inter] text-sm leading-6'>DOB:- <span className='font-normal text-gray-100'>{formatDate(dob)} </span></span>
+
                                 <span className='font-semibold font-[inter] text-sm leading-6'>
                                     Guardian Mobile:-
                                     <span className='font-normal text-gray-100'>
@@ -118,7 +120,7 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                                 <span className='font-semibold font-[inter] text-sm leading-6'>
                                     Address:-
                                     <span className='font-normal text-gray-100'>
-                                        {village}, {block},<br />{dist}, {pincode}
+                                        {address}
                                     </span>
                                 </span>
                             </div>

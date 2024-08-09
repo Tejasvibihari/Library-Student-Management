@@ -6,8 +6,24 @@ import fs from 'fs';
 import path from 'path';
 
 export const createStudent = async (req, res) => {
-    const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin, lastPayment } = req.body;
-
+    // const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin, lastPayment } = req.body;
+    const {
+        name,
+        email,
+        mobile,
+        aadhar,
+        father,
+        guardian,
+        gender,
+        preparingFor,
+        dob,
+        admissionDate,
+        shift,
+        time,
+        paymentAmount,
+        address,
+        image, admin, lastPayment
+    } = req.body
     try {
         const imageBuffer = Buffer.from(image.split(",")[1], 'base64');
 
@@ -34,7 +50,7 @@ export const createStudent = async (req, res) => {
 
         const createStudent = await Student.create({
             sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
-            gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district,
+            gender, preparingFor, admissionDate, shift, time, paymentAmount, address, 
             image: imageFilename, admin, lastPayment
         })
         sendMail({
@@ -45,7 +61,7 @@ export const createStudent = async (req, res) => {
 <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
 <p>&nbsp;</p>
 <p><strong>Student ID:</strong> ${newSid}</p>
-<p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shiftFrom} - ${shiftTo}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${village}, ${block}, ${district} - ${pincode} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
+<p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
 <p>&nbsp;</p>
 <p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
 <p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
