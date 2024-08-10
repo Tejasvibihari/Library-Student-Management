@@ -145,8 +145,9 @@ export default function PaymentStudentTable({ allStudent }) {
                                         {data.paymentAmount}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${data.nextPayment < new Date() ? "border-yellow-600 bg-yellow-800" : "border-green-600 bg-green-800"}  flex items-center justify-center`}>
-                                            {data.nextPayment < new Date() ? "Pending" : "Active"}
+                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${!data.nextPayment || data.nextPayment < new Date() ? "border-yellow-600 bg-yellow-800" : "border-green-600 bg-green-800"}  flex items-center justify-center`}>
+                                            {/* {data.nextPayment < new Date() ? "Pending" : "Active"} */}
+                                            {!data.nextPayment || data.nextPayment < new Date() ? "Payment Due" : "Active"}
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">

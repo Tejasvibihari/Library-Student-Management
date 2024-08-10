@@ -14,8 +14,8 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
 
     useEffect(() => {
         const handleStatusChange = () => {
-            if (nextPayment < new Date()) {
-                setStatus('Pending')
+            if (!nextPayment || nextPayment < new Date()) {
+                setStatus('Payment Due')
             } else {
                 setStatus('Active')
             }
@@ -43,10 +43,10 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                             </div>
 
                             <div className='mt-4'>
-                                <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
+                                <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Payment Due" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                     {status}
                                     <span className='ml-2 mr-2'>
-                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}
+                                        {status === "Active" ? <DoneIcon /> : status === "Payment Due" ? <ReportIcon /> : <CancelIcon />}
                                     </span>
                                 </div>
                             </div>
