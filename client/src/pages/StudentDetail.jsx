@@ -117,6 +117,7 @@ export default function StudentDetail() {
                             status={student.status}
                             lastPayment={student.lastPayment}
                             paymentAmount={student.paymentAmount}
+                            nextPayment={student.nextPayment}
 
                         />
                     }) : "Nothing Found "}

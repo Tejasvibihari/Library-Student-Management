@@ -17,6 +17,7 @@ import IndividualPayment from './pages/IndividualPayment'
 
 import StudentSignin from './pages/StudentSignin'
 import Student from './pages/Student'
+import PaymentDetail from './pages/PaymentDetail'
 
 
 
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/student-detail" element={<StudentDetail />} />
             <Route path="/make-payment" element={<MakePayment />} />
             <Route path="/make-payment/:_id" element={<IndividualPayment />} />
+            <Route path="/payment-detail" element={<PaymentDetail />} />
           </Route>
 
           <Route element={<AdminProtectedRoute />}>

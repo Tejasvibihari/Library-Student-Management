@@ -7,8 +7,21 @@ import ReportIcon from '@mui/icons-material/Report';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
-export default function StudentDetailCard({ studentId, sid, src, status, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount }) {
+import { useEffect, useState } from 'react';
 
+export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount, nextPayment }) {
+    const [status, setStatus] = useState('Pending');
+
+    useEffect(() => {
+        const handleStatusChange = () => {
+            if (nextPayment < new Date()) {
+                setStatus('Pending')
+            } else {
+                setStatus('Active')
+            }
+        }
+        handleStatusChange()
+    }, [nextPayment])
 
     return (
         <>
@@ -26,9 +39,9 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                                 <span className='font-semibold font-[inter] text-sm leading-6'>Last Payment:- <span className='font-normal text-gray-100'>{formatDate(lastPayment)}</span></span>
                             </div>
                             <div>
-                                <span className='font-semibold font-[inter] text-sm leading-6'>Amount:- <span className='font-normal text-gray-100'>{paymentAmount}</span></span>
-
+                                <span className='font-semibold font-[inter] text-sm leading-6'>Next Payment:- <span className='font-normal text-gray-100'>{formatDate(nextPayment)}</span></span>
                             </div>
+
                             <div className='mt-4'>
                                 <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                     {status}
@@ -44,8 +57,12 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                             <span className='font-semibold font-[inter] text-sm leading-6'>Preparing For:- <span className='font-normal text-gray-100'>{preparingFor}</span></span>
                             <span className='font-semibold font-[inter] text-sm leading-6'>Time:- <span className='font-normal text-gray-100'>{time} </span></span>
                             <span className='font-semibold font-[inter] text-sm leading-6'>Shift:- <span className='font-normal text-gray-100'>{shift}</span></span>
+                            <div>
+                                <span className='font-semibold font-[inter] text-sm leading-6'>Amount:- <span className='font-normal text-gray-100'>{paymentAmount}</span></span>
+
+                            </div>
                             {/* Social Media Link Section Start  */}
-                            <div className="flex justify-around items-center w-60 border border-gray-500 shadow-md p-2 rounded-md">
+                            {/* <div className="flex justify-around items-center w-60 border border-gray-500 shadow-md p-2 rounded-md">
                                 <Link to={`https://www.instagram.com/${facebookLink}`}>
                                     <div className="p-1 border rounded-full border-white">
                                         <Facebook size={15} />
@@ -66,7 +83,7 @@ export default function StudentDetailCard({ studentId, sid, src, status, faceboo
                                         <Facebook size={15} />
                                     </div>
                                 </Link>
-                            </div>
+                            </div> */}
                             {/* Social Media Link End  */}
                         </div>
                     </div>

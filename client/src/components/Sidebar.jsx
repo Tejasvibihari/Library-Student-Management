@@ -53,6 +53,10 @@ const SideBar = ({ children }) => {
             <IndianRupee className="w-6 h-6 mr-2" />
             <span className={`${open ? 'block' : 'hidden'}`}>Make Payment</span>
           </Link>
+          <Link to="/payment-detail" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-purple-950">
+            <IndianRupee className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Payment Detail</span>
+          </Link>
         </nav>
       </div>
 

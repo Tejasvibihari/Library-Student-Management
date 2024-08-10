@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { sendMail } from '../utils/mailer.js';
 import fs from 'fs';
 import path from 'path';
+import Payment from '../models/paymentModel.js';
 
 export const createStudent = async (req, res) => {
     // const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin, lastPayment } = req.body;
@@ -24,10 +25,10 @@ export const createStudent = async (req, res) => {
         address,
         image, admin, lastPayment
     } = req.body
-    console.log(image)
     try {
         let imageFilename = null;
-
+        let newSid;
+        let password;
         if (image && typeof image === 'string') {
             const base64String = image.split(",")[1];
             if (base64String) {
@@ -43,7 +44,7 @@ export const createStudent = async (req, res) => {
                 imageFilename = `${newSid}.jpeg`;
                 // Write the image to a file
                 fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-                const password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4))
+                password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4))
 
                 const existingStudent = await Student.findOne({ email })
                 if (existingStudent) {
@@ -55,6 +56,7 @@ export const createStudent = async (req, res) => {
                     gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
                     image: imageFilename, admin, lastPayment
                 })
+
             } else {
                 console.error("Invalid image format: base64 string is missing.");
             }
@@ -242,3 +244,4 @@ export const updateStudent = async (req, res) => {
         res.status(500).json({ message: "An error occurred while updating the student details", error: error.message });
     }
 };
+

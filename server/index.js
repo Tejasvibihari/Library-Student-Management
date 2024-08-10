@@ -6,6 +6,7 @@ import adminRouter from './router/adminAuth.js'
 import studentRouter from './router/studentRouter.js'
 import studentAuthRouter from './router/studentAuthRouter.js'
 import mailRouter from './router/mailRouter.js'
+import paymentRouter from './router/paymentRoute.js'
 // import './utils/scheduler/PaymentStatus.js'
 import dotenv from 'dotenv';
 
@@ -51,6 +52,7 @@ app.use('/api/admin/auth/', adminRouter);
 app.use('/api/student/', studentRouter);
 app.use('/api/student/auth', studentAuthRouter);
 app.use('/api/mail/', mailRouter);
+app.use('/api/payment/', paymentRouter);
 
 
 

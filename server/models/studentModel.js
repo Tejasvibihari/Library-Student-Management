@@ -20,9 +20,11 @@ const StudentSchema = new mongoose.Schema({
     facebook: { type: String },
     youtube: { type: String },
     status: { type: String, default: "Pending" },
-    lastPayment: { type: Date },
+    // Payment Model
     paymentAmount: { type: Number },
-    paymentMode: { type: String },
+    nextPayment: { type: Date },
+    lastPayment: { type: Date },
+    
     image: { type: String }, // Assuming image is stored as a URL or base64 string
     admin: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,7 +32,7 @@ const StudentSchema = new mongoose.Schema({
     },
     isOnline: { type: Boolean, default: false },
     // Assuming paymentDate is the same as lastPayment, if not, add it as well
-    paymentDate: { type: Date },
+
 });
 
 const Student = mongoose.model('Student', StudentSchema);

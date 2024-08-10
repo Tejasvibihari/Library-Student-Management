@@ -5,13 +5,39 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import client from '../services/axiosClient'
 import CircularLoading from '../components/ui/CircularLoading'
-import { loadStripe } from '@stripe/stripe-js';
+import formatDate from '../utils/FormateDate';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
 
 export default function IndividualPayment() {
     const [studentData, setStudentData] = useState({})
     const [loading, setLoading] = useState(false)
-
+    const [admissionDate, setAdmissionDate] = useState('')
     const { _id } = useParams()
+
+    const [paymentDate, setPaymentDate] = useState('')
+    const [paymentFor, setPaymentFor] = useState()
+    const [paymentData, setPaymentData] = useState({})
+    // SnackBar State 
+    const [snackOpen, setSnackOpen] = useState(false);
+    const [alertStatus, setAlertStatus] = useState('')
+    const handleSnackOpen = () => {
+        setSnackOpen(true);
+    };
+    const handleSnackClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setSnackOpen(false);
+    };
+
+
+    function safeFormatDate(dateInput) {
+        const date = new Date(dateInput);
+        return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+    }
     useEffect(() => {
         const getData = async () => {
             const response = await client.get("/api/student/getstudent", {
@@ -19,105 +45,65 @@ export default function IndividualPayment() {
             })
             setStudentData(response.data)
         }
+        const handelPaymentChange = () => {
+            setPaymentData({
+                sid: studentData.sid,
+                payment_date: paymentDate,
+                amount: studentData.paymentAmount,
+                months_paid_for: paymentFor,
+                admissionDate: studentData.admissionDate
+            })
+        }
         getData()
-    })
+        handelPaymentChange()
+        setAdmissionDate(safeFormatDate(studentData.admissionDate))
+    }, [_id, paymentDate, paymentFor, studentData.admissionDate, studentData.paymentAmount, studentData.sid])
 
-    const makePayment = async () => {
+    const handlePaymentClick = async () => {
         setLoading(true)
         try {
-            const stripe = await loadStripe('pk_test_51O6UlBSDEHgQOqxIWLAdUy36073N1Y5TwalsRza6sVcgBoYnqQdkIfMioC1L0hy4V0t5x54iLjdQamwdFwoiJS2g00fCQAVYtB');
+            const response = await client.post('/api/payment/makepayment', paymentData)
+            console.log(response)
+            setAlertStatus(response.data.message)
+            handleSnackOpen()
             setLoading(false)
+            setPaymentData({})
         } catch (error) {
-            console.log(error)
             setLoading(false)
+            if (error.response && error.response.data && error.response.data.message) {
+                setAlertStatus(error.response.data.message);
+                handleSnackOpen()
+            } else if (error.message) {
+                setAlertStatus(error.message);
+                handleSnackOpen()
+            } else {
+                setAlertStatus('An unknown error occurred');
+                handleSnackOpen()
+            }
         }
+
     }
+
+
+
+
     return (
         <div>
+            <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
+                <Alert
+                    onClose={handleSnackClose}
+                    severity={alertStatus === "Payment Success" ? "success" : "error"}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {alertStatus}
+                </Alert>
+            </Snackbar>
             <SideBar>
                 <Breadcrumbs title="Checkout" subTitle="Payment" />
 
-                <div className='grid grid-cols-6 gap-4'>
-                    <div className='col-span-4'>
-                        <div className='p-4 shadow-lg rounded-md'>
-                            <div className='py-2'>
-                                <h1 className='font-[inter] border-l-4 border-green-700 pl-2'>Personal Detail</h1>
-                            </div>
-                            <hr className='' />
-                            <div className='my-4 flex gap-4'>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Name</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.name}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Email</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.email}</h2>
-                                </div>
-                            </div>
-                            <div className='my-4 flex gap-4'>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Phone</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.mobile}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Address</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.village}, {studentData.block}, {studentData.district} - {studentData.pincode}</h2>
-                                </div>
-                            </div>
-                            <div className='my-4 flex gap-4'>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Gender</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.gender}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Aadhar</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.aadhar}</h2>
-                                </div>
-                            </div>
-                            <div className='my-4 flex gap-4'>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Date of Birth</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.dob}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Preparing For</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.preparingFor}</h2>
-                                </div>
-                            </div>
-                            <div className='py-2'>
-                                <h1 className='font-[inter] border-l-4 border-red-700 pl-2'>Guardian Detail</h1>
-                            </div>
-                            <hr className='' />
-                            <div className='my-4 flex gap-4'>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Father's Name</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.father}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Guardian Mobile No.</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.guardian}</h2>
-                                </div>
-                            </div>
-                            <div className='py-2'>
-                                <h1 className='font-[inter] border-l-4 border-red-700 pl-2'>Social Link</h1>
-                            </div>
-                            <hr className='' />
-                            <div className='my-4 flex gap-4'>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Instagram</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.instagram}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Facebook</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.facebook}</h2>
-                                </div>
-                                <div className='border p-2 rounded-sm w-full'>
-                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Youtube</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.youtube}</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div className='grid grid-cols-1 gap-4'>
+
                     <div className='col-span-2'>
                         <div className='p-4 shadow-lg rounded-md'>
                             <div className='py-2'>
@@ -127,37 +113,59 @@ export default function IndividualPayment() {
                                 <hr className='' />
                                 <div className='my-4 flex gap-4'>
                                     <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Shift From</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.shiftFrom}</h2>
-                                    </div>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Shift To</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.shiftTo}</h2>
+                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>SID</h3>
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.sid}</h2>
                                     </div>
                                 </div>
                                 <div className='my-4 flex gap-4'>
                                     <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Last Payment Date</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.lastPayment}</h2>
+                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Name</h3>
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.name}</h2>
+                                    </div>
+                                </div>
+                                <div className='my-4 flex gap-4'>
+                                    <div className='border p-2 rounded-sm w-full'>
+                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Shift</h3>
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.shift}</h2>
+                                    </div>
+                                    <div className='border p-2 rounded-sm w-full'>
+                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Time</h3>
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.time}</h2>
+                                    </div>
+                                </div>
+                                <div className='my-4 flex gap-4'>
+                                    <div className='border p-2 rounded-sm w-full'>
+                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Admission Date</h3>
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{formatDate(studentData.admissionDate)}</h2>
                                     </div>
                                 </div>
                                 <div className='my-4 flex gap-4'>
                                     <div className='border p-2 rounded-sm w-full'>
                                         <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Enter Payment Date</h3>
+                                        <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type='date' value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} placeholder='Enter Payment Date' />
+                                    </div>
+                                </div>
+                                <div className='my-4 flex gap-4'>
+                                    <div className='border p-2 rounded-sm w-full'>
+                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Payment For</h3>
                                         {/* <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.lastPayment}</h2> */}
-                                        <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full' type='date' placeholder='Enter Payment Date' />
+                                        <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' value={paymentFor} onChange={(e) => setPaymentFor(e.target.value)} type="number" placeholder='1 or 2 Month' />
                                     </div>
                                 </div>
                                 <div className='my-4 flex gap-4'>
                                     <div className='border p-2 rounded-sm w-full'>
                                         <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Amount</h3>
-                                        {/* <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.lastPayment}</h2> */}
-                                        <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full' type="number" placeholder='Enter Amount' />
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.paymentAmount}</h2>
+                                        {/* <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type="number" placeholder='Enter Amount' /> */}
                                     </div>
                                 </div>
-                                <button onClick={makePayment} type='submit' className='p-2 w-full border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
+                                <button onClick={handlePaymentClick} className='p-2 w-full border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
 
-                                    {loading ? <div className='flex items-center justify-center'><span className='mr-2'>Please Wait..</span><CircularLoading size={25} /></div> :
+                                    {loading ?
+                                        <div className='flex items-center justify-center'>
+                                            <span className='mr-2'>Please Wait..</span>
+                                            <CircularLoading size={25} />
+                                        </div> :
                                         <div className='flex items-center'>
                                             {/* <UserPlus size={17} className='mr-2' />Update Student</div>} */}
                                             Checkout</div>}
@@ -166,7 +174,7 @@ export default function IndividualPayment() {
                         </div>
                     </div>
                 </div>
-            </SideBar>
+            </SideBar >
         </div >
     )
 }

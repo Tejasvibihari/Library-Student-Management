@@ -51,12 +51,10 @@ export default function StudentUpdateForm() {
     const [preparingFor, setPreparingFor] = useState("");
     const [dob, setDob] = useState("");
     const [admissionDate, setAdmissionDate] = useState("");
-    const [shiftFrom, setShiftFrom] = useState("");
-    const [shiftTo, setShiftTo] = useState("");
-    const [pincode, setPincode] = useState("");
-    const [village, setVillage] = useState("");
-    const [block, setBlock] = useState("");
-    const [district, setDistrict] = useState("");
+    const [shift, setShift] = useState("");
+    const [time, setTime] = useState("");
+    const [address, setAddress] = useState("");
+
     const [croppedImage, setCroppedImage] = useState(null);
     const [instagram, setInstagram] = useState("")
     const [facebook, setFacebook] = useState("")
@@ -93,20 +91,9 @@ export default function StudentUpdateForm() {
         setOpen(false);
     };
     // Get Address With Pin Code 
-    const handleOnBlur = async () => {
-        try {
-            const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`)
-            setAddressArray(response.data[0].PostOffice)
-        } catch (error) {
-            console.log(error)
-        }
-    }
+
     // Show Unique Item From The array of address in the input field 
-    const uniqueBlocks = addressArray && addressArray.reduce((unique, item) => {
-        return unique.findIndex(uniqueItem => uniqueItem.Block === item.Block) < 0
-            ? [...unique, item]
-            : unique;
-    }, []);
+
     function safeFormatDate(dateInput) {
         const date = new Date(dateInput);
         return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
@@ -127,12 +114,9 @@ export default function StudentUpdateForm() {
                 setGuardian(response.data.guardian)
                 setGender(response.data.gender)
                 setPreparingFor(response.data.preparingFor)
-                setShiftFrom(response.data.shiftFrom)
-                setShiftTo(response.data.shiftTo)
-                setPincode(response.data.pincode)
-                setVillage(response.data.village)
-                setBlock(response.data.block)
-                setDistrict(response.data.district)
+                setShift(response.data.shift)
+                setTime(response.data.time)
+                setAddress(response.data.address)
                 setCroppedImage(response.data.image)
                 setStatus(response.data.status)
                 setPaymentAmount(response.data.paymentAmount)
@@ -185,12 +169,9 @@ export default function StudentUpdateForm() {
                 preparingFor,
                 dob,
                 admissionDate,
-                shiftFrom,
-                shiftTo,
-                pincode,
-                village,
-                block,
-                district,
+                shift,
+                time,
+                address,
                 instagram,
                 facebook,
                 youtube,
@@ -202,13 +183,9 @@ export default function StudentUpdateForm() {
                 admin: userId
             })
         }
-        setDistrict(addressArray.length > 0 && addressArray[0].District
-            ? addressArray[0].District
-            : null)
         handleChange()
     }, [sid, name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
-        admissionDate, shiftFrom, shiftTo,
-        pincode, village, block, district, croppedImage, userId, addressArray, instagram, facebook, youtube, status, lastPayment, paymentMode, paymentAmount])
+        admissionDate, shift, time, address, croppedImage, userId, addressArray, instagram, facebook, youtube, status, lastPayment, paymentMode, paymentAmount])
 
 
     const handleSubmit = async (e) => {
@@ -236,6 +213,34 @@ export default function StudentUpdateForm() {
         }
     }
     console.log(formData)
+    const handleTimeChange = (e) => {
+        const selectedTime = e.target.value;
+        setTime(selectedTime);
+
+        // Logic to set paymentAmount based on selectedTime
+        let amount = 0;
+        switch (selectedTime) {
+            case "07:00AM - 11:00AM":
+            case "11:00AM - 03:00PM":
+            case "03:00PM - 07:00PM":
+            case "07:00PM - 11:00PM":
+                amount = 300; // Example amount for these time slots
+                break;
+            case "07:00PM - 07:00AM":
+                amount = 500; // Example amount for this time slot
+                break;
+            case "07:00AM - 03:00PM":
+            case "11:00AM - 07:00PM":
+                amount = 500; // Example amount for these time slots
+                break;
+            case "24 Hours":
+                amount = 1000; // Example amount for 24 Hours
+                break;
+            default:
+                amount = 0;
+        }
+        setPaymentAmount(amount);
+    };
     return (
         <>
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
@@ -312,52 +317,46 @@ export default function StudentUpdateForm() {
                                 </div>
                                 <div className='border p-2 rounded-sm'>
                                     <h3>Shift</h3>
-                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
+                                    <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
                                         <div className='flex flex-col'>
-                                            <label htmlFor="fromHour">From</label>
-                                            <div className='flex gap-2'>
-                                                <input type='time' value={shiftFrom} onChange={(e) => setShiftFrom(e.target.value)} className="p-2 border rounded-md w-full" />
-                                            </div>
+                                            <label>Shift</label>
+                                            <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
+                                                <option value="" disabled selected>Select One</option>
+                                                <option value="Morning">Morning</option>
+                                                <option value="Afternoon">Afternoon</option>
+                                                <option value="Evening">Evening</option>
+                                                <option value="Night">Night</option>
+                                                <option value="Double">Double</option>
+                                                <option value="24 Hours">24 Hours</option>
+                                            </select>
                                         </div>
                                         <div className='flex flex-col'>
-                                            <label htmlFor="toHour">To</label>
-                                            <div className='flex gap-2'>
-                                                <input type='time' value={shiftTo} onChange={(e) => setShiftTo(e.target.value)} className="p-2 border rounded-md w-full" />
-
-                                            </div>
+                                            <label htmlFor="time">Time</label>
+                                            <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
+                                                <option value="" disabled selected>Select One</option>
+                                                {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
+                                                {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
+                                                {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
+                                                {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}
+                                                {shift === "Night" && <option value="07:00PM - 07:00AM">07:00PM - 07:00AM</option>}
+                                                {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
+                                                {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
+                                                {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label>Amount Chargable</label>
+                                            <input required className="p-2 border rounded-md w-full" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} type="number" placeholder="Amount Chargable" />
                                         </div>
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
                                     <div>
-                                        <label>Pincode</label>
-                                        <input required className="p-2 border rounded-md w-full" type="number" id="number" placeholder="Pincode"
-                                            value={pincode}
-                                            onChange={(e) => setPincode(e.target.value)}
-                                            onBlur={handleOnBlur} />
-                                    </div>
-                                    <div>
-                                        <label >Village</label>
-                                        <select required className="p-2 border rounded-md w-full" value={village} onChange={(e) => setVillage(e.target.value)}>
-                                            <option value="" disabled>Village</option>
-                                            {addressArray && addressArray.map((name, index) => (
-                                                <option key={index} value={name.Name}>{name.Name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label >Block</label>
-                                        <select required className="p-2 border rounded-md w-full" value={block} onChange={(e) => setBlock(e.target.value)}>
-                                            <option value="" disabled>Block</option>
-                                            {uniqueBlocks && uniqueBlocks.map((name, index) => (
-                                                <option key={index} value={name.Block}>{name.Block}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label >District</label>
-                                        <input required className="p-2 border rounded-md w-full" type="text"
-                                            value={district} id="district" placeholder="District" />
+                                        <label>Address</label>
+                                        <input required className="p-2 border rounded-md w-full" type="text" placeholder="Address"
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                        />
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
@@ -453,7 +452,7 @@ export default function StudentUpdateForm() {
                                     name={name}
                                     father={father}
                                     mobile={mobile}
-                                    village={village}
+                                    village={address}
                                     preparingFor={preparingFor}
                                     addmissionDate={admissionDate}
                                     image={croppedImage === `${sid}.jpeg` ? `http://localhost:3000/uploads/${croppedImage}` : croppedImage}

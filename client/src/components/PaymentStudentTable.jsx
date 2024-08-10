@@ -13,22 +13,17 @@ import client from '../services/axiosClient';
 import Avatar from '@mui/material/Avatar';
 import { IndianRupee } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-
+import formatDate from '../utils/FormateDate';
 const columns = [
     { id: 'sid', label: 'SID', minWidth: 70 },
     { id: 'image', label: 'Image', minWidth: 50 },
     {
         id: 'name',
         label: 'Name',
-        minWidth: 170,
+        minWidth: 150,
         align: 'center',
     },
-    {
-        id: 'email',
-        label: 'Email',
-        minWidth: 170,
-        align: 'center',
-    },
+
     {
         id: 'shift',
         label: 'Shift',
@@ -38,13 +33,19 @@ const columns = [
     {
         id: 'lastPayment',
         label: 'Last Payment',
-        minWidth: 150,
+        minWidth: 100,
         align: 'center',
     },
     {
         id: 'paymentDate',
         label: 'Payment Date',
         minWidth: 150,
+        align: 'center',
+    },
+    {
+        id: 'amount',
+        label: 'Amount',
+        minWidth: 50,
         align: 'center',
     },
     {
@@ -56,18 +57,22 @@ const columns = [
     {
         id: 'action',
         label: 'Action',
-        minWidth: 170,
+        minWidth: 100,
         align: 'center',
     },
 ];
 
 
-export default function PaymentStudentTable() {
+export default function PaymentStudentTable({ allStudent }) {
     const [page, setPage] = React.useState(0);
     const [loading, setLoading] = useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const adminId = useSelector(state => state.admin.currentAdmin._id)
-    const [allStudent, setAllStudent] = useState('')
+    // const [allStudent, setAllStudent] = useState('')
+
+    const [status, setStatus] = useState('Pending');
+
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -78,27 +83,20 @@ export default function PaymentStudentTable() {
     };
 
 
-    useEffect(() => {
-        const getAllStudent = async () => {
-            try {
-                const response = await client.get("/api/student/getallstudent", {
-                    params: { admin: adminId }
-                })
-                setAllStudent(response.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        getAllStudent()
-    }, [adminId])
+    // useEffect(() => {
+    //     const getAllStudent = async () => {
+    //         try {
+    //             const response = await client.get("/api/student/getallstudent", {
+    //                 params: { admin: adminId }
+    //             })
+    //             setAllStudent(response.data)
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+    //     }
+    //     getAllStudent()
+    // }, [adminId])
 
-    async function handleClick(id) {
-        try {
-            console.log(id)
-        } catch (error) {
-            console.log(error)
-        }
-    }
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer sx={{ maxHeight: 440 }}>
@@ -135,20 +133,20 @@ export default function PaymentStudentTable() {
                                         {data.name}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.email}
+                                        {data.time}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.shiftFrom} - {data.shiftTo}
+                                        {data.lastPayment ? formatDate(data.lastPayment) : 'N/A'}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.lastPayment ? (data.lastPayment.toString()).slice(0, 10) : 'N/A'}
+                                        {data.nextPayment ? formatDate(data.nextPayment) : 'N/A'}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.paymentDate ? (data.paymentDate.toString()).slice(0, 10) : 'N/A'}
+                                        {data.paymentAmount}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${data.status === "Active" ? "border-green-600 bg-green-800" : data.status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
-                                            {data.status}
+                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${data.nextPayment < new Date() ? "border-yellow-600 bg-yellow-800" : "border-green-600 bg-green-800"}  flex items-center justify-center`}>
+                                            {data.nextPayment < new Date() ? "Pending" : "Active"}
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
