@@ -7,8 +7,8 @@ import path from 'path';
 import Payment from '../models/paymentModel.js';
 
 export const createStudent = async (req, res) => {
-    // const { name, dob, email, mobile, aadhar, father, guardian, gender, preparingFor, admissionDate, shiftFrom, shiftTo, pincode, village, block, district, image, admin, lastPayment } = req.body;
     const {
+        sid,
         name,
         email,
         mobile,
@@ -23,72 +23,114 @@ export const createStudent = async (req, res) => {
         time,
         paymentAmount,
         address,
-        image, admin, lastPayment
-    } = req.body
+        image,
+        admin,
+        lastPayment
+    } = req.body;
+
+    console.log(`Received SID: ${sid}`);
     try {
         let imageFilename = null;
-        let newSid;
         let password;
-        if (image && typeof image === 'string') {
-            const base64String = image.split(",")[1];
-            if (base64String) {
-                const imageBuffer = Buffer.from(base64String, 'base64');
-                // Generate a unique filename for the image
-                const lastStudent = await Student.find().sort({ sid: -1 }).limit(1);
 
-                if (lastStudent.length === 0) {
-                    newSid = 1001;
-                } else {
-                    newSid = lastStudent[0].sid + 1;
-                }
-                imageFilename = `${newSid}.jpeg`;
-                // Write the image to a file
-                fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-                password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4))
+        const student = await Student.findOne({ sid });
+        const studentEmail = await Student.findOne({ email });
 
-                const existingStudent = await Student.findOne({ email })
-                if (existingStudent) {
-                    return res.status(400).json({ message: 'Student already exists', studentId: existingStudent.sid })
-                }
-                const hashedPassword = await bcrypt.hash(password, 12)
-                const createStudent = await Student.create({
-                    sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
-                    gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
-                    image: imageFilename, admin, lastPayment
-                })
+        console.log(`Student by SID: ${student}`);
+        console.log(`Student by Email: ${studentEmail}`);
 
-            } else {
-                console.error("Invalid image format: base64 string is missing.");
-            }
-        } else {
-            console.error("Invalid image: image is either undefined or not a string.");
+        if (student || studentEmail) {
+            return res.status(400).json({ message: 'Student already exists' });
         }
 
-        sendMail({
-            to: email,
-            subject: "Welcome to Bihari Library - Admission Confirmation",
-            body: `<p>Dear ${name},</p>
-<p>&nbsp;</p>
-<p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
-<p>&nbsp;</p>
-<p><strong>Student ID:</strong> ${newSid}</p>
-<p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
-<p>&nbsp;</p>
-<p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
-<p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
-<p>Once again, congratulations on your admission. We look forward to welcoming you to our campus.</p>
-<p>Best regards,</p>
-<p>&nbsp;</p>
-<p><strong><em>Bihari Library</em></strong></p>
-<p><strong><em>9608888400, 9905424292</em></strong></p>
-<p>&nbsp;</p>`
-        })
-        return res.status(201).json({ message: "Addmission Success" });
+        if (sid >= 1 && sid <= 321) {
+            if (image && typeof image === 'string') {
+                const base64String = image.split(",")[1];
+                if (base64String) {
+                    const imageBuffer = Buffer.from(base64String, 'base64');
+                    imageFilename = `${sid}.jpeg`;
+                    fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
+                    password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
+                    const hashedPassword = await bcrypt.hash(password, 12);
+
+                    await Student.create({
+                        sid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
+                        gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                        image: imageFilename, admin, lastPayment
+                    });
+
+                    sendMail({
+                        to: email,
+                        subject: "Welcome to Bihari Library - Admission Confirmation",
+                        body: `<p>Dear ${name},</p>
+                            <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
+                            <p><strong>Student ID:</strong> ${sid}</p>
+                            <p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
+                            <p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
+                            <p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
+                            <p>Once again, congratulations on your admission. We look forward to welcoming you to our campus.</p>
+                            <p>Best regards,</p>
+                            <p><strong><em>Bihari Library</em></strong></p>
+                            <p><strong><em>9608888400, 9905424292</em></strong></p>`
+                    });
+
+                    return res.status(201).json({ message: "Admission Success" });
+                } else {
+                    console.error("Invalid image format: base64 string is missing.");
+                }
+            } else {
+                console.error("Invalid image: image is either undefined or not a string.");
+            }
+        } else {
+            if (image && typeof image === 'string') {
+                const base64String = image.split(",")[1];
+                if (base64String) {
+                    const imageBuffer = Buffer.from(base64String, 'base64');
+                    const lastStudent = await Student.findOne().sort({ sid: -1 });
+                    const newSid = lastStudent ? lastStudent.sid + 1 : 322;
+
+                    imageFilename = `${newSid}.jpeg`;
+                    fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+
+                    password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
+                    const hashedPassword = await bcrypt.hash(password, 12);
+
+                    await Student.create({
+                        sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
+                        gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                        image: imageFilename, admin, lastPayment
+                    });
+
+                    sendMail({
+                        to: email,
+                        subject: "Welcome to Bihari Library - Admission Confirmation",
+                        body: `<p>Dear ${name},</p>
+                            <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
+                            <p><strong>Student ID:</strong> ${newSid}</p>
+                            <p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
+                            <p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
+                            <p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
+                            <p>Once again, congratulations on your admission. We look forward to welcoming you to our campus.</p>
+                            <p>Best regards,</p>
+                            <p><strong><em>Bihari Library</em></strong></p>
+                            <p><strong><em>9608888400, 9905424292</em></strong></p>`
+                    });
+
+                    return res.status(201).json({ message: "Admission Success" });
+                } else {
+                    console.error("Invalid image format: base64 string is missing.");
+                }
+            } else {
+                console.error("Invalid image: image is either undefined or not a string.");
+            }
+        }
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
-}
+};
+
 export const GetAllStudent = async (req, res) => {
     const { sid, name, admin, status } = req.query;
 
