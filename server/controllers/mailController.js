@@ -47,7 +47,7 @@ export const getStudentEmail = async (req, res) => {
 
 export const sendEmail = async (req, res) => {
     const { to, subject, body, admin } = req.body;
-    console.log("helo", to, subject, body, admin);
+
     try {
         // Find students to get their names and emails
         const students = await Student.find({ admin: admin });

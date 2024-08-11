@@ -37,7 +37,7 @@ const SideBar = ({ children }) => {
             <LayoutDashboard className="w-6 h-6 mr-2" />
             <span className={`${open ? 'block' : 'hidden'}`}>Dashboard</span>
           </Link>
-          <Link to="/student-admission" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-red-950">
+          <Link to="/admin-student-admission" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-red-950">
             <UserPlus className="w-6 h-6 mr-2" />
             <span className={`${open ? 'block' : 'hidden'}`}>Student Admission</span>
           </Link>

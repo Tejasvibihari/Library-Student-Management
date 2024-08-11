@@ -91,7 +91,7 @@ export const createStudent = async (req, res) => {
 }
 export const GetAllStudent = async (req, res) => {
     const { sid, name, admin, status } = req.query;
-    console.log(status)
+
     // Construct a dynamic query object
     let query = {};
     if (admin) query.admin = admin;

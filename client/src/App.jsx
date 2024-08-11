@@ -6,7 +6,7 @@ import VerifyPasswordForm from './components/adminAuth/AdminVerifyPasswordForm'
 import Home from './pages/Home'
 import Email from './pages/Email'
 import EmailEditor from './components/EmailEditor'
-import StudentAdmission from './pages/StudentAdmission'
+import AdminStudentAdmission from './pages/AdminStudentAdmission'
 import ProtectedRoute from './pages/AdminProtectedRoute'
 import AdminProtectedRoute from './pages/AdminProtectedRoute'
 import StudentId from './pages/StudentId'
@@ -18,6 +18,7 @@ import IndividualPayment from './pages/IndividualPayment'
 import StudentSignin from './pages/StudentSignin'
 import Student from './pages/Student'
 import PaymentDetail from './pages/PaymentDetail'
+import StudentAdmission from './pages/StudentAdmission'
 
 
 
@@ -33,14 +34,14 @@ export default function App() {
           <Route path="/resetpassword" element={<ResetPasswordForm />} />
           <Route path="/verifypassword" element={<VerifyPasswordForm />} />
           {/* Admin Authentication End */}
-
+          <Route path="/student-admission" element={<StudentAdmission />} />
           <Route path="/student-signin" element={<StudentSignin />} />
           <Route path="/student-dashboard" element={<Student />} />
 
           {/* Sidebar menu Start  */}
           <Route element={<AdminProtectedRoute />}>
             <Route path="/" element={<Home />} />
-            <Route path="/student-admission" element={<StudentAdmission />} />
+            <Route path="/admin-student-admission" element={<AdminStudentAdmission />} />
             <Route path="/student-update/:_id" element={<StudentUpdate />} />
             <Route path="/email" element={<Email />} />
             <Route path="/sendemail" element={<EmailEditor />} />

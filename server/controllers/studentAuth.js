@@ -6,9 +6,8 @@ import bcrypt from "bcrypt";
 export const SignIn = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password)
         const existingStudent = await Student.findOne({ email })
-        console.log(existingStudent)
+
         if (!existingStudent) {
             return res.status(404).json({ message: 'Student does not exist' })
         }
