@@ -171,7 +171,7 @@ export default function PaymentStudentTable({ allStudent }) {
             <TablePagination
                 rowsPerPageOptions={[10, 25, 30, 40, 50, 75, 100]}
                 component="div"
-                count={allStudent.length}
+                // count={allStudent.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}

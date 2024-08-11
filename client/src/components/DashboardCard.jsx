@@ -1,19 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import OverviewCard from './ui/OverviewCard'
 import { Link } from 'react-router-dom'
 
-export default function DashboardCard() {
+export default function DashboardCard({ allStudent }) {
+    const [pendingStudent, setPendingStudent] = useState()
+    const [activeStudent, setActiveStudent] = useState()
+    useEffect(() => {
+        const pending = allStudent.filter(student => student.nextPayment < new Date())
+        const active = allStudent.filter(student => student.nextPayment >= new Date())
+        setPendingStudent(pending.length)
+        setActiveStudent(active.length)
+    }, [allStudent])
     return (
         <>
             <div className='grid grid-cols-3 my-4'>
                 <div className='flex gap-4 p-2 my-4 col-span-2 w-full rounded-sm'>
                     <div className='flex flex-col gap-4 w-full'>
-                        <OverviewCard title="Total Student" value="45000" />
-                        <OverviewCard title="Pending Student" value="45000" />
+                        <OverviewCard icon="Users" title="Total Student" value={allStudent.length} />
+
                     </div>
                     <div className='flex flex-col gap-4 w-full'>
-                        <OverviewCard title="Recent Admission" value="45000" />
-                        <OverviewCard title="Total Student" value="45000" />
+                        <OverviewCard icon="CalendarArrowDown" title="Pending Student" value={pendingStudent} />
+                        {/* <OverviewCard title="Active Student" value={activeStudent} /> */}
                     </div>
                 </div>
                 <div>

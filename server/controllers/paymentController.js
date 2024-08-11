@@ -4,17 +4,12 @@ import Student from '../models/studentModel.js'; // Adjust the path as necessary
 // Create a new payment
 export const createPayment = async (req, res) => {
     const { sid, payment_date, amount, months_paid_for, admissionDate } = req.body;
-    console.log(months_paid_for)
-    console.log(typeof (months_paid_for))
     try {
         // Check if the student exists
         const student = await Student.findOne({ sid });
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
-
-
-
         let nextPaymentDate;
 
         if (student.nextPayment) {
@@ -24,12 +19,11 @@ export const createPayment = async (req, res) => {
             // If nextPayment is null, use the admissionDate as the base date
             nextPaymentDate = new Date(admissionDate);
         }
-        console.log("nextPaymentDate", nextPaymentDate)
+
         // Extract the current year and month
         let year = nextPaymentDate.getFullYear();
         let month = nextPaymentDate.getMonth() + Number(months_paid_for);
-        console.log("month", month)
-        console.log("year", year)
+
         // Calculate the new year and month, considering overflow
         year += Math.floor(month / 12);
         month = month % 12;
@@ -66,6 +60,7 @@ export const createPayment = async (req, res) => {
 // Get all payments
 export const getAllPayments = async (req, res) => {
     try {
+        console.log("hello")
         const payments = await Payment.find().populate('sid');
         res.status(200).json(payments);
     } catch (error) {

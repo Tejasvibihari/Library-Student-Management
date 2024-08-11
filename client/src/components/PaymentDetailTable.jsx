@@ -7,7 +7,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import client from '../services/axiosClient';
+import Avatar from '@mui/material/Avatar';
+import formatDate from '../utils/FormateDate';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -28,25 +32,32 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-}
 
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+export default function PaymentDetailTable({ data }) {
+    const adminId = useSelector(state => state.admin.currentAdmin._id);
+    const [studentData, setStudentData] = useState([]);
 
-export default function PaymentDetailTable() {
+    useEffect(() => {
+        const getStudent = async () => {
+            try {
+                const response = await client.get("/api/student/getallstudent", {
+                    params: { admin: adminId }
+                });
+                console.log(response.data);
+                setStudentData(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getStudent();
+    }, [adminId]);
+
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
                 <TableHead>
                     <TableRow>
-                        <StyledTableCell align="center" style={{ width: '70px' }} >SID</StyledTableCell>
+                        <StyledTableCell align="center" style={{ width: '70px' }}>SID</StyledTableCell>
                         <StyledTableCell align="center" style={{ width: '50px' }}>Profile Picture</StyledTableCell>
                         <StyledTableCell align="center" style={{ width: '100px' }}>Name</StyledTableCell>
                         <StyledTableCell align="center" style={{ width: '50px' }}>Payment Date</StyledTableCell>
@@ -54,17 +65,31 @@ export default function PaymentDetailTable() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => (
-                        <StyledTableRow key={row.name}>
-                            <StyledTableCell align="center" component="th" scope="row">
-                                {row.name}
-                            </StyledTableCell>
-                            <StyledTableCell align="center">{row.calories}</StyledTableCell>
-                            <StyledTableCell align="center">{row.fat}</StyledTableCell>
-                            <StyledTableCell align="center">{row.carbs}</StyledTableCell>
-                            <StyledTableCell align="center">{row.protein}</StyledTableCell>
-                        </StyledTableRow>
-                    ))}
+                    {data.map((row) => {
+                        const relatedData = studentData.find(item => item.sid === row.sid);
+                        return (
+                            <StyledTableRow key={row._id}>
+                                <StyledTableCell align="center" component="th" scope="row">
+                                    {row.sid}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                    <Avatar
+                                        alt="Remy Sharp"
+                                        src={`http://localhost:3000/uploads/${relatedData.image}`}
+                                        sx={{ width: 56, height: 56 }}
+                                        variant="rounded"
+                                    />
+
+                                    {/* {relatedData ? relatedData.image : 'N/A'} */}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                    {relatedData ? relatedData.name : 'N/A'}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">{formatDate(row.payment_date)}</StyledTableCell>
+                                <StyledTableCell align="center">{row.amount}</StyledTableCell>
+                            </StyledTableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
         </TableContainer>

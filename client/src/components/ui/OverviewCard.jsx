@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Users } from 'lucide-react';
+import { Users, TrendingDown } from 'lucide-react';
+// import { CalendarArrowDown } from 'lucide-react';
 
-
-export default function OverviewCard({ title, value }) {
+export default function OverviewCard({ title, value, icon }) {
     return (
         <>
-            <div className='p-4 bg-white max-w-96 border'>
-                <div className='grid grid-cols-2'>
+            <div className='p-4 bg-white border'>
+                <div className='grid grid-cols-2 gap-4'>
                     <div>
                         <p className='text-[#818995] font-semibold font-[inter] text-sm my-2'>
                             {title}
@@ -16,8 +16,11 @@ export default function OverviewCard({ title, value }) {
                             {value}
                         </div>
                     </div>
-                    <div className='flex justify-end p-3'>
-                        <Users size={30} />
+                    <div className='flex justify-end rounded-lg items-center'>
+                        <div className={`${icon === 'Users' ? 'bg-green-400' : 'bg-red-500'} p-4 rounded-lg`}>
+                            {icon === "Users" ? <Users color="#034f16" size={30} /> : <TrendingDown color="#6f0b0b" size={30} />}
+                        </div>
+
                     </div>
                 </div>
                 <div className='flex justify-end'>
@@ -25,7 +28,7 @@ export default function OverviewCard({ title, value }) {
                         View More
                     </Link>
                 </div>
-            </div>
+            </div >
         </>
     )
 }
