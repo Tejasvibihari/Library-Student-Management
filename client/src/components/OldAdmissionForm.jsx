@@ -179,7 +179,7 @@ export default function OldAdmissionForm() {
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
                 <Alert
                     onClose={handleSnackClose}
-                    severity={alertStatus === "Addmission Success" ? "success" : "error"}
+                    severity={alertStatus === "Admission Success" ? "success" : "error"}
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
