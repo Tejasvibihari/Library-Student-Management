@@ -75,7 +75,7 @@ export default function PaymentDetailTable({ data }) {
                                 <StyledTableCell align="center">
                                     <Avatar
                                         alt="Remy Sharp"
-                                        src={`http://localhost:3000/uploads/${relatedData.image}`}
+                                        src={`https://library-student-management-api.onrender.com/uploads/${relatedData.image}`}
                                         sx={{ width: 56, height: 56 }}
                                         variant="rounded"
                                     />

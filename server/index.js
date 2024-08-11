@@ -24,7 +24,7 @@ mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi
     });
 
 
-const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.vercel.app'];
+const allowedOrigins = ['http://localhost:5173', 'https://library-student-management-api.onrender.com'];
 
 app.use(cors({
     origin: function (origin, callback) {
