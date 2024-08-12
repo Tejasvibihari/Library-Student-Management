@@ -155,7 +155,7 @@ export default function IndividualPayment() {
                                 <div className='my-4 flex gap-4'>
                                     <div className='border p-2 rounded-sm w-full'>
                                         <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Amount</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.paymentAmount}</h2>
+                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.paymentAmount * paymentFor}</h2>
                                         {/* <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type="number" placeholder='Enter Amount' /> */}
                                     </div>
                                 </div>
