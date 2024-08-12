@@ -28,12 +28,11 @@ export default function AdminStudentDashboard() {
                 console.log(error);
             }
         };
-        getStudent();
+        console.log(student.sid)
+        getStudent()
         const getPayment = async () => {
             try {
-                const response = await client.get("/api/payment/getpaymentsid", {
-                    params: { sid: student.sid }
-                });
+                const response = await client.get(`/api/payment/getpaymentsid/${student.sid}`);
                 setPayment(response.data);
             } catch (error) {
                 console.log(error);
