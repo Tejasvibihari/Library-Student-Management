@@ -31,3 +31,33 @@ export const getVacantSeatsByShift = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const createSeat = async (req, res) => {
+    const { seatNumber } = req.body;
+
+    // Validate input
+    if (!seatNumber || seatNumber < 1 || seatNumber > 73) {
+        return res.status(400).json({ message: 'Invalid seat number. It must be between 1 and 73.' });
+    }
+
+    try {
+        // Check if the seat number already exists
+        const existingSeat = await Seat.findOne({ seatNumber });
+        if (existingSeat) {
+            return res.status(400).json({ message: 'Seat number already exists.' });
+        }
+
+        // Create a new seat
+        const newSeat = new Seat({
+            seatNumber,
+        });
+
+        // Save the seat to the database
+        await newSeat.save();
+
+        res.status(201).json(newSeat);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
