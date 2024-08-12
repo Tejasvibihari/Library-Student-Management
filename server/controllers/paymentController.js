@@ -131,15 +131,15 @@ export const getAllPayments = async (req, res) => {
 };
 
 // Get a specific payment by ID
-export const getPaymentById = async (req, res) => {
-    const { id } = req.params;
-
+export const getPaymentBySid = async (req, res) => {
+    const { sid } = req.params;
+    console.log(sid);
     try {
-        const payment = await Payment.findById(id).populate('student_id');
-        if (!payment) {
-            return res.status(404).json({ message: 'Payment not found' });
+        const payments = await Payment.find({ sid });
+        if (!payments || payments.length === 0) {
+            return res.status(404).json({ message: 'Payments not found' });
         }
-        res.status(200).json(payment);
+        res.status(200).json(payments);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

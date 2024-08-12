@@ -19,6 +19,7 @@ import StudentSignin from './pages/StudentSignin'
 import Student from './pages/Student'
 import PaymentDetail from './pages/PaymentDetail'
 import StudentAdmission from './pages/StudentAdmission'
+import AdminStudentDashboard from './pages/AdminStudentDashboard'
 
 
 
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/student-signin" element={<StudentSignin />} />
           <Route path="/student-dashboard" element={<Student />} />
 
+
           {/* Sidebar menu Start  */}
           <Route element={<AdminProtectedRoute />}>
             <Route path="/" element={<Home />} />
@@ -49,6 +51,7 @@ export default function App() {
             <Route path="/make-payment" element={<MakePayment />} />
             <Route path="/make-payment/:_id" element={<IndividualPayment />} />
             <Route path="/payment-detail" element={<PaymentDetail />} />
+            <Route path="/student-admin-dashboard/:_id" element={<AdminStudentDashboard />} />
           </Route>
 
           <Route element={<AdminProtectedRoute />}>
