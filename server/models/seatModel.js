@@ -2,10 +2,8 @@ import mongoose from 'mongoose';
 
 const seatSchema = new mongoose.Schema({
     seatNumber: {
-        type: Number,
+        type: String,
         required: true,
-        min: 1,
-        max: 73
     },
     availability: {
         morning: {
@@ -26,19 +24,19 @@ const seatSchema = new mongoose.Schema({
         },
         doubleMorning: {
             type: Boolean,
-            default: false
+            default: true
         },
         doubleEvening: {
             type: Boolean,
-            default: false
+            default: true
         },
         nightLong: {
             type: Boolean,
-            default: false
+            default: true
         },
         fullDay: {
             type: Boolean,
-            default: false
+            default: true
         }
     }
 });

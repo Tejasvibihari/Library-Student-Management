@@ -36,9 +36,9 @@ export const createSeat = async (req, res) => {
     const { seatNumber } = req.body;
 
     // Validate input
-    if (!seatNumber || seatNumber < 1 || seatNumber > 73) {
-        return res.status(400).json({ message: 'Invalid seat number. It must be between 1 and 73.' });
-    }
+    // if (!seatNumber || seatNumber < 1 || seatNumber > 73) {
+    //     return res.status(400).json({ message: 'Invalid seat number. It must be between 1 and 73.' });
+    // }
 
     try {
         // Check if the seat number already exists
