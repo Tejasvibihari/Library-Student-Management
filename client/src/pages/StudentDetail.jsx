@@ -16,7 +16,7 @@ export default function StudentDetail() {
     const [pending, setPending] = useState(false)
     const [deactive, setDeactive] = useState(false)
 
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
@@ -28,10 +28,10 @@ export default function StudentDetail() {
                     params: { admin: adminId }
                 })
                 setAllStudent(response.data)
-                // setLoading(false)
+                setLoading(false)
             } catch (error) {
                 console.log(error)
-                // setLoading(false)
+                setLoading(false)
             }
         }
         getAllStudent()
