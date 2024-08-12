@@ -12,6 +12,8 @@ import { useSelector } from 'react-redux';
 import client from '../services/axiosClient';
 import Avatar from '@mui/material/Avatar';
 import formatDate from '../utils/FormateDate';
+import CircularLoading from './ui/CircularLoading';
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -32,10 +34,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-
 export default function PaymentDetailTable({ data }) {
     const adminId = useSelector(state => state.admin.currentAdmin._id);
     const [studentData, setStudentData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const getStudent = async () => {
@@ -45,14 +47,18 @@ export default function PaymentDetailTable({ data }) {
                 });
                 console.log(response.data);
                 setStudentData(response.data);
+                setLoading(false);
             } catch (error) {
                 console.log(error);
             }
         };
         getStudent();
     }, [adminId]);
-
+    if (loading) {
+        return <CircularLoading size={30} />;
+    }
     return (
+
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
                 <TableHead>
@@ -79,8 +85,6 @@ export default function PaymentDetailTable({ data }) {
                                         sx={{ width: 56, height: 56 }}
                                         variant="rounded"
                                     />
-
-                                    {/* {relatedData ? relatedData.image : 'N/A'} */}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
                                     {relatedData ? relatedData.name : 'N/A'}
