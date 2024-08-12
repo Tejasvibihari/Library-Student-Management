@@ -32,8 +32,6 @@ export const createStudent = async (req, res) => {
         seatShift
     } = req.body;
 
-    console.log(`Received seatNumber: ${seatNumber}`);
-    console.log(`Received seatShift: ${seatShift}`);
     try {
         let imageFilename = null;
         let password;
@@ -41,9 +39,7 @@ export const createStudent = async (req, res) => {
         const student = await Student.findOne({ sid });
         const studentEmail = await Student.findOne({ email });
         const seat = await Seat.findOne({ seatNumber });
-        console.log("Seee", seat.availability[seatShift])
-        console.log(`Student by SID: ${student}`);
-        console.log(`Student by Email: ${studentEmail}`);
+
 
         if (student || studentEmail) {
             return res.status(400).json({ message: 'Student already exists' });
