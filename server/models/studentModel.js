@@ -15,6 +15,7 @@ const StudentSchema = new mongoose.Schema({
     admissionDate: { type: Date, required: true },
     shift: { type: String, required: true },
     time: { type: String, required: true },
+    seatNumber: { type: String, required: true },
     address: { type: String, required: true },
     instagram: { type: String },
     facebook: { type: String },
@@ -24,7 +25,7 @@ const StudentSchema = new mongoose.Schema({
     paymentAmount: { type: Number },
     nextPayment: { type: Date },
     lastPayment: { type: Date },
-    
+
     image: { type: String }, // Assuming image is stored as a URL or base64 string
     admin: {
         type: mongoose.Schema.Types.ObjectId,

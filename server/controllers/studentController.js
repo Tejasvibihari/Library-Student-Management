@@ -5,7 +5,7 @@ import { sendMail } from '../utils/mailer.js';
 import fs from 'fs';
 import path from 'path';
 import Payment from '../models/paymentModel.js';
-
+import Seat from '../models/seatModel.js';
 export const createStudent = async (req, res) => {
     const {
         sid,
@@ -25,7 +25,9 @@ export const createStudent = async (req, res) => {
         address,
         image,
         admin,
-        lastPayment
+        lastPayment,
+        seatNumber,
+        seatShift
     } = req.body;
 
     console.log(`Received SID: ${sid}`);
@@ -35,6 +37,7 @@ export const createStudent = async (req, res) => {
 
         const student = await Student.findOne({ sid });
         const studentEmail = await Student.findOne({ email });
+        const seat = await Seat.findOne({ seatNumber });
 
         console.log(`Student by SID: ${student}`);
         console.log(`Student by Email: ${studentEmail}`);
@@ -44,26 +47,30 @@ export const createStudent = async (req, res) => {
         }
 
         if (sid >= 1 && sid <= 321) {
-            if (image && typeof image === 'string') {
-                const base64String = image.split(",")[1];
-                if (base64String) {
-                    const imageBuffer = Buffer.from(base64String, 'base64');
-                    imageFilename = `${sid}.jpeg`;
-                    fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+            if (seat && seat.availability[shift]) {
+                if (image && typeof image === 'string') {
+                    const base64String = image.split(",")[1];
+                    if (base64String) {
+                        const imageBuffer = Buffer.from(base64String, 'base64');
+                        imageFilename = `${sid}.jpeg`;
+                        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
-                    password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
-                    const hashedPassword = await bcrypt.hash(password, 12);
+                        seat.availability[shift] = false;
+                        await seat.save();
 
-                    await Student.create({
-                        sid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
-                        gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
-                        image: imageFilename, admin, lastPayment
-                    });
+                        password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
+                        const hashedPassword = await bcrypt.hash(password, 12);
 
-                    sendMail({
-                        to: email,
-                        subject: "Welcome to Bihari Library - Admission Confirmation",
-                        body: `<p>Dear ${name},</p>
+                        await Student.create({
+                            sid, name, dob, email, seatNumber, password: hashedPassword, mobile, aadhar, father, guardian,
+                            gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                            image: imageFilename, admin, lastPayment
+                        });
+
+                        sendMail({
+                            to: email,
+                            subject: "Welcome to Bihari Library - Admission Confirmation",
+                            body: `<p>Dear ${name},</p>
                             <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
                             <p><strong>Student ID:</strong> ${sid}</p>
                             <p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
@@ -73,39 +80,45 @@ export const createStudent = async (req, res) => {
                             <p>Best regards,</p>
                             <p><strong><em>Bihari Library</em></strong></p>
                             <p><strong><em>9608888400, 9905424292</em></strong></p>`
-                    });
+                        });
 
-                    return res.status(201).json({ message: "Admission Success" });
+                        return res.status(201).json({ message: "Admission Success" });
+                    } else {
+                        console.error("Invalid image format: base64 string is missing.");
+                    }
                 } else {
-                    console.error("Invalid image format: base64 string is missing.");
+                    console.error("Invalid image: image is either undefined or not a string.");
                 }
             } else {
-                console.error("Invalid image: image is either undefined or not a string.");
+                res.status(400).json({ message: 'Seat not available' });
             }
         } else {
-            if (image && typeof image === 'string') {
-                const base64String = image.split(",")[1];
-                if (base64String) {
-                    const imageBuffer = Buffer.from(base64String, 'base64');
-                    const lastStudent = await Student.findOne().sort({ sid: -1 });
-                    const newSid = lastStudent ? lastStudent.sid + 1 : 322;
+            if (seat && seat.availability[shift]) {
+                if (image && typeof image === 'string') {
+                    const base64String = image.split(",")[1];
+                    if (base64String) {
+                        const imageBuffer = Buffer.from(base64String, 'base64');
+                        const lastStudent = await Student.findOne().sort({ sid: -1 });
+                        const newSid = lastStudent ? lastStudent.sid + 1 : 322;
 
-                    imageFilename = `${newSid}.jpeg`;
-                    fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+                        imageFilename = `${newSid}.jpeg`;
+                        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+                        seat.availability[shift] = false;
+                        await seat.save();
 
-                    password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
-                    const hashedPassword = await bcrypt.hash(password, 12);
+                        password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
+                        const hashedPassword = await bcrypt.hash(password, 12);
 
-                    await Student.create({
-                        sid: newSid, name, dob, email, password: hashedPassword, mobile, aadhar, father, guardian,
-                        gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
-                        image: imageFilename, admin, lastPayment
-                    });
+                        await Student.create({
+                            sid: newSid, name, dob, email, seatNumber, password: hashedPassword, mobile, aadhar, father, guardian,
+                            gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                            image: imageFilename, admin, lastPayment
+                        });
 
-                    sendMail({
-                        to: email,
-                        subject: "Welcome to Bihari Library - Admission Confirmation",
-                        body: `<p>Dear ${name},</p>
+                        sendMail({
+                            to: email,
+                            subject: "Welcome to Bihari Library - Admission Confirmation",
+                            body: `<p>Dear ${name},</p>
                             <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
                             <p><strong>Student ID:</strong> ${newSid}</p>
                             <p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
@@ -115,14 +128,17 @@ export const createStudent = async (req, res) => {
                             <p>Best regards,</p>
                             <p><strong><em>Bihari Library</em></strong></p>
                             <p><strong><em>9608888400, 9905424292</em></strong></p>`
-                    });
+                        });
 
-                    return res.status(201).json({ message: "Admission Success" });
+                        return res.status(201).json({ message: "Admission Success" });
+                    } else {
+                        console.error("Invalid image format: base64 string is missing.");
+                    }
                 } else {
-                    console.error("Invalid image format: base64 string is missing.");
+                    console.error("Invalid image: image is either undefined or not a string.");
                 }
             } else {
-                console.error("Invalid image: image is either undefined or not a string.");
+                res.status(400).json({ message: 'Seat not available' });
             }
         }
     } catch (error) {

@@ -49,7 +49,7 @@ export default function IndividualPayment() {
             setPaymentData({
                 sid: studentData.sid,
                 payment_date: paymentDate,
-                amount: studentData.paymentAmount,
+                amount: studentData.paymentAmount * paymentFor,
                 months_paid_for: paymentFor,
                 admissionDate: studentData.admissionDate
             })

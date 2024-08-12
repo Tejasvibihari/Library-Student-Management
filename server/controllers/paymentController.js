@@ -134,6 +134,7 @@ export const getAllPayments = async (req, res) => {
 export const getPaymentBySid = async (req, res) => {
     const { sid } = req.params;
     console.log(sid);
+    console.log(typeof (sid));
     try {
         const payments = await Payment.find({ sid });
         if (!payments || payments.length === 0) {

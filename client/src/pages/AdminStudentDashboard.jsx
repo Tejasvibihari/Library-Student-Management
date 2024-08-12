@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import client from '../services/axiosClient';
 import formatDate from '../utils/FormateDate';
+import CircularLoading from '../components/ui/CircularLoading';
 
 
 
@@ -29,17 +30,24 @@ export default function AdminStudentDashboard() {
             }
         };
         console.log(student.sid)
-        getStudent()
-        const getPayment = async () => {
+        const getPayment = async (sid) => {
             try {
-                const response = await client.get(`/api/payment/getpaymentsid/${student.sid}`);
+                const response = await client.get(`/api/payment/getpaymentsid/${sid}`);
                 setPayment(response.data);
+                console.log(response.data);
             } catch (error) {
                 console.log(error);
             }
         };
 
-        getPayment();
+        getStudent().then(() => {
+            if (student && student.sid) {
+                getPayment(student.sid);
+
+            } else {
+                console.log('Student SID is undefined');
+            }
+        });
     }, [_id, userId._id, student.sid]);
     return (
         <>
@@ -100,15 +108,35 @@ export default function AdminStudentDashboard() {
                     <div className='p-4'>
                         <div className='rounded-md bg-white shadow-lg p-2'>
                             <div className='font-[inter] text-lg font-semibold  border-l-red-700 border-l-4 pl-1 my-2'>Payment Detail</div>
-                            <div className='flex flex-col md:flex-row gap-2 px-4'>
-                                <div className='flex flex-col'>
-                                    <div className='font-[inter]'><span className='font-semibold'></span>:- Morning</div>
-                                    <div className='font-[inter]'><span className='font-semibold'>Timming</span>:- 07:00AM - 03:00PM</div>
-                                    <div className='font-[inter]'><span className='font-semibold'>Preparing For</span>:- Manoj Kumar</div>
-                                    <div className='font-[inter]'><span className='font-semibold'>Admission Date</span>:- 9905424292</div>
-                                    <div className='font-[inter]'><span className='font-semibold'>Date Of Birth</span>:- 30 Oct 2002</div>
-                                    <div className='font-[inter]'><span className='font-semibold'>Aadhar No.</span>:- 30 Oct 2002</div>
-                                </div>
+                            <div className="overflow-x-auto">
+                                <table className='min-w-full divide-y divide-gray-200'>
+                                    <thead className='bg-gray-50'>
+                                        <tr>
+                                            <th className='px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Payment Date</th>
+                                            <th className='px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Next Payment</th>
+                                            <th className='px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Amount</th>
+                                            <th className='px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Months Paid For</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className='bg-white divide-y divide-gray-200'>
+                                        {!payment ? (
+                                            <tr>
+                                                <td colSpan="3" className="text-center py-4">
+                                                    <CircularLoading size={50} />
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            Array.isArray(payment) && payment.map((pay) => (
+                                                <tr key={pay._id}>
+                                                    <td className='px-2 py-4 whitespace-nowrap'>{formatDate(pay.payment_date)}</td>
+                                                    <td className='px-2 py-4 whitespace-nowrap'>{formatDate(student.nextPayment)}</td>
+                                                    <td className='px-2 py-4 whitespace-nowrap'>{pay.amount}</td>
+                                                    <td className='px-2 py-4 whitespace-nowrap'>{pay.months_paid_for}</td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
