@@ -6,6 +6,8 @@ import fs from 'fs';
 import path from 'path';
 import Payment from '../models/paymentModel.js';
 import Seat from '../models/seatModel.js';
+
+
 export const createStudent = async (req, res) => {
     const {
         sid,
@@ -30,7 +32,8 @@ export const createStudent = async (req, res) => {
         seatShift
     } = req.body;
 
-    console.log(`Received SID: ${sid}`);
+    console.log(`Received seatNumber: ${seatNumber}`);
+    console.log(`Received seatShift: ${seatShift}`);
     try {
         let imageFilename = null;
         let password;
@@ -38,7 +41,7 @@ export const createStudent = async (req, res) => {
         const student = await Student.findOne({ sid });
         const studentEmail = await Student.findOne({ email });
         const seat = await Seat.findOne({ seatNumber });
-
+        console.log("Seee", seat.availability[seatShift])
         console.log(`Student by SID: ${student}`);
         console.log(`Student by Email: ${studentEmail}`);
 
@@ -47,7 +50,7 @@ export const createStudent = async (req, res) => {
         }
 
         if (sid >= 1 && sid <= 321) {
-            if (seat && seat.availability[shift]) {
+            if (seat.availability[seatShift]) {
                 if (image && typeof image === 'string') {
                     const base64String = image.split(",")[1];
                     if (base64String) {
@@ -55,7 +58,7 @@ export const createStudent = async (req, res) => {
                         imageFilename = `${sid}.jpeg`;
                         fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
-                        seat.availability[shift] = false;
+                        seat.availability[seatShift] = false;
                         await seat.save();
 
                         password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
@@ -93,7 +96,7 @@ export const createStudent = async (req, res) => {
                 res.status(400).json({ message: 'Seat not available' });
             }
         } else {
-            if (seat && seat.availability[shift]) {
+            if (seat.availability[seatShift]) {
                 if (image && typeof image === 'string') {
                     const base64String = image.split(",")[1];
                     if (base64String) {
@@ -103,7 +106,7 @@ export const createStudent = async (req, res) => {
 
                         imageFilename = `${newSid}.jpeg`;
                         fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-                        seat.availability[shift] = false;
+                        seat.availability[seatShift] = false;
                         await seat.save();
 
                         password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));

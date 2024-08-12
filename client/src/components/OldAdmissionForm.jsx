@@ -49,7 +49,9 @@ export default function OldAdmissionForm() {
     const [address, setAddress] = useState("");
     const [croppedImage, setCroppedImage] = useState(null);
     const [formData, setFormData] = useState({})
-
+    const [seatShift, setSeatShift] = useState("")
+    const [vacantSeat, setVacantSeat] = useState([])
+    const [seatNumber, setSeatNumber] = useState("")
 
     // Alert Snackbar 
     const handleSnackOpen = () => {
@@ -95,13 +97,15 @@ export default function OldAdmissionForm() {
                 paymentAmount,
                 address,
                 image: croppedImage,
-                admin: userId
+                admin: userId,
+                seatNumber,
+                seatShift
             })
         }
 
         handleChange()
     }, [name, sid, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
-        admissionDate, shift, time, paymentAmount,
+        admissionDate, shift, time, paymentAmount, seatNumber, seatShift,
         address, croppedImage, userId])
 
 
@@ -130,6 +134,8 @@ export default function OldAdmissionForm() {
             // setToAmPm("")
             setAddress("")
             setCroppedImage("")
+            setSeatNumber("")
+            setSeatShift("")
         } catch (error) {
             setLoading(false)
             if (error.response && error.response.data && error.response.data.message) {
@@ -171,9 +177,45 @@ export default function OldAdmissionForm() {
             default:
                 amount = 0;
         }
+        getAvailableSeats()
         setPaymentAmount(amount);
     };
-
+    useEffect(() => {
+        const handleShiftChange = () => {
+            if (time === "07:00AM - 11:00AM") {
+                setSeatShift("morning")
+                console.log("morning")
+            } else if (time === "11:00AM - 03:00PM") {
+                setSeatShift("afternoon")
+                console.log("afternoon")
+            } else if (time === "03:00PM - 07:00PM") {
+                setSeatShift("evening")
+            } else if (time === "07:00PM - 11:00PM") {
+                setSeatShift("night")
+            } else if (time === "07:00PM - 07:00AM") {
+                setSeatShift("nightLong")
+            } else if (time === "07:00AM - 03:00PM") {
+                setSeatShift("doubleMorning")
+            } else if (time === "11:00AM - 07:00PM") {
+                setSeatShift("doubleEvening")
+            } else {
+                setSeatShift("fullDay")
+            }
+        }
+        handleShiftChange()
+    }, [time])
+    const getAvailableSeats = async () => {
+        try {
+            console.log(seatShift)
+            const response = await client.get(`/api/seat/getVacantSeatsByShift`, {
+                params: { seatShift }
+            });
+            setVacantSeat(response.data)
+            console.log(response.data)
+        } catch (error) {
+            console.error('Error fetching available seats:', error.response ? error.response.data : error.message);
+        }
+    };
     return (
         <>
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
@@ -252,7 +294,7 @@ export default function OldAdmissionForm() {
                             </div>
                             <div className='border p-2 rounded-sm'>
                                 <h3>Shift</h3>
-                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
+                                <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
                                     <div className='flex flex-col'>
                                         <label>Shift</label>
                                         <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
@@ -277,6 +319,15 @@ export default function OldAdmissionForm() {
                                             {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
                                             {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
                                             {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
+                                        </select>
+                                    </div>
+                                    <div className='flex flex-col'>
+                                        <label htmlFor="seat">Seat</label>
+                                        <select required className="p-2 border rounded-md w-full" value={seatNumber} onChange={(e) => setSeatNumber(e.target.value)}>
+                                            <option value="" disabled>Select One</option>
+                                            {Array.isArray(vacantSeat) ? vacantSeat.map((seat, index) => (
+                                                <option key={index} value={seat.seatNumber}>{seat.seatNumber}</option>
+                                            )) : null}
                                         </select>
                                     </div>
                                     <div>

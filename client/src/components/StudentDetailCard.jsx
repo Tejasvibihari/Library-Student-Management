@@ -9,7 +9,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
 import { useEffect, useState } from 'react';
 
-export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount, nextPayment }) {
+export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount, nextPayment, seatNumber }) {
     const [status, setStatus] = useState('Pending');
 
     useEffect(() => {
@@ -54,7 +54,7 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                         <div className='flex flex-col leading-3 text-right'>
                             {/* Dates Section  */}
                             <span className='font-semibold font-[inter] text-sm leading-6'>Addmission Date:- <span className='font-normal text-gray-100'>{formatDate(addmissionDate)}</span></span>
-                            <span className='font-semibold font-[inter] text-sm leading-6'>Preparing For:- <span className='font-normal text-gray-100'>{preparingFor}</span></span>
+                            <span className='font-semibold font-[inter] text-sm leading-6'>Seat No:- <span className='font-normal text-gray-100'>{seatNumber}</span></span>
                             <span className='font-semibold font-[inter] text-sm leading-6'>Time:- <span className='font-normal text-gray-100'>{time} </span></span>
                             <span className='font-semibold font-[inter] text-sm leading-6'>Shift:- <span className='font-normal text-gray-100'>{shift}</span></span>
                             <div>
@@ -125,6 +125,8 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                             </div>
                             {/* Gender nad Address  */}
                             <div className='flex flex-col'>
+                                <span className='font-semibold font-[inter] text-sm leading-6'>Preparing For:- <span className='font-normal text-gray-100'>{preparingFor}</span></span>
+
                                 <span className='font-semibold font-[inter] text-sm leading-6'>
                                     Gender:-
                                     <span className='font-normal text-gray-100'>

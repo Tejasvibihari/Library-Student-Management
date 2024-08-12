@@ -96,6 +96,7 @@ export default function AdminStudentDashboard() {
                                 <div className='font-[inter] text-lg font-semibold  border-l-yellow-300 border-l-4 pl-1 my-2'>Additional Detail</div>
                                 <div className='flex flex-col md:flex-row gap-2 px-4'>
                                     <div className='flex flex-col'>
+                                        <div className='font-[inter]'><span className='font-semibold'>Seat No</span>:- {student.seatNumber}</div>
                                         <div className='font-[inter]'><span className='font-semibold'>Shift</span>:- {student.shift}</div>
                                         <div className='font-[inter]'><span className='font-semibold'>Timming</span>:- {student.time}</div>
                                         <div className='font-[inter]'><span className='font-semibold'>Preparing For</span>:-{student.preparingFor}</div>

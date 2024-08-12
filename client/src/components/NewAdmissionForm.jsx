@@ -49,7 +49,8 @@ export default function NewAdmissionForm() {
     const [croppedImage, setCroppedImage] = useState(null);
     const [formData, setFormData] = useState({})
     const [seatShift, setSeatShift] = useState("")
-
+    const [vacantSeat, setVacantSeat] = useState([])
+    const [seatNumber, setSeatNumber] = useState("")
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -93,13 +94,15 @@ export default function NewAdmissionForm() {
                 paymentAmount,
                 address,
                 image: croppedImage,
-                admin: userId
+                admin: userId,
+                seatNumber,
+                seatShift
             })
         }
 
         handleChange()
     }, [name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
-        admissionDate, shift, time, paymentAmount,
+        admissionDate, shift, time, paymentAmount, seatNumber, seatShift,
         address, croppedImage, userId])
 
 
@@ -127,6 +130,8 @@ export default function NewAdmissionForm() {
             // setToAmPm("")
             setAddress("")
             setCroppedImage("")
+            setSeatNumber("")
+
         } catch (error) {
             setLoading(false)
             if (error.response && error.response.data && error.response.data.message) {
@@ -176,29 +181,34 @@ export default function NewAdmissionForm() {
         const handleShiftChange = () => {
             if (time === "07:00AM - 11:00AM") {
                 setSeatShift("morning")
+                console.log("morning")
             } else if (time === "11:00AM - 03:00PM") {
-                setShift("afternoon")
+                setSeatShift("afternoon")
+                console.log("afternoon")
             } else if (time === "03:00PM - 07:00PM") {
-                setShift("evening")
+                setSeatShift("evening")
             } else if (time === "07:00PM - 11:00PM") {
                 setSeatShift("night")
             } else if (time === "07:00PM - 07:00AM") {
-                seatShift("nightLong")
+                setSeatShift("nightLong")
             } else if (time === "07:00AM - 03:00PM") {
-                seatShift("doubleMorning")
+                setSeatShift("doubleMorning")
             } else if (time === "11:00AM - 07:00PM") {
-                seatShift("doubleEvening")
+                setSeatShift("doubleEvening")
             } else {
-                seatShift("fullDay")
+                setSeatShift("fullDay")
             }
         }
         handleShiftChange()
     })
     const getAvailableSeats = async () => {
         try {
-            const response = await axios.get(`/api/seat/getAvailableSeats/${seatShift}`);
-            console.log('Available Seats:', response.data);
-            return response.data;
+            console.log(seatShift)
+            const response = await client.get(`/api/seat/getVacantSeatsByShift`, {
+                params: { seatShift }
+            });
+            setVacantSeat(response.data)
+            console.log(response.data)
         } catch (error) {
             console.error('Error fetching available seats:', error.response ? error.response.data : error.message);
         }
@@ -305,17 +315,12 @@ export default function NewAdmissionForm() {
                                         </select>
                                     </div>
                                     <div className='flex flex-col'>
-                                        <label htmlFor="time">Seat</label>
-                                        <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
-                                            <option value="" disabled selected>Select One</option>
-                                            {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
-                                            {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
-                                            {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
-                                            {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}
-                                            {shift === "Night" && <option value="07:00PM - 07:00AM">07:00PM - 07:00AM</option>}
-                                            {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
-                                            {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
-                                            {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
+                                        <label htmlFor="seat">Seat</label>
+                                        <select required className="p-2 border rounded-md w-full" value={seatNumber} onChange={(e) => setSeatNumber(e.target.value)}>
+                                            <option value="" disabled>Select One</option>
+                                            {Array.isArray(vacantSeat) ? vacantSeat.map((seat, index) => (
+                                                <option key={index} value={seat.seatNumber}>{seat.seatNumber}</option>
+                                            )) : null}
                                         </select>
                                     </div>
                                     <div>

@@ -127,6 +127,7 @@ export default function StudentDetail() {
                                     lastPayment={student.lastPayment}
                                     paymentAmount={student.paymentAmount}
                                     nextPayment={student.nextPayment}
+                                    seatNumber={student.seatNumber}
 
                                 />
                             ))
