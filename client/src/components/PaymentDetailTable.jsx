@@ -55,7 +55,11 @@ export default function PaymentDetailTable({ data }) {
         getStudent();
     }, [adminId]);
     if (loading) {
-        return <CircularLoading size={30} />;
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh' }}>
+                <CircularLoading size={30} />
+            </div>
+        );
     }
     return (
 
