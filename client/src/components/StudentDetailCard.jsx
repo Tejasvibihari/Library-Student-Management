@@ -2,7 +2,7 @@ import { CrossIcon, Instagram, } from 'lucide-react';
 import { Youtube } from 'lucide-react';
 import { Facebook } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { UserCog } from 'lucide-react';
+import { UserCog, ReceiptText } from 'lucide-react';
 import ReportIcon from '@mui/icons-material/Report';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
@@ -155,7 +155,7 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                         <div className='mx-1'>
                             <Link to={`/student-admin-dashboard/${studentId}`}>
                                 <button className='p-2 w-full  rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
-                                    <UserCog size={17} className='mr-2' />Payment Detail
+                                    <ReceiptText size={17} className='mr-2' />Payment Detail
                                 </button>
                             </Link>
                         </div>

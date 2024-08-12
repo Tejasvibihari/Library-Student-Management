@@ -45,8 +45,9 @@ export default function PaymentDetailTable({ data }) {
                 const response = await client.get("/api/student/getallstudent", {
                     params: { admin: adminId }
                 });
-                console.log(response.data);
+
                 setStudentData(response.data);
+                console.log(response.data);
                 setLoading(false);
             } catch (error) {
                 console.log(error);
@@ -54,6 +55,7 @@ export default function PaymentDetailTable({ data }) {
         };
         getStudent();
     }, [adminId]);
+
     if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh' }}>
@@ -61,9 +63,9 @@ export default function PaymentDetailTable({ data }) {
             </div>
         );
     }
-    return (
 
-        <TableContainer component={Paper}>
+    return (
+        !data ? <div>No Data Found</div> : <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
                 <TableHead>
                     <TableRow>
@@ -83,12 +85,14 @@ export default function PaymentDetailTable({ data }) {
                                     {row.sid}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
-                                    <Avatar
-                                        alt="Remy Sharp"
-                                        src={`https://library-student-management-api.onrender.com/uploads/${relatedData.image}`}
-                                        sx={{ width: 56, height: 56 }}
-                                        variant="rounded"
-                                    />
+                                    {relatedData ? (
+                                        <Avatar
+                                            alt={relatedData.name}
+                                            src={`https://library-student-management-api.onrender.com/uploads/${relatedData.image}`}
+                                            sx={{ width: 56, height: 56 }}
+                                            variant="rounded"
+                                        />
+                                    ) : 'N/A'}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
                                     {relatedData ? relatedData.name : 'N/A'}

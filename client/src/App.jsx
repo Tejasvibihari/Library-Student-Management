@@ -20,6 +20,7 @@ import Student from './pages/Student'
 import PaymentDetail from './pages/PaymentDetail'
 import StudentAdmission from './pages/StudentAdmission'
 import AdminStudentDashboard from './pages/AdminStudentDashboard'
+import Seats from './pages/Seats'
 
 
 
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="/make-payment/:_id" element={<IndividualPayment />} />
             <Route path="/payment-detail" element={<PaymentDetail />} />
             <Route path="/student-admin-dashboard/:_id" element={<AdminStudentDashboard />} />
+            <Route path="/seat" element={<Seats />} />
           </Route>
 
           <Route element={<AdminProtectedRoute />}>

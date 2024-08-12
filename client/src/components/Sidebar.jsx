@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, MailPlus, LayoutDashboard, UserPlus, IndianRupee } from 'lucide-react';
+import { Menu, X, User, MailPlus, LayoutDashboard, UserPlus, IndianRupee, HandCoins, Armchair } from 'lucide-react';
 import Profile from './Profile'; // Adjust the import based on your file structure
 
 const SideBar = ({ children }) => {
@@ -50,12 +50,16 @@ const SideBar = ({ children }) => {
             <span className={`${open ? 'block' : 'hidden'}`}>Email</span>
           </Link>
           <Link to="/make-payment" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-purple-950">
-            <IndianRupee className="w-6 h-6 mr-2" />
+            <HandCoins className="w-6 h-6 mr-2" />
             <span className={`${open ? 'block' : 'hidden'}`}>Make Payment</span>
           </Link>
-          <Link to="/payment-detail" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-purple-950">
+          <Link to="/payment-detail" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-gray-950">
             <IndianRupee className="w-6 h-6 mr-2" />
             <span className={`${open ? 'block' : 'hidden'}`}>Payment Detail</span>
+          </Link>
+          <Link to="/seat" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-pink-950">
+            <Armchair className="w-6 h-6 mr-2" />
+            <span className={`${open ? 'block' : 'hidden'}`}>Seat</span>
           </Link>
         </nav>
       </div>
