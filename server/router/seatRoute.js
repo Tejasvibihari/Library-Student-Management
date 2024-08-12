@@ -3,7 +3,7 @@ import { getAvailableSeats, getVacantSeatsByShift, createSeat } from "../control
 
 const router = express.Router()
 
-router.get('/getAvailableSeats', getAvailableSeats)
+router.get('/getAvailableSeats/:shift', getAvailableSeats)
 router.get('/getVacantSeatsByShift', getVacantSeatsByShift)
 router.post('/createSeat', createSeat)
 

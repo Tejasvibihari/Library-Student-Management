@@ -48,7 +48,7 @@ export default function NewAdmissionForm() {
     const [address, setAddress] = useState("");
     const [croppedImage, setCroppedImage] = useState(null);
     const [formData, setFormData] = useState({})
-
+    const [seatShift, setSeatShift] = useState("")
 
     // Alert Snackbar 
     const handleSnackOpen = () => {
@@ -168,9 +168,41 @@ export default function NewAdmissionForm() {
             default:
                 amount = 0;
         }
+        getAvailableSeats()
         setPaymentAmount(amount);
-    };
 
+    };
+    useEffect(() => {
+        const handleShiftChange = () => {
+            if (time === "07:00AM - 11:00AM") {
+                setSeatShift("morning")
+            } else if (time === "11:00AM - 03:00PM") {
+                setShift("afternoon")
+            } else if (time === "03:00PM - 07:00PM") {
+                setShift("evening")
+            } else if (time === "07:00PM - 11:00PM") {
+                setSeatShift("night")
+            } else if (time === "07:00PM - 07:00AM") {
+                seatShift("nightLong")
+            } else if (time === "07:00AM - 03:00PM") {
+                seatShift("doubleMorning")
+            } else if (time === "11:00AM - 07:00PM") {
+                seatShift("doubleEvening")
+            } else {
+                seatShift("fullDay")
+            }
+        }
+        handleShiftChange()
+    })
+    const getAvailableSeats = async () => {
+        try {
+            const response = await axios.get(`/api/seat/getAvailableSeats/${seatShift}`);
+            console.log('Available Seats:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching available seats:', error.response ? error.response.data : error.message);
+        }
+    };
     return (
         <>
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
@@ -245,7 +277,7 @@ export default function NewAdmissionForm() {
                             </div>
                             <div className='border p-2 rounded-sm'>
                                 <h3>Shift</h3>
-                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
+                                <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
                                     <div className='flex flex-col'>
                                         <label>Shift</label>
                                         <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
@@ -260,6 +292,20 @@ export default function NewAdmissionForm() {
                                     </div>
                                     <div className='flex flex-col'>
                                         <label htmlFor="time">Time</label>
+                                        <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
+                                            <option value="" disabled selected>Select One</option>
+                                            {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
+                                            {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
+                                            {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
+                                            {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}
+                                            {shift === "Night" && <option value="07:00PM - 07:00AM">07:00PM - 07:00AM</option>}
+                                            {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
+                                            {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
+                                            {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
+                                        </select>
+                                    </div>
+                                    <div className='flex flex-col'>
+                                        <label htmlFor="time">Seat</label>
                                         <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
                                             <option value="" disabled selected>Select One</option>
                                             {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
