@@ -69,7 +69,7 @@ export const createStudent = async (req, res) => {
                         sendMail({
                             to: email,
                             subject: "Welcome to Bihari Library - Admission Confirmation",
-                            body: `<hr />
+                            body: `
 <p>Dear ${name},</p>
 <p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
 <p><strong>Student Information:</strong></p>
@@ -91,7 +91,7 @@ export const createStudent = async (req, res) => {
 <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
 <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
 <p>Warm regards,</p>
-<p><strong>Bihari Library</strong><br /><em>9608888400</em></p>`
+<p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
                         });
 
                         return res.status(201).json({ message: "Admission Success" });
@@ -152,7 +152,7 @@ export const createStudent = async (req, res) => {
 <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
 <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
 <p>Warm regards,</p>
-<p><strong>Bihari Library</strong><br /><em>9608888400</em></p>`
+<p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
                         });
 
                         return res.status(201).json({ message: "Admission Success" });
