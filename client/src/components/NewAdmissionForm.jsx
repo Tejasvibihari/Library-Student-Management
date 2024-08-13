@@ -167,6 +167,9 @@ export default function NewAdmissionForm() {
             case "11:00AM - 07:00PM":
                 amount = 500; // Example amount for these time slots
                 break;
+            case "07:00AM - 07:00PM":
+                amount = 700; // Example amount for these time slots
+                break;
             case "24 Hours":
                 amount = 1000; // Example amount for 24 Hours
                 break;
@@ -195,12 +198,15 @@ export default function NewAdmissionForm() {
                 setSeatShift("doubleMorning")
             } else if (time === "11:00AM - 07:00PM") {
                 setSeatShift("doubleEvening")
-            } else {
+            } else if (time === "07:00AM - 07:00PM") {
+                setSeatShift("morningLong")
+            }
+            else {
                 setSeatShift("fullDay")
             }
         }
         handleShiftChange()
-    })
+    }, [time])
     const getAvailableSeats = async () => {
         try {
             console.log(seatShift)
@@ -305,6 +311,7 @@ export default function NewAdmissionForm() {
                                         <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
                                             <option value="" disabled selected>Select One</option>
                                             {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
+                                            {shift === "Morning" && <option value="07:00AM - 07:00PM">07:00AM - 11:00AM</option>}
                                             {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
                                             {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
                                             {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}

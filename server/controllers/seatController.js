@@ -1,13 +1,21 @@
 import Seat from "../models/seatModel.js";
 
-
+export const getAllSeats = async (req, res) => {
+    try {
+        // Query to get all seat records
+        const allSeats = await Seat.find();
+        res.status(200).json({ allSeats });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 export const getAvailableSeats = async (req, res) => {
     const { shift } = req.params;
     console.log(shift)
     try {
         // Query seats that are available for the given shift
         const availableSeats = await Seat.find({ [`availability.${shift}`]: true });
-    
+
         res.status(200).json({ availableSeats });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

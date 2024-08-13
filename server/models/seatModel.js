@@ -37,7 +37,12 @@ const seatSchema = new mongoose.Schema({
         fullDay: {
             type: Boolean,
             default: true
+        },
+        morningLong: {
+            type: Boolean,
+            default: true
         }
+
     }
 });
 

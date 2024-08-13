@@ -171,6 +171,9 @@ export default function OldAdmissionForm() {
             case "11:00AM - 07:00PM":
                 amount = 500; // Example amount for these time slots
                 break;
+            case "07:00AM - 07:00PM":
+                amount = 700; // Example amount for these time slots
+                break;
             case "24 Hours":
                 amount = 1000; // Example amount for 24 Hours
                 break;
@@ -184,10 +187,8 @@ export default function OldAdmissionForm() {
         const handleShiftChange = () => {
             if (time === "07:00AM - 11:00AM") {
                 setSeatShift("morning")
-                console.log("morning")
             } else if (time === "11:00AM - 03:00PM") {
                 setSeatShift("afternoon")
-                console.log("afternoon")
             } else if (time === "03:00PM - 07:00PM") {
                 setSeatShift("evening")
             } else if (time === "07:00PM - 11:00PM") {
@@ -198,7 +199,10 @@ export default function OldAdmissionForm() {
                 setSeatShift("doubleMorning")
             } else if (time === "11:00AM - 07:00PM") {
                 setSeatShift("doubleEvening")
-            } else {
+            } else if (time === "07:00AM - 07:00PM") {
+                setSeatShift("morningLong")
+            }
+            else {
                 setSeatShift("fullDay")
             }
         }
@@ -312,6 +316,7 @@ export default function OldAdmissionForm() {
                                         <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
                                             <option value="" disabled selected>Select One</option>
                                             {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
+                                            {shift === "Morning" && <option value="07:00AM - 07:00PM">07:00AM - 07:00AM</option>}
                                             {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
                                             {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
                                             {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}

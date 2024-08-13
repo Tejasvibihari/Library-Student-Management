@@ -1,5 +1,5 @@
 import express from "express";
-import { getAvailableSeats, getVacantSeatsByShift, createSeat } from "../controllers/seatController.js";
+import { getAvailableSeats, getVacantSeatsByShift, createSeat, getAllSeats } from "../controllers/seatController.js";
 
 const router = express.Router()
 
@@ -7,5 +7,6 @@ const router = express.Router()
 router.get('/getAvailableSeats/:shift', getAvailableSeats)
 router.get('/getVacantSeatsByShift', getVacantSeatsByShift)
 router.post('/createSeat', createSeat)
+router.get('/getAllSeat', getAllSeats)
 
 export default router;
