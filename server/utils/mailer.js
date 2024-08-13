@@ -7,21 +7,33 @@ export const sendMail = async ({ to, subject, body }) => {
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 587,
-            secure: false, // Use `true` for port 465, `false` for all other ports
+            secure: false,
             auth: {
-                user: "tejasvibihari2000@gmail.com",
-                pass: "shveiecrdkhwbama",
+                user: "biharilibrary@gmail.com",
+                pass: "qhdjpsfvdsracoai", // Ensure you're using an app-specific password
+            },
+            tls: {
+                rejectUnauthorized: false, // This can sometimes help avoid spam filters
             },
         });
 
+        // const emailFormat = {
+        //     from: 'biharilibrary@gmail.com', // sender address
+        //     text: "Bihari Library",
+        //     to: to, // list of receivers
+        //     subject: subject, // Subject line
+        //     html: body, // html body
+        // }
         const emailFormat = {
-            from: 'tejasvibihari2000@gmail.com', // sender address
-            text: "Bihari Library",
-            to: to, // list of receivers
-            subject: subject, // Subject line
-            html: body, // html body
-        }
-
+            from: '"Bihari Library" <biharilibrary@gmail.com>', // Include a clear display name
+            to: to,
+            subject: subject,
+            text: "Bihari Library", // Consider adding a plaintext version of the email
+            html: body,
+            headers: {
+                'X-Priority': '3', // Normal priority
+            },
+        };
         const info = await transporter.sendMail(emailFormat)
         console.log(info.messageId)
 
