@@ -69,16 +69,29 @@ export const createStudent = async (req, res) => {
                         sendMail({
                             to: email,
                             subject: "Welcome to Bihari Library - Admission Confirmation",
-                            body: `<p>Dear ${name},</p>
-                            <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
-                            <p><strong>Student ID:</strong> ${sid}</p>
-                            <p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
-                            <p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
-                            <p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
-                            <p>Once again, congratulations on your admission. We look forward to welcoming you to our campus.</p>
-                            <p>Best regards,</p>
-                            <p><strong><em>Bihari Library</em></strong></p>
-                            <p><strong><em>9608888400, 9905424292</em></strong></p>`
+                            body: `<hr />
+<p>Dear ${name},</p>
+<p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
+<p><strong>Student Information:</strong></p>
+<ul>
+<li><strong>Student ID:</strong> ${sid}</li>
+<li><strong>Name:</strong> ${name}</li>
+<li><strong>Shift:</strong> ${shift}</li>
+<li><strong>Admission Date:</strong> ${admissionDate}</li>
+<li><strong>Father's Name:</strong> ${father}</li>
+<li><strong>Address:</strong> ${address}</li>
+<li><strong>Email:</strong> ${email}</li>
+<li><strong>Password:</strong> ${password}</li>
+</ul>
+<p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
+<p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.vercel.app/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
+<p>or&nbsp;</p>
+<p>Copy the link Given Below and paste it into any Browser</p>
+<p>https://biharilibrary.vercel.app/student-dashboard</p>
+<p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
+<p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
+<p>Warm regards,</p>
+<p><strong>Bihari Library</strong><br /><em>9608888400</em></p>`
                         });
 
                         return res.status(201).json({ message: "Admission Success" });
@@ -117,16 +130,29 @@ export const createStudent = async (req, res) => {
                         sendMail({
                             to: email,
                             subject: "Welcome to Bihari Library - Admission Confirmation",
-                            body: `<p>Dear ${name},</p>
-                            <p>Congratulations! We are pleased to inform you that you have been admitted to [School/College Name]. Please find your admission details below:</p>
-                            <p><strong>Student ID:</strong> ${newSid}</p>
-                            <p><strong>Name:</strong> ${name}<br /><strong>Shift:</strong> ${shift}<br /><strong>Admission Date:</strong> ${admissionDate}<br /><strong>Father's Name:</strong> ${father}<br /><strong>Address:</strong> ${address} <br /><strong>Email:</strong> ${email}<br /><strong>Password:</strong> ${password}</p>
-                            <p>Please ensure to complete the admission process by paying the required fee. The payment details and deadline will be shared with you shortly.</p>
-                            <p>If you have any questions or need further assistance, do not hesitate to contact us at <strong>Bihari Library</strong>.</p>
-                            <p>Once again, congratulations on your admission. We look forward to welcoming you to our campus.</p>
-                            <p>Best regards,</p>
-                            <p><strong><em>Bihari Library</em></strong></p>
-                            <p><strong><em>9608888400, 9905424292</em></strong></p>`
+                            body: `<hr />
+<p>Dear ${name},</p>
+<p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
+<p><strong>Student Information:</strong></p>
+<ul>
+<li><strong>Student ID:</strong> ${sid}</li>
+<li><strong>Name:</strong> ${name}</li>
+<li><strong>Shift:</strong> ${shift}</li>
+<li><strong>Admission Date:</strong> ${admissionDate}</li>
+<li><strong>Father's Name:</strong> ${father}</li>
+<li><strong>Address:</strong> ${address}</li>
+<li><strong>Email:</strong> ${email}</li>
+<li><strong>Password:</strong> ${password}</li>
+</ul>
+<p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
+<p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.vercel.app/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
+<p>or&nbsp;</p>
+<p>Copy the link Given Below and paste it into any Browser</p>
+<p>https://biharilibrary.vercel.app/student-dashboard</p>
+<p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
+<p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
+<p>Warm regards,</p>
+<p><strong>Bihari Library</strong><br /><em>9608888400</em></p>`
                         });
 
                         return res.status(201).json({ message: "Admission Success" });
