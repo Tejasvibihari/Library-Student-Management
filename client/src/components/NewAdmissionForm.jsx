@@ -25,7 +25,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function NewAdmissionForm() {
-    const userId = useSelector(state => state.admin.currentAdmin)
+
     const [open, setOpen] = React.useState(false);
     const [loading, setLoading] = useState(false);
     const [snackOpen, setSnackOpen] = React.useState(false);
@@ -94,7 +94,6 @@ export default function NewAdmissionForm() {
                 paymentAmount,
                 address,
                 image: croppedImage,
-                admin: userId,
                 seatNumber,
                 seatShift
             })
@@ -103,7 +102,7 @@ export default function NewAdmissionForm() {
         handleChange()
     }, [name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
         admissionDate, shift, time, paymentAmount, seatNumber, seatShift,
-        address, croppedImage, userId])
+        address, croppedImage])
 
 
     const handleSubmit = async (e) => {
@@ -311,7 +310,7 @@ export default function NewAdmissionForm() {
                                         <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
                                             <option value="" disabled selected>Select One</option>
                                             {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
-                                            {shift === "Morning" && <option value="07:00AM - 07:00PM">07:00AM - 11:00AM</option>}
+                                            {shift === "Morning" && <option value="07:00AM - 07:00PM">07:00AM - 07:00AM</option>}
                                             {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
                                             {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
                                             {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}

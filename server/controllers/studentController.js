@@ -26,7 +26,6 @@ export const createStudent = async (req, res) => {
         paymentAmount,
         address,
         image,
-        admin,
         lastPayment,
         seatNumber,
         seatShift
@@ -54,8 +53,21 @@ export const createStudent = async (req, res) => {
                         imageFilename = `${sid}.jpeg`;
                         fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
-                        seat.availability[seatShift] = false;
+                        if (seatShift === "fullDay") {
+                            seat.availability.morning = false;
+                            seat.availability.afternoon = false;
+                            seat.availability.evening = false;
+                            seat.availability.night = false;
+                            seat.availability.doubleMorning = false;
+                            seat.availability.doubleEvening = false;
+                            seat.availability.nightLong = false;
+                            seat.availability.fullDay = false;
+                            seat.availability.morningLong = false;
+                        } else {
+                            seat.availability[seatShift] = false;
+                        }
                         await seat.save();
+
 
                         password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
                         const hashedPassword = await bcrypt.hash(password, 12);
@@ -115,7 +127,19 @@ export const createStudent = async (req, res) => {
 
                         imageFilename = `${newSid}.jpeg`;
                         fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-                        seat.availability[seatShift] = false;
+                        if (seatShift === "fullDay") {
+                            seat.availability.morning = false;
+                            seat.availability.afternoon = false;
+                            seat.availability.evening = false;
+                            seat.availability.night = false;
+                            seat.availability.doubleMorning = false;
+                            seat.availability.doubleEvening = false;
+                            seat.availability.nightLong = false;
+                            seat.availability.fullDay = false;
+                            seat.availability.morningLong = false;
+                        } else {
+                            seat.availability[seatShift] = false;
+                        }
                         await seat.save();
 
                         password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
@@ -173,11 +197,11 @@ export const createStudent = async (req, res) => {
 };
 
 export const GetAllStudent = async (req, res) => {
-    const { sid, name, admin, status } = req.query;
+    const { sid, name, status } = req.query;
 
     // Construct a dynamic query object
     let query = {};
-    if (admin) query.admin = admin;
+    // if (admin) query.admin = admin;
     if (sid) query.sid = sid;
     if (name) query.name = name;
     if (status) query.status = status;

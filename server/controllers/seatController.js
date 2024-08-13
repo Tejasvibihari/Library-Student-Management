@@ -11,7 +11,7 @@ export const getAllSeats = async (req, res) => {
 };
 export const getAvailableSeats = async (req, res) => {
     const { shift } = req.params;
-    console.log(shift)
+    // console.log(shift)
     try {
         // Query seats that are available for the given shift
         const availableSeats = await Seat.find({ [`availability.${shift}`]: true });
@@ -32,7 +32,7 @@ export const getVacantSeatsByShift = async (req, res) => {
             [`availability.${seatShift}`]: true // Check if the shift is available
         }, 'seatNumber'); // Only select seatNumber
 
-        console.log(vacantSeats);
+        // console.log(vacantSeats);
         res.status(200).json(vacantSeats);
     } catch (error) {
         console.error(error);

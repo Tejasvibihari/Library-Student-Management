@@ -27,10 +27,6 @@ const StudentSchema = new mongoose.Schema({
     lastPayment: { type: Date },
 
     image: { type: String }, // Assuming image is stored as a URL or base64 string
-    admin: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
-    },
     isOnline: { type: Boolean, default: false },
     // Assuming paymentDate is the same as lastPayment, if not, add it as well
 
