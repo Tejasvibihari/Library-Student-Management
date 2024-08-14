@@ -7,7 +7,7 @@ import { Facebook } from 'lucide-react';
 import { Link } from "react-router-dom";
 
 
-export default function StudentIdCard({ name, father, mobile, preparingFor, addmissionDate, image, village }) {
+export default function StudentIdCard({ sid, name, father, mobile, preparingFor, addmissionDate, image, village }) {
 
     const canvasRef = useRef(null);
     const gradientRef = useRef(null);
@@ -80,7 +80,7 @@ export default function StudentIdCard({ name, father, mobile, preparingFor, addm
                         {image ? <img src={image} className="rounded-full w-32 border-gray-400 border-4 mx-auto" /> :
                             <img src="./img/idDp.jpg" className="rounded-full w-32 border-gray-400 border-4 mx-auto" />}
                         <h2 className="text-center my-1 text-gray-700 font-normal">
-                            1001
+                            {sid}
                         </h2>
                         <h2 className="text-center text-lg my-1 text-black font-semibold">
                             {name}

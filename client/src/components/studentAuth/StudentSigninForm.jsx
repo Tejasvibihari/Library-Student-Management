@@ -43,11 +43,11 @@ export default function StudentSigninForm() {
             dispatch(signInStart())
             const formData = { email, password }
             const response = await client.post('/api/student/auth/signin', formData)
-            console.log(response.data.result)
-            dispatch(signInSuccess(response.data.result))
+            console.log(response.data.student)
+            dispatch(signInSuccess(response.data.student))
 
             navigate('/student-dashboard')
-       
+
         } catch (error) {
             console.log(error)
             if (error.response && error.response.data) {

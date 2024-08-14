@@ -22,6 +22,7 @@ import StudentAdmission from './pages/StudentAdmission'
 import AdminStudentDashboard from './pages/AdminStudentDashboard'
 import Seats from './pages/Seats'
 import Sidebar from './components/Sidebar'
+import StudentIdCard from './components/StudentIdCard'
 
 
 
@@ -37,9 +38,13 @@ export default function App() {
           <Route path="/resetpassword" element={<ResetPasswordForm />} />
           <Route path="/verifypassword" element={<VerifyPasswordForm />} />
           {/* Admin Authentication End */}
+
           <Route path="/student-admission" element={<StudentAdmission />} />
           <Route path="/student-signin" element={<StudentSignin />} />
+
+
           <Route path="/student-dashboard" element={<Student />} />
+          <Route path="/student-id" element={<StudentId />} />
 
 
           {/* Sidebar menu Start  */}
