@@ -51,6 +51,11 @@ export const createStudent = async (req, res) => {
                     if (base64String) {
                         const imageBuffer = Buffer.from(base64String, 'base64');
                         imageFilename = `${sid}.jpeg`;
+                        const uploadsDir = path.join(__dirname, 'uploads');
+                        if (!fs.existsSync(uploadsDir)) {
+                            fs.mkdirSync(uploadsDir);
+                        }
+
                         fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
 
                         if (seatShift === "fullDay") {
@@ -126,6 +131,11 @@ export const createStudent = async (req, res) => {
                         const newSid = lastStudent ? lastStudent.sid + 1 : 322;
 
                         imageFilename = `${newSid}.jpeg`;
+                        const uploadsDir = path.join(__dirname, 'uploads');
+                        if (!fs.existsSync(uploadsDir)) {
+                            fs.mkdirSync(uploadsDir);
+                        }
+
                         fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
                         if (seatShift === "fullDay") {
                             seat.availability.morning = false;
