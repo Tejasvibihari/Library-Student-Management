@@ -25,7 +25,7 @@ export const sendMail = async ({ to, subject, body }) => {
         //     html: body, // html body
         // }
         const emailFormat = {
-            from: '"Bihari Library" <manojihari35@gmail.com>', // Include a clear display name
+            from: '"Bihari Library" <manojbihari35@gmail.com>', // Include a clear display name
             to: to,
             subject: subject,
             text: "Bihari Library", // Consider adding a plaintext version of the email
