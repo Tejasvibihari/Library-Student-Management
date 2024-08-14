@@ -204,10 +204,10 @@ export const GetAllStudent = async (req, res) => {
     if (sid) query.sid = sid;
     if (name) query.name = name;
     if (status) {
-        if (status === "pending") {
+        if (status === "Pending") {
             query.status = status;
             query.nextPayment = { $lte: moment().endOf('day').toDate() }; // Check if nextPayment is less than or equal to today
-        } else if (status === "active") {
+        } else if (status === "Active") {
             query.status = status;
             query.nextPayment = { $gt: moment().endOf('day').toDate() }; // Check if nextPayment is greater than today
         } else {
