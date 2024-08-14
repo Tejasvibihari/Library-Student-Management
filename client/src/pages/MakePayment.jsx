@@ -53,7 +53,7 @@ export default function MakePayment() {
     }, [adminId])
     return (
         <>
-            <SideBar>
+            {/* <SideBar> */}
                 <Breadcrumbs title="Make Payment" subTitle="Student" />
                 <div className='grid grid-cols-1 md:grid-cols-6 gap-4 mt-5 border p-4 shadow-md bg-white mb-4'>
                     <div className='col-span-2'>
@@ -92,7 +92,7 @@ export default function MakePayment() {
                     </button>
                 </div>
                 <PaymentStudentTable allStudent={Student} />
-            </SideBar>
+            {/* </SideBar> */}
         </>
     )
 }

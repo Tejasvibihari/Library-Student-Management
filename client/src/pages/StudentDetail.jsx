@@ -54,7 +54,7 @@ export default function StudentDetail() {
     }
     return (
         <>
-            <SideBar>
+            {/* <SideBar> */}
                 <Breadcrumbs title="Student Details" subTitle="Student" />
                 <div className='grid grid-cols-1 md:grid-cols-6 gap-4 mt-5 border p-4 shadow-md'>
                     <div className='col-span-2'>
@@ -129,7 +129,7 @@ export default function StudentDetail() {
                         )
                     )}
                 </div>
-            </SideBar>
+            {/* </SideBar> */}
         </>
     )
 }

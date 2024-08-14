@@ -21,6 +21,7 @@ import PaymentDetail from './pages/PaymentDetail'
 import StudentAdmission from './pages/StudentAdmission'
 import AdminStudentDashboard from './pages/AdminStudentDashboard'
 import Seats from './pages/Seats'
+import Sidebar from './components/Sidebar'
 
 
 
@@ -28,7 +29,7 @@ export default function App() {
   return (
     <>
       <BrowserRouter>
-
+        <Sidebar />
         <Routes>
           {/* Admin Authentication Start */}
           <Route path="/signup" element={<SignUp />} />
@@ -42,6 +43,7 @@ export default function App() {
 
 
           {/* Sidebar menu Start  */}
+
           <Route element={<AdminProtectedRoute />}>
             <Route path="/" element={<Home />} />
             <Route path="/admin-student-admission" element={<AdminStudentAdmission />} />
@@ -55,7 +57,7 @@ export default function App() {
             <Route path="/student-admin-dashboard/:_id" element={<AdminStudentDashboard />} />
             <Route path="/seat" element={<Seats />} />
           </Route>
-
+          {/* </Sidebar> */}
           <Route element={<AdminProtectedRoute />}>
             <Route path="/studentId" element={<StudentId />} />
           </Route>

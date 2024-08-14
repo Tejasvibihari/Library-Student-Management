@@ -1,83 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, User, MailPlus, LayoutDashboard, UserPlus, IndianRupee, HandCoins, Armchair } from 'lucide-react';
-import Profile from './Profile'; // Adjust the import based on your file structure
+// import { buttonVariants } from "../ui/button";
+import { User2 } from "lucide-react";
+import MenuLinks from "./ui/MenuLinks";
+import { Link } from "react-router-dom";
+// import Notifications from "./notifications";
 
-const SideBar = ({ children }) => {
-  const [open, setOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+export default function Sidebar() {
+    // const location = useLocation();
+    // // const isSignInPage = location.pathname === "/sign-in";
 
-  const handleToggle = () => {
-    setOpen(!open);
-  };
+    // if (isSignInPage) {
+    //     return null;
+    // }
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      setOpen(window.innerWidth >= 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className={`bg-[#1c2c3f] text-white ${open ? 'w-64' : 'w-17'} transition-all duration-300`}>
-        <div className="flex justify-between items-center p-4">
-          <span className={`${open ? 'block' : 'hidden'} font-bold text-xl font-[inter]`}>Library Management</span>
-          <button onClick={handleToggle} className="md:hidden">
-            {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-        <hr />
-        <nav className="flex flex-col p-2 font-[inter]">
-          <Link to="/" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-green-950">
-            <LayoutDashboard className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Dashboard</span>
-          </Link>
-          <Link to="/admin-student-admission" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-red-950">
-            <UserPlus className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Student Admission</span>
-          </Link>
-          <Link to="/student-detail" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-yellow-400">
-            <User className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Student Detail</span>
-          </Link>
-          <Link to="/email" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-lime-400">
-            <MailPlus className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Email</span>
-          </Link>
-          <Link to="/make-payment" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-purple-950">
-            <HandCoins className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Make Payment</span>
-          </Link>
-          <Link to="/payment-detail" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-gray-950">
-            <IndianRupee className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Payment Detail</span>
-          </Link>
-          <Link to="/seat" className="flex items-center p-2 hover:bg-[#283e58] hover:border-l-4 border-pink-950">
-            <Armchair className="w-6 h-6 mr-2" />
-            <span className={`${open ? 'block' : 'hidden'}`}>Seat</span>
-          </Link>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <header className="flex justify-between items-center bg-[#8e54e9] p-1 shadow-md">
-          {/* <button onClick={handleToggle} className="md:hidden">
-            <Menu className="w-6 h-6" />
-          </button> */}
-          <Profile />
-        </header>
-        <main className="p-4 bg-gray-100">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
-};
-
-export default SideBar;
+    return (
+        <nav>
+            <div className="h-12 p-2 flex items-center justify-between border-b border-b-zinc-200">
+                <MenuLinks />
+                <div className="md:flex flex items-center gap-2 ">
+                    {/* <Notifications /> */}
+                    <Link to="/profile" className='flex items-center border p-2'>
+                        <User2 className="w-4 h-4 md:me-1" />
+                        <span className="hidden md:flex">Profile</span>
+                    </Link>
+                </div>
+            </div>
+        </nav >
+    );
+}

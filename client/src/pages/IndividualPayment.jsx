@@ -1,5 +1,5 @@
 
-import SideBar from '../components/Sidebar'
+
 import Breadcrumbs from '../components/Breadcrumbs'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -99,82 +99,82 @@ export default function IndividualPayment() {
                     {alertStatus}
                 </Alert>
             </Snackbar>
-            <SideBar>
-                <Breadcrumbs title="Checkout" subTitle="Payment" />
+            {/* <SideBar> */}
+            <Breadcrumbs title="Checkout" subTitle="Payment" />
 
-                <div className='grid grid-cols-1 gap-4'>
+            <div className='grid grid-cols-1 gap-4'>
 
-                    <div className='col-span-2'>
-                        <div className='p-4 shadow-lg rounded-md'>
-                            <div className='py-2'>
-                                <h1 className='font-[inter] border-l-4 border-yellow-700 pl-2'>
-                                    Payment Detail
-                                </h1>
-                                <hr className='' />
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>SID</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.sid}</h2>
-                                    </div>
+                <div className='col-span-2'>
+                    <div className='p-4 shadow-lg rounded-md'>
+                        <div className='py-2'>
+                            <h1 className='font-[inter] border-l-4 border-yellow-700 pl-2'>
+                                Payment Detail
+                            </h1>
+                            <hr className='' />
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>SID</h3>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.sid}</h2>
                                 </div>
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Name</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.name}</h2>
-                                    </div>
-                                </div>
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Shift</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.shift}</h2>
-                                    </div>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Time</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.time}</h2>
-                                    </div>
-                                </div>
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Admission Date</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{formatDate(studentData.admissionDate)}</h2>
-                                    </div>
-                                </div>
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Enter Payment Date</h3>
-                                        <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type='date' value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} placeholder='Enter Payment Date' />
-                                    </div>
-                                </div>
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Payment For</h3>
-                                        {/* <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.lastPayment}</h2> */}
-                                        <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' value={paymentFor} onChange={(e) => setPaymentFor(e.target.value)} type="number" placeholder='1 or 2 Month' />
-                                    </div>
-                                </div>
-                                <div className='my-4 flex gap-4'>
-                                    <div className='border p-2 rounded-sm w-full'>
-                                        <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Amount</h3>
-                                        <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.paymentAmount * paymentFor}</h2>
-                                        {/* <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type="number" placeholder='Enter Amount' /> */}
-                                    </div>
-                                </div>
-                                <button onClick={handlePaymentClick} className='p-2 w-full border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
-
-                                    {loading ?
-                                        <div className='flex items-center justify-center'>
-                                            <span className='mr-2'>Please Wait..</span>
-                                            <CircularLoading size={25} />
-                                        </div> :
-                                        <div className='flex items-center'>
-                                            {/* <UserPlus size={17} className='mr-2' />Update Student</div>} */}
-                                            Checkout</div>}
-                                </button>
                             </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Name</h3>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.name}</h2>
+                                </div>
+                            </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Shift</h3>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.shift}</h2>
+                                </div>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Time</h3>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.time}</h2>
+                                </div>
+                            </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Admission Date</h3>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{formatDate(studentData.admissionDate)}</h2>
+                                </div>
+                            </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Enter Payment Date</h3>
+                                    <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type='date' value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} placeholder='Enter Payment Date' />
+                                </div>
+                            </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Payment For</h3>
+                                    {/* <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.lastPayment}</h2> */}
+                                    <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' value={paymentFor} onChange={(e) => setPaymentFor(e.target.value)} type="number" placeholder='1 or 2 Month' />
+                                </div>
+                            </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Amount</h3>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.paymentAmount * paymentFor}</h2>
+                                    {/* <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type="number" placeholder='Enter Amount' /> */}
+                                </div>
+                            </div>
+                            <button onClick={handlePaymentClick} className='p-2 w-full border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
+
+                                {loading ?
+                                    <div className='flex items-center justify-center'>
+                                        <span className='mr-2'>Please Wait..</span>
+                                        <CircularLoading size={25} />
+                                    </div> :
+                                    <div className='flex items-center'>
+                                        {/* <UserPlus size={17} className='mr-2' />Update Student</div>} */}
+                                        Checkout</div>}
+                            </button>
                         </div>
                     </div>
                 </div>
-            </SideBar >
+            </div>
+            {/* </SideBar > */}
         </div >
     )
 }

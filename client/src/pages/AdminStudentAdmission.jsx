@@ -6,13 +6,13 @@ import Breadcrumbs from '../components/Breadcrumbs'
 export default function AdminStudentAdmission() {
     return (
         <>
-            <SideBar>
-                <div>
-                    <Breadcrumbs title="Student Admission" subTitle="Student" />
-                    <StudentAdmissionForm />
+            {/* <SideBar> */}
+            <div>
+                <Breadcrumbs title="Student Admission" subTitle="Student" />
+                <StudentAdmissionForm />
 
-                </div>
-            </SideBar>
+            </div>
+            {/* </SideBar> */}
         </>
     )
 }

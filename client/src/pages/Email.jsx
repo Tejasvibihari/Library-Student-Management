@@ -7,7 +7,7 @@ import Breadcrumbs from '../components/Breadcrumbs'
 export default function Email() {
     return (
         <>
-            <SideBar>
+            {/* <SideBar> */}
                 <Breadcrumbs title="Mail" subTitle='Dashboard' />
                 <div className='grid grid-cols-1 md:grid-cols-4 gap-3'>
                     <div className='col-span-3'>
@@ -18,7 +18,7 @@ export default function Email() {
                     </div>
                 </div>
 
-            </SideBar>
+            {/* </SideBar> */}
         </>
     )
 }

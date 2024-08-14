@@ -24,10 +24,10 @@ export default function PaymentDetail() {
 
     return (
         <>
-            <SideBar>
+            {/* <SideBar> */}
                 <Breadcrumbs title='Payment Detail' subTitle='Payment' />
                 <PaymentDetailTable data={allPaymentData} />
-            </SideBar>
+            {/* </SideBar> */}
         </>
     )
 }

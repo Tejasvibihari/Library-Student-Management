@@ -64,52 +64,52 @@ export default function Seats() {
     ];
     return (
         <>
-            <SideBar>
-                <Breadcrumbs title="Admin" subTitle="Seats" />
-                <div className='border p-2 rounded-sm mb-4 bg-white shadow-md'>
-                    <h3>Shift</h3>
-                    <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4 items-center'>
-                        <div className='flex flex-col'>
-                            <label>Shift</label>
-                            <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
-                                <option value="" disabled selected>Select One</option>
-                                <option value="Morning">Morning</option>
-                                <option value="Afternoon">Afternoon</option>
-                                <option value="Evening">Evening</option>
-                                <option value="Night">Night</option>
-                                <option value="Double">Double</option>
-                                <option value="24 Hours">24 Hours</option>
-                            </select>
-                        </div>
-                        <div className='flex flex-col'>
-                            <label htmlFor="time">Time</label>
-                            <select required className="p-2 border rounded-md w-full" value={time} onChange={(e) => setTime(e.target.value)}>
-                                <option value="" disabled selected>Select One</option>
-                                {shift === "Morning" && <option value="morning">07:00AM - 11:00AM</option>}
-                                {shift === "Morning" && <option value="morningLong">07:00AM - 07:00AM</option>}
-                                {shift === "Afternoon" && <option value="afternoon">11:00AM - 03:00PM</option>}
-                                {shift === "Evening" && <option value="evening">03:00PM - 07:00PM</option>}
-                                {shift === "Night" && <option value="night">07:00PM - 11:00PM</option>}
-                                {shift === "Night" && <option value="nightLong">07:00PM - 07:00AM</option>}
-                                {shift === "Double" && <option value="doubleMorning">07:00AM - 03:00PM</option>}
-                                {shift === "Double" && <option value="doubleEvening">11:00AM - 07:00PM</option>}
-                                {shift === "24 Hours" && <option value="fullDay">24 Hours</option>}
-                            </select>
-                        </div>
+            {/* <SideBar> */}
+            <Breadcrumbs title="Admin" subTitle="Seats" />
+            <div className='border p-2 rounded-sm mb-4 bg-white shadow-md'>
+                <h3>Shift</h3>
+                <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4 items-center'>
+                    <div className='flex flex-col'>
+                        <label>Shift</label>
+                        <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
+                            <option value="" disabled selected>Select One</option>
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Evening">Evening</option>
+                            <option value="Night">Night</option>
+                            <option value="Double">Double</option>
+                            <option value="24 Hours">24 Hours</option>
+                        </select>
+                    </div>
+                    <div className='flex flex-col'>
+                        <label htmlFor="time">Time</label>
+                        <select required className="p-2 border rounded-md w-full" value={time} onChange={(e) => setTime(e.target.value)}>
+                            <option value="" disabled selected>Select One</option>
+                            {shift === "Morning" && <option value="morning">07:00AM - 11:00AM</option>}
+                            {shift === "Morning" && <option value="morningLong">07:00AM - 07:00AM</option>}
+                            {shift === "Afternoon" && <option value="afternoon">11:00AM - 03:00PM</option>}
+                            {shift === "Evening" && <option value="evening">03:00PM - 07:00PM</option>}
+                            {shift === "Night" && <option value="night">07:00PM - 11:00PM</option>}
+                            {shift === "Night" && <option value="nightLong">07:00PM - 07:00AM</option>}
+                            {shift === "Double" && <option value="doubleMorning">07:00AM - 03:00PM</option>}
+                            {shift === "Double" && <option value="doubleEvening">11:00AM - 07:00PM</option>}
+                            {shift === "24 Hours" && <option value="fullDay">24 Hours</option>}
+                        </select>
                     </div>
                 </div>
-                <div className='grid grid-cols-2 gap-4 md:grid-cols-7'>
-                    {seatRanges.map((range, index) => (
-                        <div key={index} className='border items-center flex flex-col justify-start p-2 bg-white shadow-lg'>
-                            {allSeat && allSeat
-                                .filter(seat => seat.seatNumber >= range[0] && seat.seatNumber <= range[1])
-                                .map((s, i) => (
-                                    <Seat key={i} seatNumber={s.seatNumber} available={s.availability[time]} />
-                                ))}
-                        </div>
-                    ))}
-                </div>
-            </SideBar >
+            </div>
+            <div className='grid grid-cols-2 gap-4 md:grid-cols-7'>
+                {seatRanges.map((range, index) => (
+                    <div key={index} className='border items-center flex flex-col justify-start p-2 bg-white shadow-lg'>
+                        {allSeat && allSeat
+                            .filter(seat => seat.seatNumber >= range[0] && seat.seatNumber <= range[1])
+                            .map((s, i) => (
+                                <Seat key={i} seatNumber={s.seatNumber} available={s.availability[time]} />
+                            ))}
+                    </div>
+                ))}
+            </div>
+            {/* </SideBar > */}
         </>
     )
 }

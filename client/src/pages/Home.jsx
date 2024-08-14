@@ -29,15 +29,15 @@ export default function Home() {
     }, [adminId])
     return (
         <>
-            <SideBar>
-                <Breadcrumbs title="Home" subTitle="Dshboard" />
-                <div className="">
+            {/* <SideBar> */}
+            <Breadcrumbs title="Home" subTitle="Dshboard" />
+            <div className="">
 
-                    <DashboardCard allStudent={Student} />
-                    {/* <Chart /> */}
-                    < PaymentStudentTable allStudent={Student} />
-                </div>
-            </SideBar >
+                <DashboardCard allStudent={Student} />
+                {/* <Chart /> */}
+                < PaymentStudentTable allStudent={Student} />
+            </div>
+            {/* </SideBar > */}
         </>
     );
 }

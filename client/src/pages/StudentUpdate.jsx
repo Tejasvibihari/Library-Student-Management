@@ -6,10 +6,10 @@ import Breadcrumbs from '../components/Breadcrumbs'
 export default function StudentUpdate() {
     return (
         <>
-            <SideBar>
+            {/* <SideBar> */}
                 <Breadcrumbs title="Student Update" subTitle="Student" />
                 <StudentUpdateForm />
-            </SideBar>
+            {/* </SideBar> */}
         </>
     )
 }
