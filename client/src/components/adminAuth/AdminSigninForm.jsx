@@ -130,6 +130,9 @@ export default function SigninForm() {
                         <div className='flex justify-center items-center text-sm text-[#818995] mt-2'>
                             Don't have an account? <Link to="/signup" className='px-2 text-[#8e54e9] underline cursor-pointer'>Sign Up</Link>
                         </div>
+                        <div className='flex justify-center items-center text-sm text-[#818995] mt-2'>
+                            Student Login <Link to='/student-signin' className='px-2 text-[#8e54e9] underline cursor-pointer'>Click Here</Link>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -179,6 +179,9 @@ export default function SignupForm() {
                             <div className='flex justify-center items-center text-sm text-[#818995] mt-2'>
                                 Already have an account? <Link to='/signin' className='px-2 text-[#8e54e9] underline cursor-pointer'>Sign In</Link>
                             </div>
+                            <div className='flex justify-center items-center text-sm text-[#818995] mt-2'>
+                                Create Student Account <Link to='/student-admission' className='px-2 text-[#8e54e9] underline cursor-pointer'>Click Here</Link>
+                            </div>
                         </form>
                     </div>
                 </div>
