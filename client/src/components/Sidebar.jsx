@@ -1,16 +1,14 @@
-// import { buttonVariants } from "../ui/button";
 import { User2 } from "lucide-react";
 import MenuLinks from "./ui/MenuLinks";
 import { Link } from "react-router-dom";
-// import Notifications from "./notifications";
+import { useSelector } from "react-redux";
 
 export default function Sidebar() {
-    // const location = useLocation();
-    // // const isSignInPage = location.pathname === "/sign-in";
+    const { isAuthenticated, currentAdmin } = useSelector(state => state.admin);
 
-    // if (isSignInPage) {
-    //     return null;
-    // }
+    if (!isAuthenticated || currentAdmin.role !== 'admin') {
+        return null; // Don't render the sidebar if the user is not authenticated or not an admin
+    }
 
     return (
         <nav>
@@ -24,6 +22,6 @@ export default function Sidebar() {
                     </Link>
                 </div>
             </div>
-        </nav >
+        </nav>
     );
 }
