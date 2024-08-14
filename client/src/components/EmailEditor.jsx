@@ -62,7 +62,7 @@ export default function EmailEditor() {
             to,
             subject,
             body: editorContent,
-            admin: adminId// Use the latest editor content directly
+            admin: to// Use the latest editor content directly
         };
         console.log(updatedMailData.body)
         try {
