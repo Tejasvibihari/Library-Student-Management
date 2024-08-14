@@ -39,13 +39,21 @@ export const createPayment = async (req, res) => {
         // Save the updated student
         await student.save();
 
+
+
+        // Get the current invoice number and increment it
+        const lastPayment = await Payment.findOne().sort({ invoiceNumber: -1 });
+        const invoiceNumber = lastPayment ? lastPayment.invoiceNumber + 1 : 1;
+
+
         // Create a new payment
         const newPayment = new Payment({
             sid,
             payment_date,
             amount,
             months_paid_for,
-            admissionDate
+            admissionDate,
+            invoiceNumber
         });
 
         // Save the payment to the database
@@ -65,7 +73,7 @@ export const createPayment = async (req, res) => {
 <tbody>
 <tr style="height: 13px;">
 <td style="padding: 8px; border: 1px solid #dddddd; height: 13px;"><strong>Invoice Number:</strong></td>
-<td style="padding: 8px; border: 1px solid #dddddd; height: 13px;">${_id}</td>
+<td style="padding: 8px; border: 1px solid #dddddd; height: 13px;">${invoiceNumber}</td>
 </tr>
 <tr style="height: 13px;">
 <td style="padding: 8px; border: 1px solid #dddddd; height: 13px;"><strong>Date:</strong></td>

@@ -128,7 +128,7 @@ export default function StudentIdCard({ sid, name, father, mobile, preparingFor,
                             </div>
                         </div>
                         <div className="flex justify-around items-center w-60 mt-2">
-                            <Link to="https://www.instagram.com/">
+                            <Link to="">
                                 <div className="p-2 border rounded-full border-black">
                                     <Facebook size={24} />
                                 </div>
@@ -141,11 +141,6 @@ export default function StudentIdCard({ sid, name, father, mobile, preparingFor,
                             <Link to="">
                                 <div className="p-2 border rounded-full border-black">
                                     <Youtube size={24} />
-                                </div>
-                            </Link>
-                            <Link to="">
-                                <div className="p-2 border rounded-full border-black">
-                                    <Facebook size={24} />
                                 </div>
                             </Link>
                         </div>
