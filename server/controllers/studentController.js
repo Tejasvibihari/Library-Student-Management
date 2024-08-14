@@ -1,13 +1,11 @@
-import Student from '../models/studentModel.js'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import Student from '../models/studentModel.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { sendMail } from '../utils/mailer.js';
 import fs from 'fs';
 import path from 'path';
 import Payment from '../models/paymentModel.js';
 import Seat from '../models/seatModel.js';
-const fs = require('fs');
-const path = require('path');
 
 export const createStudent = async (req, res) => {
     const {
