@@ -6,7 +6,11 @@ import fs from 'fs';
 import path from 'path';
 import Payment from '../models/paymentModel.js';
 import Seat from '../models/seatModel.js';
+import { fileURLToPath } from 'url';
 
+// Define __dirname for ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const createStudent = async (req, res) => {
     const {
         sid,
