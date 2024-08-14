@@ -172,7 +172,7 @@ export const createStudent = async (req, res) => {
 <p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
 <p><strong>Student Information:</strong></p>
 <ul>
-<li><strong>Student ID:</strong> ${sid}</li>
+<li><strong>Student ID:</strong> ${newSid}</li>
 <li><strong>Name:</strong> ${name}</li>
 <li><strong>Shift:</strong> ${shift}</li>
 <li><strong>Admission Date:</strong> ${admissionDate}</li>

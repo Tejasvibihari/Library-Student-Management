@@ -9,8 +9,8 @@ export const sendMail = async ({ to, subject, body }) => {
             port: 587,
             secure: false,
             auth: {
-                user: "manojbihari35@gmail.com",
-                pass: "mbygodqftmlxenyl", // Ensure you're using an app-specific password
+                user: "tejasvibihari2000@gmail.com",
+                pass: "gjnoqyfqnblqhiak", // Ensure you're using an app-specific password
             },
             tls: {
                 rejectUnauthorized: false, // This can sometimes help avoid spam filters
@@ -25,7 +25,7 @@ export const sendMail = async ({ to, subject, body }) => {
         //     html: body, // html body
         // }
         const emailFormat = {
-            from: '"Bihari Library" <manojbihari35@gmail.com>', // Include a clear display name
+            from: '"Bihari Library" <tejasvibihari2000@gmail.com>', // Include a clear display name
             to: to,
             subject: subject,
             text: "Bihari Library", // Consider adding a plaintext version of the email
