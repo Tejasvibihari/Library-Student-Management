@@ -11,11 +11,18 @@ import seatRouter from './router/seatRoute.js'
 // import './utils/scheduler/PaymentStatus.js'
 import './utils/scheduler/seatStatus.js'
 import dotenv from 'dotenv';
-
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 dotenv.config();
 
 const app = express();
 const port = 3000;
+
+
+// Define __dirname for ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // mongoose.connect("mongodb+srv://tejasvibihari2000:z1VS5wWSKyakzfds@bihari.kup0kde.mongodb.net/?retryWrites=true&w=majority")
 mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
@@ -57,6 +64,15 @@ app.use('/api/mail/', mailRouter);
 app.use('/api/payment/', paymentRouter);
 app.use('/api/seat/', seatRouter);
 
+
+
+// Define the uploads directory path
+const uploadsDir = path.join(__dirname, 'uploads');
+
+// Ensure the uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 
 
