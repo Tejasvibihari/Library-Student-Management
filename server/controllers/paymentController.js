@@ -65,7 +65,7 @@ export const createPayment = async (req, res) => {
 <tbody>
 <tr style="height: 13px;">
 <td style="padding: 8px; border: 1px solid #dddddd; height: 13px;"><strong>Invoice Number:</strong></td>
-<td style="padding: 8px; border: 1px solid #dddddd; height: 13px;">[Invoice Number]</td>
+<td style="padding: 8px; border: 1px solid #dddddd; height: 13px;">${_id}</td>
 </tr>
 <tr style="height: 13px;">
 <td style="padding: 8px; border: 1px solid #dddddd; height: 13px;"><strong>Date:</strong></td>
