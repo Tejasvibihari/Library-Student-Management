@@ -66,7 +66,7 @@ export const createStudent = async (req, res) => {
                         } else {
                             seat.availability[seatShift] = false;
                         }
-                        await seat.save();
+
 
 
                         password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
@@ -75,9 +75,9 @@ export const createStudent = async (req, res) => {
                         await Student.create({
                             sid, name, dob, email, seatNumber, password: hashedPassword, mobile, aadhar, father, guardian,
                             gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
-                            image: imageFilename, admin, lastPayment
+                            image: imageFilename, lastPayment
                         });
-
+                        await seat.save();
                         sendMail({
                             to: email,
                             subject: "Welcome to Bihari Library - Admission Confirmation",
@@ -140,7 +140,7 @@ export const createStudent = async (req, res) => {
                         } else {
                             seat.availability[seatShift] = false;
                         }
-                        await seat.save();
+
 
                         password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
                         const hashedPassword = await bcrypt.hash(password, 12);
@@ -148,9 +148,9 @@ export const createStudent = async (req, res) => {
                         await Student.create({
                             sid: newSid, name, dob, email, seatNumber, password: hashedPassword, mobile, aadhar, father, guardian,
                             gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
-                            image: imageFilename, admin, lastPayment
+                            image: imageFilename, lastPayment
                         });
-
+                        await seat.save();
                         sendMail({
                             to: email,
                             subject: "Welcome to Bihari Library - Admission Confirmation",
@@ -198,23 +198,22 @@ export const createStudent = async (req, res) => {
 
 export const GetAllStudent = async (req, res) => {
     const { sid, name, status } = req.query;
-
     // Construct a dynamic query object
     let query = {};
     if (sid) query.sid = sid;
     if (name) query.name = name;
     if (status) {
         if (status === "Pending") {
-            query.status = status;
-            query.nextPayment = { $lte: moment().endOf('day').toDate() }; // Check if nextPayment is less than or equal to today
+            // query.status = status;
+            query.nextPayment = { $lte: new Date() }; // Check if nextPayment is less than or equal to today
         } else if (status === "Active") {
-            query.status = status;
-            query.nextPayment = { $gt: moment().endOf('day').toDate() }; // Check if nextPayment is greater than today
+            // query.status = status;
+            query.nextPayment = { $gt: new Date() }; // Check if nextPayment is greater than today
         } else {
             query.status = status;
         }
     }
-
+    console.log(query)
     try {
         // Use the constructed query object to filter data
         const students = await Student.find(query);
@@ -310,7 +309,7 @@ export const updateStudent = async (req, res) => {
         paymentAmount,
         paymentMode,
         image,
-        admin
+        // admin
     } = req.body;
 
     try {
@@ -350,7 +349,7 @@ export const updateStudent = async (req, res) => {
         student.paymentAmount = paymentAmount;
         student.paymentMode = paymentMode;
         student.image = imageFilename;
-        student.admin = admin;
+        // student.admin = admin;
 
         await student.save();
 
