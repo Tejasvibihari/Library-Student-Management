@@ -10,7 +10,7 @@ export const sendMail = async ({ to, subject, body }) => {
             secure: false,
             auth: {
                 user: "biharilibrary@gmail.com",
-                pass: "qhdjpsfvdsracoai", // Ensure you're using an app-specific password
+                pass: "cjlbuyjnsghkbgwg", // Ensure you're using an app-specific password
             },
             tls: {
                 rejectUnauthorized: false, // This can sometimes help avoid spam filters
