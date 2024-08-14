@@ -201,10 +201,19 @@ export const GetAllStudent = async (req, res) => {
 
     // Construct a dynamic query object
     let query = {};
-    // if (admin) query.admin = admin;
     if (sid) query.sid = sid;
     if (name) query.name = name;
-    if (status) query.status = status;
+    if (status) {
+        if (status === "pending") {
+            query.status = status;
+            query.nextPayment = { $lte: moment().endOf('day').toDate() }; // Check if nextPayment is less than or equal to today
+        } else if (status === "active") {
+            query.status = status;
+            query.nextPayment = { $gt: moment().endOf('day').toDate() }; // Check if nextPayment is greater than today
+        } else {
+            query.status = status;
+        }
+    }
 
     try {
         // Use the constructed query object to filter data
