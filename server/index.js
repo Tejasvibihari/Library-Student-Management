@@ -23,7 +23,7 @@ const port = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-mongoose.connect("process.env.MONGODB_URL")
+mongoose.connect(process.env.MONGODB_URL)
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => {
         console.error(`Could not connect to MongoDB... + ${err}`);
