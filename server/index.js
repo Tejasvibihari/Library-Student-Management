@@ -18,13 +18,13 @@ import { fileURLToPath } from 'url';
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Define __dirname for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-mongoose.connect("mongodb://localhost:27017/biharilibrary")
+mongoose.connect("process.env.MONGODB_URL")
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => {
         console.error(`Could not connect to MongoDB... + ${err}`);
