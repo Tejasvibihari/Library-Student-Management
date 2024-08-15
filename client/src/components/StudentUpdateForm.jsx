@@ -455,7 +455,7 @@ export default function StudentUpdateForm() {
                                     village={address}
                                     preparingFor={preparingFor}
                                     addmissionDate={admissionDate}
-                                    image={croppedImage === `${sid}.jpeg` ? `https://library-student-management-api.onrender.com/uploads/${croppedImage}` : croppedImage}
+                                    image={croppedImage === `${sid}.jpeg` ? `http://localhost:3000/uploads/${croppedImage}` : croppedImage}
                                 />
                             </div>
 

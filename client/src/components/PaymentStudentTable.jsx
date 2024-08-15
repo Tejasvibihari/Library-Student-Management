@@ -124,7 +124,7 @@ export default function PaymentStudentTable({ allStudent }) {
                                     <TableCell align="center">
                                         <Avatar
                                             alt="Remy Sharp"
-                                            src={`https://library-student-management-api.onrender.com/uploads/${data.image}`}
+                                            src={`http://localhost:3000/uploads/${data.image}`}
                                             sx={{ width: 56, height: 56 }}
                                             variant="rounded"
                                         />

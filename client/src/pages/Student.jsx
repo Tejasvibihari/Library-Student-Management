@@ -43,7 +43,7 @@ export default function AdminStudentDashboard() {
                     <div className='rounded-md bg-white p-2 shadow-lg'>
                         <div className='flex flex-col md:flex-row gap-2'>
                             <div>
-                                <img className='w-32 rounded-full' src={`https://library-student-management-api.onrender.com/uploads/${user.image}`} />
+                                <img className='w-32 rounded-full' src={`http://localhost:3000/uploads/${user.image}`} />
                             </div>
                             <div className='flex flex-col py-3'>
                                 <div className='font-[inter]'><span className='font-semibold'>SID</span>:- {user.sid}</div>

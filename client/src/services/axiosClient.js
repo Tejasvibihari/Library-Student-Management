@@ -1,8 +1,7 @@
 import axios from 'axios'
 
 const client = axios.create({
-    // baseURL: 'http://localhost:3000',
-    baseURL: 'https://library-student-management-api.onrender.com/',
+    baseURL: 'http://localhost:3000/',
     timeout: 10000
 });
 

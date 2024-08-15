@@ -30,7 +30,7 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                     <div className='flex flex-col md:flex-row justify-between items-center'>
                         {/* Proile Image  */}
                         <div>
-                            {/* <img src={`https://library-student-management-api.onrender.com/uploads/${src}`} className='w-32 rounded-full shadow-sm shadow-white border' /> */}
+                            {/* <img src={`http://localhost:3000/uploads/${src}`} className='w-32 rounded-full shadow-sm shadow-white border' /> */}
                             <img src={`${src}`} className='w-32 rounded-full shadow-sm shadow-white border' />
                             <div className='text-center'>{sid}</div>
                         </div>

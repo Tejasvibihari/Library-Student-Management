@@ -16,7 +16,7 @@ export default function StudentId() {
                 village={user.address}
                 preparingFor={user.preparingFor}
                 addmissionDate={formatDate(user.admissionDate)}
-                image={`https://library-student-management-api.onrender.com/uploads/${user.image}`}
+                image={`http://localhost:3000/uploads/${user.image}`}
             />
         </div>
     )
