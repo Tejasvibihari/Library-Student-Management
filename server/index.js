@@ -18,19 +18,19 @@ import { fileURLToPath } from 'url';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 // Define __dirname for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-mongoose.connect(process.env.MONGODB_URL)
+mongoose.connect("mongodb://localhost:27017/biharilibrary")
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => {
         console.error(`Could not connect to MongoDB... + ${err}`);
     });
 
-const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.vercel.app'];
+const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.in'];
 
 app.use(cors({
     origin: function (origin, callback) {
