@@ -2,36 +2,33 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import adminRouter from './router/adminAuth.js'
-import studentRouter from './router/studentRouter.js'
-import studentAuthRouter from './router/studentAuthRouter.js'
-import mailRouter from './router/mailRouter.js'
-import paymentRouter from './router/paymentRoute.js'
-import seatRouter from './router/seatRoute.js'
-// import './utils/scheduler/PaymentStatus.js'
-import './utils/scheduler/seatStatus.js'
+import adminRouter from './router/adminAuth.js';
+import studentRouter from './router/studentRouter.js';
+import studentAuthRouter from './router/studentAuthRouter.js';
+import mailRouter from './router/mailRouter.js';
+import paymentRouter from './router/paymentRoute.js';
+import seatRouter from './router/seatRoute.js';
+// import './utils/scheduler/PaymentStatus.js';
+import './utils/scheduler/seatStatus.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 dotenv.config();
 
 const app = express();
-const port = 3000;
-
+const port = process.env.PORT || 3000;
 
 // Define __dirname for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// mongoose.connect("mongodb+srv://tejasvibihari2000:z1VS5wWSKyakzfds@bihari.kup0kde.mongodb.net/?retryWrites=true&w=majority")
-mongoose.connect("mongodb+srv://allinone801109:r7hF5NImT2KgOg3H@cluster0.rpizybi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-    // mongoose.connect("mongodb://localhost:27017/studentLibrary")
+mongoose.connect(process.env.MONGODB_URL)
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => {
         console.error(`Could not connect to MongoDB... + ${err}`);
     });
-
 
 const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.vercel.app'];
 
@@ -55,7 +52,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.get("/", (req, res) => {
     res.send("Hello World");
-})
+});
 
 app.use('/api/admin/auth/', adminRouter);
 app.use('/api/student/', studentRouter);
@@ -63,8 +60,6 @@ app.use('/api/student/auth', studentAuthRouter);
 app.use('/api/mail/', mailRouter);
 app.use('/api/payment/', paymentRouter);
 app.use('/api/seat/', seatRouter);
-
-
 
 // Define the uploads directory path
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -74,9 +69,6 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-
-
-
 app.listen(port, (req, res) => {
-    console.log(`Connected to PORT ${port}...`)
-})
+    console.log(`Connected to PORT ${port}...`);
+});
