@@ -1,7 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import adminRouter from './router/adminAuth.js';
 import studentRouter from './router/studentRouter.js';
 import studentAuthRouter from './router/studentAuthRouter.js';
