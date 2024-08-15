@@ -115,7 +115,7 @@ export default function StudentDetail() {
                                 time={student.time}
                                 dist={student.district}
                                 block={student.block}
-                                src={student.image ? `http://localhost:3000/uploads/${student.image}` : (student.gender === "Male" ? './img/idDp.jpg' : './img/femaledp.jpg')}                            // src={student.image}
+                                src={student.image ? `http://api.biharilibrary.in/uploads/${student.image}` : (student.gender === "Male" ? './img/idDp.jpg' : './img/femaledp.jpg')}                            // src={student.image}
                                 status={student.status}
                                 lastPayment={student.lastPayment}
                                 paymentAmount={student.paymentAmount}

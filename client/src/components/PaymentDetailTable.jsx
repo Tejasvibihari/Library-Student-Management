@@ -88,7 +88,7 @@ export default function PaymentDetailTable({ data }) {
                                     {relatedData ? (
                                         <Avatar
                                             alt={relatedData.name}
-                                            src={`http://localhost:3000/uploads/${relatedData.image}`}
+                                            src={`http://api.biharilibrary.in/uploads/${relatedData.image}`}
                                             sx={{ width: 56, height: 56 }}
                                             variant="rounded"
                                         />
