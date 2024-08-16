@@ -124,7 +124,7 @@ export default function PaymentStudentTable({ allStudent }) {
                                     <TableCell align="center">
                                         <Avatar
                                             alt="Remy Sharp"
-                                            src={`${baseUrl}/uploads/${data.image}`}
+                                            src={`https://api.biharilibrary.in/uploads/${data.image}`}
                                             sx={{ width: 56, height: 56 }}
                                             variant="rounded"
                                         />

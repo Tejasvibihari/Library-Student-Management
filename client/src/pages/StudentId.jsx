@@ -16,7 +16,7 @@ export default function StudentId() {
                 village={user.address}
                 preparingFor={user.preparingFor}
                 addmissionDate={formatDate(user.admissionDate)}
-                image={`${baseUrl}/uploads/${user.image}`}
+                image={`https://api.biharilibrary.in/uploads/${user.image}`}
             />
         </div>
     )

@@ -55,7 +55,7 @@ export default function EmailDetail() {
                                     return (
                                         <div key={i} className='border-b'>
                                             <div className='grid grid-cols-5 py-2 cursor-pointer'>
-                                                <Avatar alt={data.name} src={`${baseUrl}/uploads/${data.image}`} />
+                                                <Avatar alt={data.name} src={`https://api.biharilibrary.in/uploads/${data.image}`} />
                                                 <div className='col-span-4'>
                                                     <div className='flex justify-between'>
                                                         <p className='text-sm'>

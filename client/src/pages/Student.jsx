@@ -43,7 +43,7 @@ export default function AdminStudentDashboard() {
                     <div className='rounded-md bg-white p-2 shadow-lg'>
                         <div className='flex flex-col md:flex-row gap-2'>
                             <div>
-                                <img className='w-32 rounded-full' src={`${baseUrl}/uploads/${user.image}`} />
+                                <img className='w-32 rounded-full' src={`https://api.biharilibrary.in/uploads/${user.image}`} />
                             </div>
                             <div className='flex flex-col py-3'>
                                 <div className='font-[inter]'><span className='font-semibold'>SID</span>:- {user.sid}</div>

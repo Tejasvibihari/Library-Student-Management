@@ -455,7 +455,7 @@ export default function StudentUpdateForm() {
                                     village={address}
                                     preparingFor={preparingFor}
                                     addmissionDate={admissionDate}
-                                    image={croppedImage === `${sid}.jpeg` ? `${baseUrl}/uploads/${croppedImage}` : croppedImage}
+                                    image={croppedImage === `${sid}.jpeg` ? `https://api.biharilibrary.in/uploads/${croppedImage}` : croppedImage}
                                 />
                             </div>
 

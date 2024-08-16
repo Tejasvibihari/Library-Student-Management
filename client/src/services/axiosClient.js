@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const client = axios.create({
-    baseURL: process.env.BASE_URL,
+    baseURL: 'https://api.biharilibrary.in/',
     timeout: 10000
 });
 
