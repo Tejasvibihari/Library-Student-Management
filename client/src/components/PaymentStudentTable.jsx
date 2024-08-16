@@ -71,7 +71,7 @@ export default function PaymentStudentTable({ allStudent }) {
     // const [allStudent, setAllStudent] = useState('')
 
     const [status, setStatus] = useState('Pending');
-    const baseUrl = process.env.BASE_URL
+    // const baseUrl = process.env.BASE_URL
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);

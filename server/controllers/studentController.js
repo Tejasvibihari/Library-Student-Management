@@ -7,7 +7,7 @@ import path from 'path';
 import Payment from '../models/paymentModel.js';
 import Seat from '../models/seatModel.js';
 import { fileURLToPath } from 'url';
-
+import sharp from 'sharp'
 // Define __dirname for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,12 +54,20 @@ export const createStudent = async (req, res) => {
                     if (base64String) {
                         const imageBuffer = Buffer.from(base64String, 'base64');
                         imageFilename = `${sid}.jpeg`;
-                        const uploadsDir = path.join(__dirname, 'uploads');
+                        const uploadsDir = path.join(__dirname, '../uploads');
                         if (!fs.existsSync(uploadsDir)) {
                             fs.mkdirSync(uploadsDir);
                         }
-
-                        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+                        sharp(imageBuffer)
+                            .jpeg({ quality: 80 }) // Compress the image with 80% quality
+                            .toBuffer()
+                            .then(compressedBuffer => {
+                                fs.writeFileSync(path.join(uploadsDir, imageFilename), compressedBuffer);
+                                // Now you can send the compressed image to the database
+                            })
+                            .catch(err => {
+                                console.error('Error compressing the image:', err);
+                            });
 
                         if (seatShift === "fullDay") {
                             seat.availability.morning = false;
@@ -134,12 +142,22 @@ export const createStudent = async (req, res) => {
                         const newSid = lastStudent ? lastStudent.sid + 1 : 322;
 
                         imageFilename = `${newSid}.jpeg`;
-                        const uploadsDir = path.join(__dirname, 'uploads');
+                        // const uploadsDir = path.join(__dirname, 'uploads');
+                        const uploadsDir = path.join(__dirname, '../uploads');
                         if (!fs.existsSync(uploadsDir)) {
                             fs.mkdirSync(uploadsDir);
                         }
-
-                        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+                        sharp(imageBuffer)
+                            .jpeg({ quality: 80 }) // Compress the image with 80% quality
+                            .toBuffer()
+                            .then(compressedBuffer => {
+                                fs.writeFileSync(path.join(uploadsDir, imageFilename), compressedBuffer);
+                                // Now you can send the compressed image to the database
+                            })
+                            .catch(err => {
+                                console.error('Error compressing the image:', err);
+                            });
+                        // fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
                         if (seatShift === "fullDay") {
                             seat.availability.morning = false;
                             seat.availability.afternoon = false;
