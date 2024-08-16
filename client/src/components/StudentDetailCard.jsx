@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 
 export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount, nextPayment, seatNumber }) {
     const [status, setStatus] = useState('Pending');
-
+    const baseUrl = process.env.BASE_URL
     useEffect(() => {
         const handleStatusChange = () => {
             if (!nextPayment || nextPayment < new Date()) {
@@ -30,7 +30,7 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                     <div className='flex flex-col md:flex-row justify-between items-center'>
                         {/* Proile Image  */}
                         <div>
-                            {/* <img src={`http://api.biharilibrary.in/uploads/${src}`} className='w-32 rounded-full shadow-sm shadow-white border' /> */}
+                            {/* <img src={`${baseUrl}/uploads/${src}`} className='w-32 rounded-full shadow-sm shadow-white border' /> */}
                             <img src={`${src}`} className='w-32 rounded-full shadow-sm shadow-white border' />
                             <div className='text-center'>{sid}</div>
                         </div>

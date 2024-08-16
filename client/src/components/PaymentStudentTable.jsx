@@ -71,7 +71,7 @@ export default function PaymentStudentTable({ allStudent }) {
     // const [allStudent, setAllStudent] = useState('')
 
     const [status, setStatus] = useState('Pending');
-
+    const baseUrl = process.env.BASE_URL
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -124,7 +124,7 @@ export default function PaymentStudentTable({ allStudent }) {
                                     <TableCell align="center">
                                         <Avatar
                                             alt="Remy Sharp"
-                                            src={`http://api.biharilibrary.in/uploads/${data.image}`}
+                                            src={`${baseUrl}/uploads/${data.image}`}
                                             sx={{ width: 56, height: 56 }}
                                             variant="rounded"
                                         />

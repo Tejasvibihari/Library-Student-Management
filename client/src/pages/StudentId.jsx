@@ -5,7 +5,7 @@ import formatDate from '../utils/FormateDate'
 
 export default function StudentId() {
     const user = useSelector(state => state.student.currentStudent)
-    console.log(user)
+    const baseUrl = process.env.BASE_URL
     return (
         <div className='grid grid-cols-1 w-full p-4 mt-4'>
             <StudentIdCard
@@ -16,7 +16,7 @@ export default function StudentId() {
                 village={user.address}
                 preparingFor={user.preparingFor}
                 addmissionDate={formatDate(user.admissionDate)}
-                image={`http://api.biharilibrary.in/uploads/${user.image}`}
+                image={`${baseUrl}/uploads/${user.image}`}
             />
         </div>
     )

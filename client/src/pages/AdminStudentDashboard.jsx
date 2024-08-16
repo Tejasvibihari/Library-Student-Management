@@ -16,7 +16,7 @@ export default function AdminStudentDashboard() {
     const { _id } = useParams()
     const [student, setStudent] = useState({})
     const [payment, setPayment] = useState({})
-
+    const baseUrl = process.env.BASE_URL
 
     useEffect(() => {
         const getStudent = async () => {
@@ -60,7 +60,7 @@ export default function AdminStudentDashboard() {
                     <div className='rounded-md bg-white p-2 shadow-lg'>
                         <div className='flex flex-col md:flex-row gap-2'>
                             <div>
-                                <img className='w-32 rounded-full' src={`http://api.biharilibrary.in/uploads/${student.image}`} />
+                                <img className='w-32 rounded-full' src={`${baseUrl}/uploads/${student.image}`} />
                             </div>
                             <div className='flex flex-col py-3'>
                                 <div className='font-[inter]'><span className='font-semibold'>SID</span>:- {student.sid}</div>

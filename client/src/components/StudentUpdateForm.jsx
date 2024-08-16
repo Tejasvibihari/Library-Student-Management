@@ -34,7 +34,7 @@ export default function StudentUpdateForm() {
     const [snackOpen, setSnackOpen] = React.useState(false);
     const [alertStatus, setAlertStatus] = useState('')
     const [form, setForm] = useState('')
-
+    const baseUrl = process.env.BASE_URL
 
 
     const { _id } = useParams()
@@ -455,7 +455,7 @@ export default function StudentUpdateForm() {
                                     village={address}
                                     preparingFor={preparingFor}
                                     addmissionDate={admissionDate}
-                                    image={croppedImage === `${sid}.jpeg` ? `http://api.biharilibrary.in/uploads/${croppedImage}` : croppedImage}
+                                    image={croppedImage === `${sid}.jpeg` ? `${baseUrl}/uploads/${croppedImage}` : croppedImage}
                                 />
                             </div>
 

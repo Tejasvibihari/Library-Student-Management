@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MailPlus, Search } from 'lucide-react';
 import Avatar from '@mui/material/Avatar';
-import { Link } from 'react-router-dom';
-import axios from 'axios'; // Make sure to install axios
 import client from '../services/axiosClient';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +8,7 @@ import { useSelector } from 'react-redux';
 export default function EmailDetail() {
     const [emailDetails, setEmailDetails] = useState(null);
     const adminId = useSelector(state => state.admin.currentAdmin._id)
-    console.log(adminId)
+    const baseUrl = process.env.BASE_URL
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -57,7 +55,7 @@ export default function EmailDetail() {
                                     return (
                                         <div key={i} className='border-b'>
                                             <div className='grid grid-cols-5 py-2 cursor-pointer'>
-                                                <Avatar alt={data.name} src={`http://api.biharilibrary.in/uploads/${data.image}`} />
+                                                <Avatar alt={data.name} src={`${baseUrl}/uploads/${data.image}`} />
                                                 <div className='col-span-4'>
                                                     <div className='flex justify-between'>
                                                         <p className='text-sm'>

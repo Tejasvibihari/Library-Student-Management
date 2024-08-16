@@ -15,7 +15,7 @@ export default function StudentDetail() {
     const [active, setActive] = useState(false)
     const [pending, setPending] = useState(false)
     const [deactive, setDeactive] = useState(false)
-
+    const baseUrl = process.env.BASE_URL
     const [loading, setLoading] = useState(false)
 
 
@@ -115,7 +115,7 @@ export default function StudentDetail() {
                                 time={student.time}
                                 dist={student.district}
                                 block={student.block}
-                                src={student.image ? `http://api.biharilibrary.in/uploads/${student.image}` : (student.gender === "Male" ? './img/idDp.jpg' : './img/femaledp.jpg')}                            // src={student.image}
+                                src={student.image ? `${baseUrl}/uploads/${student.image}` : (student.gender === "Male" ? './img/idDp.jpg' : './img/femaledp.jpg')}                            // src={student.image}
                                 status={student.status}
                                 lastPayment={student.lastPayment}
                                 paymentAmount={student.paymentAmount}

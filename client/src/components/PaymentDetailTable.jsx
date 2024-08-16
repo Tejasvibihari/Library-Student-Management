@@ -38,7 +38,7 @@ export default function PaymentDetailTable({ data }) {
     const adminId = useSelector(state => state.admin.currentAdmin._id);
     const [studentData, setStudentData] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const baseUrl = process.env.BASE_URL
     useEffect(() => {
         const getStudent = async () => {
             try {
@@ -88,7 +88,7 @@ export default function PaymentDetailTable({ data }) {
                                     {relatedData ? (
                                         <Avatar
                                             alt={relatedData.name}
-                                            src={`http://api.biharilibrary.in/uploads/${relatedData.image}`}
+                                            src={`${baseUrl}/uploads/${relatedData.image}`}
                                             sx={{ width: 56, height: 56 }}
                                             variant="rounded"
                                         />
