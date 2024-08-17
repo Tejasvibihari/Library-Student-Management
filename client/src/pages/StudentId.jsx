@@ -5,7 +5,7 @@ import formatDate from '../utils/FormateDate'
 
 export default function StudentId() {
     const user = useSelector(state => state.student.currentStudent)
-    const baseUrl = process.env.BASE_URL
+
     return (
         <div className='grid grid-cols-1 w-full p-4 mt-4'>
             <StudentIdCard

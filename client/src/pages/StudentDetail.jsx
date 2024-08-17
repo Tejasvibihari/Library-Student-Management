@@ -15,7 +15,7 @@ export default function StudentDetail() {
     const [active, setActive] = useState(false)
     const [pending, setPending] = useState(false)
     const [deactive, setDeactive] = useState(false)
-    const baseUrl = process.env.BASE_URL
+
     const [loading, setLoading] = useState(false)
 
 

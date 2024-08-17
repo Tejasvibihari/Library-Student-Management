@@ -66,17 +66,11 @@ export default function StudentIdCard({ sid, name, father, mobile, preparingFor,
         <>
             <div className="flex items-center justify-center my-auto">
                 <div className="relative rounded-md overflow-hidden shadow-lg">
-                    <canvas
-                        className="w-96 h-[30rem]"
-                        style={{
-                            // isolation: "isolate",
-                            // height: "100%",
-                            // width: "100%",
-                        }}
-                        ref={canvasRef}
-                    />
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2  mt-4">
-                        <h1 className="text-center font-bold text-black text-xl my-4">Bihari Library</h1>
+                    <div className="w-72 h-[30rem]" style={{ backgroundImage: `url('/img/idbackground.png')`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2  mt-4">
+                        <div className="flex items-center justify-center">
+                            <img src="./img/biharilogo.png" className="my-4 w-[170px]" />
+
+                        </div>
                         {image ? <img src={image} className="rounded-full w-32 border-gray-400 border-4 mx-auto" /> :
                             <img src="./img/idDp.jpg" className="rounded-full w-32 border-gray-400 border-4 mx-auto" />}
                         <h2 className="text-center my-1 text-gray-700 font-normal">
@@ -144,6 +138,7 @@ export default function StudentIdCard({ sid, name, father, mobile, preparingFor,
                                 </div>
                             </Link>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

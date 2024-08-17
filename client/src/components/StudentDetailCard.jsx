@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 
 export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount, nextPayment, seatNumber }) {
     const [status, setStatus] = useState('Pending');
-    const baseUrl = process.env.BASE_URL
+
     useEffect(() => {
         const handleStatusChange = () => {
             if (!nextPayment || nextPayment < new Date()) {

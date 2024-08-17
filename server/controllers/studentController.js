@@ -112,10 +112,10 @@ export const createStudent = async (req, res) => {
 <li><strong>Password:</strong> ${password}</li>
 </ul>
 <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
-<p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.vercel.app/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
+<p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
 <p>or&nbsp;</p>
 <p>Copy the link Given Below and paste it into any Browser</p>
-<p>https://biharilibrary.vercel.app/student-dashboard</p>
+<p>https://biharilibrary.in/student-dashboard</p>
 <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
 <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
 <p>Warm regards,</p>
@@ -200,10 +200,10 @@ export const createStudent = async (req, res) => {
 <li><strong>Password:</strong> ${password}</li>
 </ul>
 <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
-<p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.vercel.app/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
+<p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
 <p>or&nbsp;</p>
 <p>Copy the link Given Below and paste it into any Browser</p>
-<p>https://biharilibrary.vercel.app/student-dashboard</p>
+<p>https://biharilibrary.in/student-dashboard</p>
 <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
 <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
 <p>Warm regards,</p>

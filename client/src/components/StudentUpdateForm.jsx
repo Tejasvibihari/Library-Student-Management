@@ -34,7 +34,7 @@ export default function StudentUpdateForm() {
     const [snackOpen, setSnackOpen] = React.useState(false);
     const [alertStatus, setAlertStatus] = useState('')
     const [form, setForm] = useState('')
-    const baseUrl = process.env.BASE_URL
+
 
 
     const { _id } = useParams()

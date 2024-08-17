@@ -3,12 +3,13 @@ import { MailPlus, Search } from 'lucide-react';
 import Avatar from '@mui/material/Avatar';
 import client from '../services/axiosClient';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 
 export default function EmailDetail() {
     const [emailDetails, setEmailDetails] = useState(null);
     const adminId = useSelector(state => state.admin.currentAdmin._id)
-    const baseUrl = process.env.BASE_URL
+
     useEffect(() => {
         const fetchData = async () => {
             try {

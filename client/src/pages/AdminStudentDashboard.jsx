@@ -16,7 +16,7 @@ export default function AdminStudentDashboard() {
     const { _id } = useParams()
     const [student, setStudent] = useState({})
     const [payment, setPayment] = useState({})
-    const baseUrl = process.env.BASE_URL
+
 
     useEffect(() => {
         const getStudent = async () => {

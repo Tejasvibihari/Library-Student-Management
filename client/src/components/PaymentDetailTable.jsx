@@ -38,7 +38,7 @@ export default function PaymentDetailTable({ data }) {
     const adminId = useSelector(state => state.admin.currentAdmin._id);
     const [studentData, setStudentData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const baseUrl = process.env.BASE_URL
+
     useEffect(() => {
         const getStudent = async () => {
             try {
