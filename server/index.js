@@ -33,11 +33,11 @@ const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.in'];
 
 app.use(cors({
     origin: function (origin, callback) {
-        console.log('Origin:', origin); // Log the origin
+        // console.log('Origin:', origin); // Log the origin
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            console.log('Blocked by CORS:', origin); // Log blocked origins
+            // console.log('Blocked by CORS:', origin); // Log blocked origins
             callback(new Error('Not allowed by CORS'));
         }
     },
