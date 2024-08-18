@@ -17,12 +17,11 @@ export const createStudent = async (req, res) => {
         name,
         email,
         mobile,
-        aadhar,
         father,
         guardian,
         gender,
-        preparingFor,
-        dob,
+
+
         admissionDate,
         shift,
         time,
@@ -84,13 +83,12 @@ export const createStudent = async (req, res) => {
                         }
 
 
-
-                        password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
+                        password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
                         const hashedPassword = await bcrypt.hash(password, 12);
 
                         await Student.create({
-                            sid, name, dob, email, seatNumber, password: hashedPassword, mobile, aadhar, father, guardian,
-                            gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                            sid, name, dob, email, seatNumber, password: hashedPassword, mobile, father, guardian,
+                            gender, admissionDate, shift, time, paymentAmount, address,
                             image: imageFilename, lastPayment
                         });
                         await seat.save();
@@ -197,12 +195,12 @@ export const createStudent = async (req, res) => {
                         }
 
 
-                        password = (name.slice(0, 4)).toUpperCase() + (aadhar.toString().slice(-4));
+                        password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
                         const hashedPassword = await bcrypt.hash(password, 12);
 
                         await Student.create({
-                            sid: newSid, name, dob, email, seatNumber, password: hashedPassword, mobile, aadhar, father, guardian,
-                            gender, preparingFor, admissionDate, shift, time, paymentAmount, address,
+                            sid: newSid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
+                            gender, admissionDate, shift, time, paymentAmount, address,
                             image: imageFilename, lastPayment
                         });
                         await seat.save();

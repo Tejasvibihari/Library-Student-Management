@@ -35,12 +35,9 @@ export default function NewAdmissionForm() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
-    const [aadhar, setAadhar] = useState("");
     const [father, setFather] = useState("");
     const [guardian, setGuardian] = useState("");
     const [gender, setGender] = useState("");
-    const [preparingFor, setPreparingFor] = useState("");
-    const [dob, setDob] = useState("");
     const [admissionDate, setAdmissionDate] = useState("");
     const [shift, setShift] = useState("");
     const [time, setTime] = useState("");
@@ -82,12 +79,11 @@ export default function NewAdmissionForm() {
                 name,
                 email,
                 mobile,
-                aadhar,
+
                 father,
                 guardian,
                 gender,
-                preparingFor,
-                dob,
+
                 admissionDate,
                 shift,
                 time,
@@ -100,7 +96,7 @@ export default function NewAdmissionForm() {
         }
 
         handleChange()
-    }, [name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
+    }, [name, email, mobile, father, guardian, gender,
         admissionDate, shift, time, paymentAmount, seatNumber, seatShift,
         address, croppedImage])
 
@@ -117,12 +113,11 @@ export default function NewAdmissionForm() {
             setName("")
             setEmail("")
             setMobile("")
-            setAadhar("")
+
             setFather("")
             setGuardian("")
             setGender("")
-            setPreparingFor("")
-            setDob("")
+
             setAdmissionDate("")
             setShift("")
             setTime('')
@@ -251,8 +246,13 @@ export default function NewAdmissionForm() {
                                     <input required className="p-2 border rounded-md w-full" value={mobile} onChange={(e) => setMobile(e.target.value)} type="number" id="mobile" placeholder="Mobile" />
                                 </div>
                                 <div>
-                                    <label htmlFor="aadhar">Aadhar No</label>
-                                    <input required className="p-2 border rounded-md w-full" value={aadhar} onChange={(e) => setAadhar(e.target.value)} type="number" id="number" placeholder="Aadhar No" />
+                                    <label htmlFor="aadhar">Gender</label>
+                                    <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
+                                        <option value="" disabled selected>Select One</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Not to Say">Prefer Not To Say</option>
+                                    </select>
                                 </div>
                             </div>
                             <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
@@ -266,25 +266,15 @@ export default function NewAdmissionForm() {
                                     <input className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
                                 </div>
                                 <div>
-                                    <label htmlFor="aadhar">Gender</label>
-                                    <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
-                                        <option value="" disabled selected>Select One</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Not to Say">Prefer Not To Say</option>
-                                    </select>
+                                    <label>Address</label>
+                                    <input required className="p-2 border rounded-md w-full" type="text" placeholder="Address"
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                    />
                                 </div>
                             </div>
 
                             <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
-                                <div>
-                                    <label htmlFor="aadhar">Preparing For</label>
-                                    <input required className="p-2 border rounded-md w-full" value={preparingFor} onChange={(e) => setPreparingFor(e.target.value)} type="text" id="preparingFor" placeholder="Preparing For" />
-                                </div>
-                                <div>
-                                    <label htmlFor="dob">Date of Birth</label>
-                                    <input required className="p-2 border rounded-md w-full" value={dob} onChange={(e) => setDob(e.target.value)} type="date" id="dob" placeholder="Date of Birth" />
-                                </div>
                                 <div>
                                     <label htmlFor="aadhar">Addmission Date</label>
                                     <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
@@ -335,16 +325,7 @@ export default function NewAdmissionForm() {
                                     </div>
                                 </div>
                             </div>
-                            <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
-                                <div>
-                                    <label>Address</label>
-                                    <input required className="p-2 border rounded-md w-full" type="text" placeholder="Address"
-                                        value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className='grid grid-cols-3'>
+                            <div className='grid grid-cols-3 my-3'>
                                 <div
                                     onClick={handleClickOpen}
                                     className='flex flex-col items-center border-dashed border-slate-300 border-[1px] p-4 bg-slate-200 cursor-pointer'>
@@ -369,7 +350,6 @@ export default function NewAdmissionForm() {
                         father={father}
                         mobile={mobile}
                         village={address}
-                        preparingFor={preparingFor}
                         addmissionDate={admissionDate}
                         image={croppedImage}
                     />
