@@ -179,14 +179,18 @@ export const createStudent = async (req, res) => {
                         } else if (seatShift === "doubleMorning") {
                             seat.availability.morning = false;
                             seat.availability.afternoon = false;
+                            seat.availability.doubleMorning = false;
                         } else if (seatShift === "doubleEvening") {
                             seat.availability.afternoon = false;
                             seat.availability.evening = false;
+                            seat.availability.doubleEvening = false;
                         } else if (seatShift === "morningLong") {
                             seat.availability.morning = false;
                             seat.availability.afternoon = false;
+                            seat.availability.morningLong = false;
                         } else if (seatShift === "nightLong") {
                             seat.availability.night = false;
+                            seat.availability.nightLong = false;
                         } else {
                             seat.availability[seatShift] = false;
                         }
