@@ -46,6 +46,8 @@ app.use(cors({
     credentials: true
 }));
 
+app.options('*', cors());
+
 app.use(express.json({ limit: '50mb' })); // For JSON requests
 app.use(express.urlencoded({ limit: '50mb', extended: true })); // For URL-encoded requests
 
