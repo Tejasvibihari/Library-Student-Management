@@ -168,6 +168,25 @@ export const createStudent = async (req, res) => {
                             seat.availability.nightLong = false;
                             seat.availability.fullDay = false;
                             seat.availability.morningLong = false;
+                        } else if (seatShift === "morning") {
+                            seat.availability.morning = false;
+                        } else if (seatShift === "afternoon") {
+                            seat.availability.afternoon = false;
+                        } else if (seatShift === "evening") {
+                            seat.availability.evening = false;
+                        } else if (seatShift === "night") {
+                            seat.availability.night = false;
+                        } else if (seatShift === "doubleMorning") {
+                            seat.availability.morning = false;
+                            seat.availability.afternoon = false;
+                        } else if (seatShift === "doubleEvening") {
+                            seat.availability.afternoon = false;
+                            seat.availability.evening = false;
+                        } else if (seatShift === "morningLong") {
+                            seat.availability.morning = false;
+                            seat.availability.afternoon = false;
+                        } else if (seatShift === "nightLong") {
+                            seat.availability.night = false;
                         } else {
                             seat.availability[seatShift] = false;
                         }

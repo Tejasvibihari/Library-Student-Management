@@ -414,39 +414,6 @@ export default function StudentUpdateForm() {
                     </div>
                     <div>
                         <div className='shadow-md rounded-md p-2 bg-white'>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
-                                <div>
-                                    <label>Payment Status</label>
-                                    <select className="p-2 border rounded-md w-full" value={status} onChange={(e) => setStatus(e.target.value)}>
-                                        <option value="" disabled selected>Select One</option>
-                                        <option value="Deactive">Deactive</option>
-                                        <option value="Active">Active</option>
-                                        <option value="Pending">Pending</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label >Last Payment</label>
-                                    <input className="p-2 border rounded-md w-full" value={lastPayment} onChange={(e) => setLastPayment(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
-                                </div>
-                            </div>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
-                                <div>
-                                    <label >Payment Amount</label>
-                                    <input
-                                        className="p-2 border rounded-md w-full"
-                                        value={paymentAmount}
-                                        onChange={(e) => setPaymentAmount(e.target.value)}
-                                        type="number" placeholder="Payment Amount" />
-                                </div>
-                                <div>
-                                    <label >Payment Mode</label>
-                                    <select className="p-2 border rounded-md w-full" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
-                                        <option value="" disabled selected>Select One</option>
-                                        <option value="Cash">Cash</option>
-                                        <option value="Online">Online</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div>
                                 <StudentIdCard
                                     name={name}
@@ -458,7 +425,6 @@ export default function StudentUpdateForm() {
                                     image={croppedImage === `${sid}.jpeg` ? `https://api.biharilibrary.in/uploads/${croppedImage}` : croppedImage}
                                 />
                             </div>
-
                         </div>
                     </div>
                 </div>

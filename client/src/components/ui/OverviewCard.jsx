@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Users, TrendingDown } from 'lucide-react';
 // import { CalendarArrowDown } from 'lucide-react';
 
-export default function OverviewCard({ title, value, icon }) {
+export default function OverviewCard({ title, value, icon, link }) {
     return (
         <>
             <div className='p-4 bg-white border'>
@@ -24,7 +24,7 @@ export default function OverviewCard({ title, value, icon }) {
                     </div>
                 </div>
                 <div className='flex justify-end'>
-                    <Link className='text-[#818995] font-semibold font-[inter] text-sm underline'>
+                    <Link to={`/${link}`} className='text-[#818995] font-semibold font-[inter] text-sm underline'>
                         View More
                     </Link>
                 </div>
