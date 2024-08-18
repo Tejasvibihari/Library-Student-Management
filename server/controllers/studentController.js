@@ -187,6 +187,7 @@ export const createStudent = async (req, res) => {
                         } else if (seatShift === "morningLong") {
                             seat.availability.morning = false;
                             seat.availability.afternoon = false;
+                            seat.availability.evening = false;
                             seat.availability.morningLong = false;
                         } else if (seatShift === "nightLong") {
                             seat.availability.night = false;

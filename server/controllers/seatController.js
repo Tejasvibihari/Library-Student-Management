@@ -23,14 +23,43 @@ export const getAvailableSeats = async (req, res) => {
 };
 
 
-// Controller to get all vacant seats based on the selected shift
 export const getVacantSeatsByShift = async (req, res) => {
     const { seatShift } = req.query;
+    let query = {};
+
+    // Build the query based on the seatShift
+    if (seatShift === "morningLong") {
+        query = {
+            'availability.morning': true,
+            'availability.afternoon': true,
+            'availability.evening': true
+        };
+    } else if (seatShift === "doubleEvening") {
+        query = {
+            'availability.afternoon': true,
+            'availability.evening': true
+        };
+    } else if (seatShift === "doubleMorning") {
+        query = {
+            'availability.morning': true,
+            'availability.afternoon': true
+        };
+    } else if (seatShift === "fullDay") {
+        query = {
+            'availability.morning': true,
+            'availability.afternoon': true,
+            'availability.evening': true,
+            'availability.night': true
+        };
+    } else {
+        query = {
+            [`availability.${seatShift}`]: true
+        };
+    }
+
     try {
         // Query to find seats that are vacant during the selected shift
-        const vacantSeats = await Seat.find({
-            [`availability.${seatShift}`]: true // Check if the shift is available
-        }, 'seatNumber'); // Only select seatNumber
+        const vacantSeats = await Seat.find(query, 'seatNumber'); // Only select seatNumber
 
         // console.log(vacantSeats);
         res.status(200).json(vacantSeats);
@@ -64,6 +93,27 @@ export const createSeat = async (req, res) => {
         await newSeat.save();
 
         res.status(201).json(newSeat);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+// Controller to update a seat
+export const updateSeat = async (req, res) => {
+    const { seatNumber } = req.params;
+    const updateData = req.body;
+
+    try {
+        // Find the seat by seatNumber and update it with the new data
+        const updatedSeat = await Seat.findOneAndUpdate({ seatNumber }, updateData, { new: true });
+
+        if (!updatedSeat) {
+            return res.status(404).json({ message: 'Seat not found.' });
+        }
+
+        res.status(200).json(updatedSeat);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
