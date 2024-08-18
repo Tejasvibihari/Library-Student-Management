@@ -44,7 +44,7 @@ export const createStudent = async (req, res) => {
             return res.status(400).json({ message: 'Student already exists' });
         }
 
-        if (sid >= 1 && sid <= 321) {
+        if (sid >= 1 && sid <= 326) {
             if (seat.availability[seatShift]) {
                 if (image && typeof image === 'string') {
                     const base64String = image.split(",")[1];
