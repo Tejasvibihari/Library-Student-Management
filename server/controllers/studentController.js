@@ -411,3 +411,70 @@ export const updateStudent = async (req, res) => {
     }
 };
 
+
+export const bulkStudentAdmission = async (req, res) => {
+    const studentsData = req.body.students; // Expecting an array of student data
+
+    if (!Array.isArray(studentsData) || studentsData.length === 0) {
+        return res.status(400).json({ message: "Invalid input data. Please provide an array of student data." });
+    }
+
+    try {
+        const savedStudents = [];
+        let password;
+
+        for (const studentData of studentsData) {
+            const {
+                sid,
+                name,
+                email,
+                mobile,
+                father,
+                guardian,
+                gender,
+                admissionDate,
+                shift,
+                time,
+                paymentAmount,
+                address,
+                image,
+                lastPayment,
+                seatNumber,
+                seatShift
+            } = studentData;
+
+            // Generate password using the first four letters of the name in uppercase and the last four digits of the mobile number
+            password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
+            const hashedPassword = await bcrypt.hash(password, 12);
+
+
+            const newStudent = new Student({
+                sid,
+                name,
+                email,
+                mobile,
+                father,
+                guardian,
+                gender,
+                admissionDate,
+                shift,
+                time,
+                paymentAmount,
+                address,
+                image,
+                lastPayment,
+                seatNumber,
+                seatShift,
+                password: hashedPassword
+            });
+
+            const savedStudent = await newStudent.save();
+            savedStudents.push(savedStudent);
+        }
+
+        res.status(201).json({ message: "Students admitted successfully", students: savedStudents });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while admitting the students", error: error.message });
+    }
+};
