@@ -40,89 +40,63 @@ export const createStudent = async (req, res) => {
         const studentEmail = await Student.findOne({ email });
         const seat = await Seat.findOne({ seatNumber });
 
-
         if (student || studentEmail) {
             return res.status(400).json({ message: 'Student already exists' });
         }
 
+        if (!seat || !seat.availability[seatShift]) {
+            return res.status(400).json({ message: 'Seat not available' });
+        }
+
+        if (image && typeof image === 'string') {
+            const base64String = image.split(",")[1];
+            if (base64String) {
+                const imageBuffer = Buffer.from(base64String, 'base64');
+                imageFilename = `${sid}.jpeg`;
+                const uploadsDir = path.join(__dirname, '../uploads');
+                if (!fs.existsSync(uploadsDir)) {
+                    fs.mkdirSync(uploadsDir);
+                }
+                try {
+                    const compressedBuffer = await sharp(imageBuffer)
+                        .jpeg({ quality: 80 })
+                        .toBuffer();
+                    fs.writeFileSync(path.join(uploadsDir, imageFilename), compressedBuffer);
+                } catch (err) {
+                    console.error('Error compressing the image:', err);
+                    return res.status(500).json({ message: 'Error processing image' });
+                }
+            } else {
+                console.error("Invalid image format: base64 string is missing.");
+                return res.status(400).json({ message: 'Invalid image format' });
+            }
+        } else {
+            console.error("Invalid image: image is either undefined or not a string.");
+            return res.status(400).json({ message: 'Invalid image' });
+        }
+
         if (sid >= 1 && sid <= 326) {
-            if (seat.availability[seatShift]) {
-                if (image && typeof image === 'string') {
-                    const base64String = image.split(",")[1];
-                    if (base64String) {
-                        const imageBuffer = Buffer.from(base64String, 'base64');
-                        imageFilename = `${sid}.jpeg`;
-                        const uploadsDir = path.join(__dirname, '../uploads');
-                        if (!fs.existsSync(uploadsDir)) {
-                            fs.mkdirSync(uploadsDir);
-                        }
-                        sharp(imageBuffer)
-                            .jpeg({ quality: 80 }) // Compress the image with 80% quality
-                            .toBuffer()
-                            .then(compressedBuffer => {
-                                fs.writeFileSync(path.join(uploadsDir, imageFilename), compressedBuffer);
-                                // Now you can send the compressed image to the database
-                            })
-                            .catch(err => {
-                                console.error('Error compressing the image:', err);
-                            });
+            // Handle old student admissions
+            updateSeatAvailability(seat, seatShift);
 
-                        if (seatShift === "fullDay") {
-                            seat.availability.morning = false;
-                            seat.availability.afternoon = false;
-                            seat.availability.evening = false;
-                            seat.availability.night = false;
-                            seat.availability.doubleMorning = false;
-                            seat.availability.doubleEvening = false;
-                            seat.availability.nightLong = false;
-                            seat.availability.fullDay = false;
-                            seat.availability.morningLong = false;
-                        } else if (seatShift === "morning") {
-                            seat.availability.morning = false;
-                        } else if (seatShift === "afternoon") {
-                            seat.availability.afternoon = false;
-                        } else if (seatShift === "evening") {
-                            seat.availability.evening = false;
-                        } else if (seatShift === "night") {
-                            seat.availability.night = false;
-                        } else if (seatShift === "doubleMorning") {
-                            seat.availability.morning = false;
-                            seat.availability.afternoon = false;
-                            seat.availability.doubleMorning = false;
-                        } else if (seatShift === "doubleEvening") {
-                            seat.availability.afternoon = false;
-                            seat.availability.evening = false;
-                            seat.availability.doubleEvening = false;
-                        } else if (seatShift === "morningLong") {
-                            seat.availability.morning = false;
-                            seat.availability.afternoon = false;
-                            seat.availability.evening = false;
-                            seat.availability.morningLong = false;
-                        } else if (seatShift === "nightLong") {
-                            seat.availability.night = false;
-                            seat.availability.nightLong = false;
-                        } else {
-                            seat.availability[seatShift] = false;
-                        }
+            password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
+            const hashedPassword = await bcrypt.hash(password, 12);
 
+            await Student.create({
+                sid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
+                gender, admissionDate, shift, time, paymentAmount, address,
+                image: imageFilename, lastPayment
+            });
+            await seat.save();
 
-                        password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
-                        const hashedPassword = await bcrypt.hash(password, 12);
-
-                        await Student.create({
-                            sid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
-                            gender, admissionDate, shift, time, paymentAmount, address,
-                            image: imageFilename, lastPayment
-                        });
-                        await seat.save();
-                        sendMail({
-                            to: email,
-                            subject: "Welcome to Bihari Library - Admission Confirmation",
-                            body: `
-                        <p>Dear ${name},</p>
-                        <p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
-                        <p><strong>Student Information:</strong></p>
-                        <ul>
+            sendMail({
+                to: email,
+                subject: "Welcome to Bihari Library - Admission Confirmation",
+                body: `
+                    <p>Dear ${name},</p>
+                    <p>We are thrilled to welcome you to Bihari Library. Congratulations on your admission. Below are the details of your enrollment:</p>
+                    <p><strong>Student Information:</strong></p>
+                    <ul>
                         <li><strong>Student ID:</strong> ${sid}</li>
                         <li><strong>Name:</strong> ${name}</li>
                         <li><strong>Shift:</strong> ${shift}</li>
@@ -131,109 +105,44 @@ export const createStudent = async (req, res) => {
                         <li><strong>Address:</strong> ${address}</li>
                         <li><strong>Email:</strong> ${email}</li>
                         <li><strong>Password:</strong> ${password}</li>
-                        </ul>
-                        <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
-                        <p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
-                        <p>or&nbsp;</p>
-                        <p>Copy the link Given Below and paste it into any Browser</p>
-                        <p>https://biharilibrary.in/student-dashboard</p>
-                        <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
-                        <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
-                        <p>Warm regards,</p>
-                        <p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
-                        });
-                        return res.status(201).json({ message: "Admission Success" });
-                    } else {
-                        console.error("Invalid image format: base64 string is missing.");
-                    }
-                } else {
-                    console.error("Invalid image: image is either undefined or not a string.");
-                }
-            } else {
-                res.status(400).json({ message: 'Seat not available' });
-            }
+                    </ul>
+                    <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
+                    <p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
+                    <p>or&nbsp;</p>
+                    <p>Copy the link Given Below and paste it into any Browser</p>
+                    <p>https://biharilibrary.in/student-dashboard</p>
+                    <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
+                    <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
+                    <p>Warm regards,</p>
+                    <p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
+            });
+
+            return res.status(201).json({ message: "Admission Success" });
         } else {
-            if (seat.availability[seatShift]) {
-                if (image && typeof image === 'string') {
-                    const base64String = image.split(",")[1];
-                    if (base64String) {
-                        const imageBuffer = Buffer.from(base64String, 'base64');
-                        const lastStudent = await Student.findOne().sort({ sid: -1 });
-                        const newSid = lastStudent ? lastStudent.sid + 1 : 322;
+            // Handle new student admissions
+            const lastStudent = await Student.findOne().sort({ sid: -1 });
+            const newSid = lastStudent ? lastStudent.sid + 1 : 327;
 
-                        imageFilename = `${newSid}.jpeg`;
-                        // const uploadsDir = path.join(__dirname, 'uploads');
-                        const uploadsDir = path.join(__dirname, '../uploads');
-                        if (!fs.existsSync(uploadsDir)) {
-                            fs.mkdirSync(uploadsDir);
-                        }
-                        sharp(imageBuffer)
-                            .jpeg({ quality: 80 }) // Compress the image with 80% quality
-                            .toBuffer()
-                            .then(compressedBuffer => {
-                                fs.writeFileSync(path.join(uploadsDir, imageFilename), compressedBuffer);
-                                // Now you can send the compressed image to the database
-                            })
-                            .catch(err => {
-                                console.error('Error compressing the image:', err);
-                            });
-                        // fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-                        if (seatShift === "fullDay") {
-                            seat.availability.morning = false;
-                            seat.availability.afternoon = false;
-                            seat.availability.evening = false;
-                            seat.availability.night = false;
-                            seat.availability.doubleMorning = false;
-                            seat.availability.doubleEvening = false;
-                            seat.availability.nightLong = false;
-                            seat.availability.fullDay = false;
-                            seat.availability.morningLong = false;
-                        } else if (seatShift === "morning") {
-                            seat.availability.morning = false;
-                        } else if (seatShift === "afternoon") {
-                            seat.availability.afternoon = false;
-                        } else if (seatShift === "evening") {
-                            seat.availability.evening = false;
-                        } else if (seatShift === "night") {
-                            seat.availability.night = false;
-                        } else if (seatShift === "doubleMorning") {
-                            seat.availability.morning = false;
-                            seat.availability.afternoon = false;
-                            seat.availability.doubleMorning = false;
-                        } else if (seatShift === "doubleEvening") {
-                            seat.availability.afternoon = false;
-                            seat.availability.evening = false;
-                            seat.availability.doubleEvening = false;
-                        } else if (seatShift === "morningLong") {
-                            seat.availability.morning = false;
-                            seat.availability.afternoon = false;
-                            seat.availability.evening = false;
-                            seat.availability.morningLong = false;
-                        } else if (seatShift === "nightLong") {
-                            seat.availability.night = false;
-                            seat.availability.nightLong = false;
-                        } else {
-                            seat.availability[seatShift] = false;
-                        }
+            updateSeatAvailability(seat, seatShift);
 
+            password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
+            const hashedPassword = await bcrypt.hash(password, 12);
 
-                        password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
-                        const hashedPassword = await bcrypt.hash(password, 12);
+            await Student.create({
+                sid: newSid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
+                gender, admissionDate, shift, time, paymentAmount, address,
+                image: imageFilename, lastPayment
+            });
+            await seat.save();
 
-                        await Student.create({
-                            sid: newSid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
-                            gender, admissionDate, shift, time, paymentAmount, address,
-                            image: imageFilename, lastPayment
-                        });
-                        await seat.save();
-                        sendMail({
-                            to: email,
-                            subject: "Welcome to Bihari Library - Admission Confirmation",
-                            body: `<hr />
-                        <p>Dear ${name},</p>
-                        <p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
-                        <p><strong>Student Information:</strong></p>
-                        <ul>
+            sendMail({
+                to: email,
+                subject: "Welcome to Bihari Library - Admission Confirmation",
+                body: `
+                    <p>Dear ${name},</p>
+                    <p>We are thrilled to welcome you to Bihari Library. Congratulations on your admission. Below are the details of your enrollment:</p>
+                    <p><strong>Student Information:</strong></p>
+                    <ul>
                         <li><strong>Student ID:</strong> ${newSid}</li>
                         <li><strong>Name:</strong> ${name}</li>
                         <li><strong>Shift:</strong> ${shift}</li>
@@ -242,33 +151,39 @@ export const createStudent = async (req, res) => {
                         <li><strong>Address:</strong> ${address}</li>
                         <li><strong>Email:</strong> ${email}</li>
                         <li><strong>Password:</strong> ${password}</li>
-                        </ul>
-                        <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
-                        <p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
-                        <p>or&nbsp;</p>
-                        <p>Copy the link Given Below and paste it into any Browser</p>
-                        <p>https://biharilibrary.in/student-dashboard</p>
-                        <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
-                        <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
-                        <p>Warm regards,</p>
-                        <p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
-                        });
+                    </ul>
+                    <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
+                    <p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
+                    <p>or&nbsp;</p>
+                    <p>Copy the link Given Below and paste it into any Browser</p>
+                    <p>https://biharilibrary.in/student-dashboard</p>
+                    <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
+                    <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
+                    <p>Warm regards,</p>
+                    <p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
+            });
 
-                        return res.status(201).json({ message: "Admission Success" });
-                    } else {
-                        console.error("Invalid image format: base64 string is missing.");
-                    }
-                } else {
-                    console.error("Invalid image: image is either undefined or not a string.");
-                }
-            } else {
-                res.status(400).json({ message: 'Seat not available' });
-            }
+            return res.status(201).json({ message: "Admission Success" });
         }
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
+};
+
+const updateSeatAvailability = (seat, seatShift) => {
+    const shifts = {
+        fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
+        morning: ['morning'],
+        afternoon: ['afternoon'],
+        evening: ['evening'],
+        night: ['night'],
+        doubleMorning: ['morning', 'afternoon', 'doubleMorning'],
+        doubleEvening: ['afternoon', 'evening', 'doubleEvening'],
+        morningLong: ['morning', 'afternoon', 'evening', 'morningLong'],
+        nightLong: ['night', 'nightLong']
+    };
+    shifts[seatShift].forEach(shift => seat.availability[shift] = false);
 };
 
 export const GetAllStudent = async (req, res) => {
@@ -376,6 +291,7 @@ export const updateStudent = async (req, res) => {
         instagram,
         facebook,
         youtube,
+        nextPayment
         // admin
     } = req.body;
     console.log(image)
@@ -424,6 +340,7 @@ export const updateStudent = async (req, res) => {
         student.image = imageFilename;
         student.seatNumber = seatNumber;
         student.time = time;
+        student.nextPayment = nextPayment;
         // student.admin = admin;
 
         await student.save();

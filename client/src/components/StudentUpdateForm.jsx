@@ -60,6 +60,7 @@ export default function StudentUpdateForm() {
     const [formData, setFormData] = useState({})
     const [seatNumber, setSeatNumber] = useState("")
     const [compressImage, setCompressImage] = useState("")
+    const [nextPaymentDate, setNextPaymentDate] = useState("")
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -156,11 +157,14 @@ export default function StudentUpdateForm() {
                 setFacebook(response.data.facebook)
                 setYoutube(response.data.youtube)
                 setSeatNumber(response.data.seatNumber)
+
                 try {
                     // Safely format dates using the helper function
                     const formattedAdmissionDate = safeFormatDate(response.data.admissionDate);
+                    const formattedNextPaymentDate = safeFormatDate(response.data.nextPayment);
                     // Set state with the safely formatted dates or fallback values
                     setAdmissionDate(formattedAdmissionDate);
+                    setNextPaymentDate(formattedNextPaymentDate)
                 } catch (error) {
                     console.log(error);
                 }
@@ -193,12 +197,13 @@ export default function StudentUpdateForm() {
                 paymentAmount,
                 image: compressImage,
                 admin: userId,
-                seatNumber
+                seatNumber,
+                nextPayment: nextPaymentDate,
 
             })
         }
         handleChange()
-    }, [sid, name, email, mobile, father, guardian, gender, seatNumber,
+    }, [sid, name, email, mobile, father, guardian, gender, seatNumber, nextPaymentDate,
         admissionDate, shift, time, address, compressImage, userId, addressArray, instagram, facebook, youtube, status, paymentAmount])
 
 
@@ -327,6 +332,10 @@ export default function StudentUpdateForm() {
                                     <div>
                                         <label >Addmission Date</label>
                                         <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
+                                    </div>
+                                    <div>
+                                        <label >Next Payment Date</label>
+                                        <input required className="p-2 border rounded-md w-full" value={nextPaymentDate} onChange={(e) => setNextPaymentDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
                                     </div>
                                 </div>
                                 <div className='border p-2 rounded-sm'>
