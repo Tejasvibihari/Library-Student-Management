@@ -46,6 +46,12 @@ export const MenuLinkItems = [
                 name: "Seat",
                 href: "/seat",
             },
+            {
+                id: 7,
+                icon: Armchair,
+                name: "Update Seat",
+                href: "/update-seat",
+            },
         ],
     },
 ];

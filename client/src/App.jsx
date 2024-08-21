@@ -24,6 +24,7 @@ import Seats from './pages/Seats'
 import Sidebar from './components/Sidebar'
 import StudentIdCard from './components/StudentIdCard'
 import StudentProtectedRoute from './pages/StudentProtectedRoute'
+import UpdateSeat from './pages/UpdateSeat'
 
 
 
@@ -48,7 +49,7 @@ export default function App() {
             <Route path="/student-id" element={<StudentId />} />
           </Route>
 
-    
+
 
           {/* Sidebar menu Start  */}
 
@@ -64,6 +65,7 @@ export default function App() {
             <Route path="/payment-detail" element={<PaymentDetail />} />
             <Route path="/student-admin-dashboard/:_id" element={<AdminStudentDashboard />} />
             <Route path="/seat" element={<Seats />} />
+            <Route path="/update-seat" element={<UpdateSeat />} />
           </Route>
           {/* </Sidebar> */}
 
