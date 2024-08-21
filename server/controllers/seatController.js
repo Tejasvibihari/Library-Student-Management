@@ -119,3 +119,18 @@ export const updateSeat = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const getSeatBySeatNumber = async (req, res) => {
+    const { seatNumber } = req.params;
+
+    try {
+        const seat = await Seat.findOne({ seatNumber });
+        if (!seat) {
+            return res.status(404).json({ message: "Seat not found" });
+        }
+        res.status(200).json(seat);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while fetching the seat details", error: error.message });
+    }
+} 
