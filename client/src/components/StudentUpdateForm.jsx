@@ -33,7 +33,7 @@ export default function StudentUpdateForm() {
     const [loading, setLoading] = useState(false);
     const [snackOpen, setSnackOpen] = React.useState(false);
     const [alertStatus, setAlertStatus] = useState('')
-    const [form, setForm] = useState('')
+
 
 
 
@@ -44,27 +44,22 @@ export default function StudentUpdateForm() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
-    const [aadhar, setAadhar] = useState("");
     const [father, setFather] = useState("");
     const [guardian, setGuardian] = useState("");
     const [gender, setGender] = useState("");
-    const [preparingFor, setPreparingFor] = useState("");
-    const [dob, setDob] = useState("");
     const [admissionDate, setAdmissionDate] = useState("");
     const [shift, setShift] = useState("");
     const [time, setTime] = useState("");
     const [address, setAddress] = useState("");
-
     const [croppedImage, setCroppedImage] = useState(null);
     const [instagram, setInstagram] = useState("")
     const [facebook, setFacebook] = useState("")
     const [youtube, setYoutube] = useState("")
     const [status, setStatus] = useState('')
-    const [lastPayment, setLastPayment] = useState('')
     const [paymentAmount, setPaymentAmount] = useState('')
-    const [paymentMode, setPaymentMode] = useState('')
     const [formData, setFormData] = useState({})
-
+    const [seatNumber, setSeatNumber] = useState("")
+    const [compressImage, setCompressImage] = useState("")
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -90,9 +85,48 @@ export default function StudentUpdateForm() {
     const handleClose = () => {
         setOpen(false);
     };
-    // Get Address With Pin Code 
+    function compressBase64Image(base64Str, maxWidth, maxHeight, quality = 0.8) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
 
-    // Show Unique Item From The array of address in the input field 
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                resolve(compressedBase64);
+            };
+            img.onerror = (err) => {
+                reject(err);
+            };
+        });
+    }
+    compressBase64Image(croppedImage, 400, 400).then(compressedImage => {
+        console.log("Compressed image:", compressedImage);
+        setCompressImage(compressedImage)
+    }).catch(err => {
+        console.error("Error compressing image:", err);
+    });
+
 
     function safeFormatDate(dateInput) {
         const date = new Date(dateInput);
@@ -109,44 +143,27 @@ export default function StudentUpdateForm() {
                 setName(response.data.name)
                 setEmail(response.data.email)
                 setMobile(response.data.mobile)
-                setAadhar(response.data.aadhar)
                 setFather(response.data.father)
                 setGuardian(response.data.guardian)
                 setGender(response.data.gender)
-                setPreparingFor(response.data.preparingFor)
                 setShift(response.data.shift)
                 setTime(response.data.time)
                 setAddress(response.data.address)
-                setCroppedImage(response.data.image)
+                setCompressImage(response.data.image)
                 setStatus(response.data.status)
                 setPaymentAmount(response.data.paymentAmount)
-                setPaymentMode(response.data.paymentMode)
                 setInstagram(response.data.instagram)
                 setFacebook(response.data.facebook)
                 setYoutube(response.data.youtube)
-
-                // Helper function to safely format date
-
-
+                setSeatNumber(response.data.seatNumber)
                 try {
                     // Safely format dates using the helper function
-                    const formattedDob = safeFormatDate(response.data.dob);
                     const formattedAdmissionDate = safeFormatDate(response.data.admissionDate);
-                    const formattedLastPayment = safeFormatDate(response.data.lastPayment);
-
                     // Set state with the safely formatted dates or fallback values
-                    setDob(formattedDob);
                     setAdmissionDate(formattedAdmissionDate);
-                    setLastPayment(formattedLastPayment);
                 } catch (error) {
                     console.log(error);
                 }
-                // const formattedDob = new Date(response.data.dob).toISOString().split('T')[0];
-                // const formattedAddmissionDate = new Date(response.data.admissionDate).toISOString().split('T')[0];
-                // const formattedLastPayment = new Date(response.data.lastPayment).toISOString().split('T')[0];
-                // setDob(formattedDob);
-                // setAdmissionDate(formattedAddmissionDate)
-                // setLastPayment(formattedLastPayment)
             } catch (error) {
                 console.log(error)
             }
@@ -162,12 +179,9 @@ export default function StudentUpdateForm() {
                 name,
                 email,
                 mobile,
-                aadhar,
                 father,
                 guardian,
                 gender,
-                preparingFor,
-                dob,
                 admissionDate,
                 shift,
                 time,
@@ -176,16 +190,16 @@ export default function StudentUpdateForm() {
                 facebook,
                 youtube,
                 status,
-                lastPayment,
                 paymentAmount,
-                paymentMode,
-                image: croppedImage,
-                admin: userId
+                image: compressImage,
+                admin: userId,
+                seatNumber
+
             })
         }
         handleChange()
-    }, [sid, name, email, mobile, aadhar, father, guardian, gender, preparingFor, dob,
-        admissionDate, shift, time, address, croppedImage, userId, addressArray, instagram, facebook, youtube, status, lastPayment, paymentMode, paymentAmount])
+    }, [sid, name, email, mobile, father, guardian, gender, seatNumber,
+        admissionDate, shift, time, address, compressImage, userId, addressArray, instagram, facebook, youtube, status, paymentAmount])
 
 
     const handleSubmit = async (e) => {
@@ -212,7 +226,7 @@ export default function StudentUpdateForm() {
 
         }
     }
-    console.log(formData)
+
     const handleTimeChange = (e) => {
         const selectedTime = e.target.value;
         setTime(selectedTime);
@@ -259,7 +273,11 @@ export default function StudentUpdateForm() {
                     <div className='col-span-2'>
                         <div className='bg-white shadow-lg rounded-md'>
                             <div className='p-4'>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
+                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
+                                    <div>
+                                        <label htmlFor="name">Sid</label>
+                                        <input required className="p-2 border rounded-md w-full" value={sid} onChange={(e) => setSid(e.target.value)} type="number" id="sid" placeholder="Sid" />
+                                    </div>
                                     <div>
                                         <label htmlFor="name">Name</label>
                                         <input required className="p-2 border rounded-md w-full" value={name} onChange={(e) => setName(e.target.value)} type="text" id="name" placeholder="Name" />
@@ -276,8 +294,11 @@ export default function StudentUpdateForm() {
                                         <input required className="p-2 border rounded-md w-full" value={mobile} onChange={(e) => setMobile(e.target.value)} type="number" id="mobile" placeholder="Mobile" />
                                     </div>
                                     <div>
-                                        <label >Aadhar No</label>
-                                        <input required className="p-2 border rounded-md w-full" value={aadhar} onChange={(e) => setAadhar(e.target.value)} type="number" id="number" placeholder="Aadhar No" />
+                                        <label>Address</label>
+                                        <input required className="p-2 border rounded-md w-full" type="text" placeholder="Address"
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                        />
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
@@ -288,7 +309,7 @@ export default function StudentUpdateForm() {
                                     </div>
                                     <div>
                                         <label htmlFor="mother">Guardian's Mobile No.</label>
-                                        <input required className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
+                                        <input className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
                                     </div>
                                     <div>
                                         <label>Gender</label>
@@ -302,14 +323,7 @@ export default function StudentUpdateForm() {
                                 </div>
 
                                 <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
-                                    <div>
-                                        <label >Preparing For</label>
-                                        <input required className="p-2 border rounded-md w-full" value={preparingFor} onChange={(e) => setPreparingFor(e.target.value)} type="text" id="preparingFor" placeholder="Preparing For" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="dob">Date of Birth</label>
-                                        <input required className="p-2 border rounded-md w-full" value={dob} onChange={(e) => setDob(e.target.value)} type="date" id="dob" placeholder="Date of Birth" />
-                                    </div>
+
                                     <div>
                                         <label >Addmission Date</label>
                                         <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
@@ -317,7 +331,7 @@ export default function StudentUpdateForm() {
                                 </div>
                                 <div className='border p-2 rounded-sm'>
                                     <h3>Shift</h3>
-                                    <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
+                                    <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
                                         <div className='flex flex-col'>
                                             <label>Shift</label>
                                             <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
@@ -346,22 +360,19 @@ export default function StudentUpdateForm() {
                                         </div>
                                         <div>
                                             <label>Amount Chargable</label>
+
                                             <input required className="p-2 border rounded-md w-full" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} type="number" placeholder="Amount Chargable" />
                                         </div>
-                                    </div>
-                                </div>
-                                <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
-                                    <div>
-                                        <label>Address</label>
-                                        <input required className="p-2 border rounded-md w-full" type="text" placeholder="Address"
-                                            value={address}
-                                            onChange={(e) => setAddress(e.target.value)}
-                                        />
+                                        <div>
+                                            <label>Seat Number</label>
+                                            <input required className="p-2 border rounded-md w-full" value={seatNumber} onChange={(e) => setSeatNumber(e.target.value)} type="text" placeholder="Amount Chargable" />
+                                        </div>
+
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
                                     <div>
-                                        <label >Instagram</label>
+                                        <label>Instagram</label>
                                         <input
 
                                             className="p-2 border rounded-md w-full"
@@ -420,9 +431,10 @@ export default function StudentUpdateForm() {
                                     father={father}
                                     mobile={mobile}
                                     village={address}
-                                    preparingFor={preparingFor}
+
                                     addmissionDate={admissionDate}
-                                    image={croppedImage === `${sid}.jpeg` ? `https://api.biharilibrary.in/uploads/${croppedImage}` : croppedImage}
+                                    // image={compressImage === `${sid}.jpeg` ? `https://api.biharilibrary.in/uploads/${compressImage}` : compressImage}
+                                    image={compressImage === `${sid}.jpeg` ? `http://localhost:3000/uploads/${compressImage}` : compressImage}
                                 />
                             </div>
                         </div>

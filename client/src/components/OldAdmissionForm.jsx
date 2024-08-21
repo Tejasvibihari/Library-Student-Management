@@ -52,7 +52,7 @@ export default function OldAdmissionForm() {
     const [seatShift, setSeatShift] = useState("")
     const [vacantSeat, setVacantSeat] = useState([])
     const [seatNumber, setSeatNumber] = useState("")
-
+    const [compressImage, setCompressImage] = useState("")
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -76,7 +76,47 @@ export default function OldAdmissionForm() {
     const handleClose = () => {
         setOpen(false);
     };
+    function compressBase64Image(base64Str, maxWidth, maxHeight, quality = 0.8) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
 
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                resolve(compressedBase64);
+            };
+            img.onerror = (err) => {
+                reject(err);
+            };
+        });
+    }
+    compressBase64Image(croppedImage, 400, 400).then(compressedImage => {
+        console.log("Compressed image:", compressedImage);
+        setCompressImage(compressedImage)
+    }).catch(err => {
+        console.error("Error compressing image:", err);
+    });
 
     useEffect(() => {
         const handleChange = () => {
@@ -93,7 +133,7 @@ export default function OldAdmissionForm() {
                 time,
                 paymentAmount,
                 address,
-                image: croppedImage,
+                image: compressImage,
                 admin: userId,
                 seatNumber,
                 seatShift
@@ -103,7 +143,7 @@ export default function OldAdmissionForm() {
         handleChange()
     }, [name, sid, email, mobile, father, guardian, gender,
         admissionDate, shift, time, paymentAmount, seatNumber, seatShift,
-        address, croppedImage, userId])
+        address, compressImage, userId])
 
 
     const handleSubmit = async (e) => {
@@ -363,7 +403,7 @@ export default function OldAdmissionForm() {
                         mobile={mobile}
                         village={address}
                         addmissionDate={admissionDate}
-                        image={croppedImage}
+                        image={compressImage}
                     />
                 </div>
             </div>

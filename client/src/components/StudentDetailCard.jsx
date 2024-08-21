@@ -9,7 +9,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
 import { useEffect, useState } from 'react';
 
-export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, preparingFor, addmissionDate, shift, time, dob, aadhar, address, lastPayment, paymentAmount, nextPayment, seatNumber }) {
+export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, addmissionDate, shift, time, address, lastPayment, paymentAmount, nextPayment, seatNumber }) {
     const [status, setStatus] = useState('Pending');
 
     useEffect(() => {
@@ -116,16 +116,10 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                                         {mobile}
                                     </span>
                                 </span>
-                                <span className='font-semibold font-[inter] text-sm leading-6'>
-                                    Aadhar:-
-                                    <span className='font-normal text-gray-100'>
-                                        {aadhar}
-                                    </span>
-                                </span>
+
                             </div>
                             {/* Gender nad Address  */}
                             <div className='flex flex-col'>
-                                <span className='font-semibold font-[inter] text-sm leading-6'>Preparing For:- <span className='font-normal text-gray-100'>{preparingFor}</span></span>
 
                                 <span className='font-semibold font-[inter] text-sm leading-6'>
                                     Gender:-
@@ -133,7 +127,6 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                                         {gender}
                                     </span>
                                 </span>
-                                <span className='font-semibold font-[inter] text-sm leading-6'>DOB:- <span className='font-normal text-gray-100'>{formatDate(dob)} </span></span>
 
                                 <span className='font-semibold font-[inter] text-sm leading-6'>
                                     Guardian Mobile:-

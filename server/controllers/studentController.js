@@ -11,6 +11,7 @@ import sharp from 'sharp'
 // Define __dirname for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 export const createStudent = async (req, res) => {
     const {
         sid,
@@ -76,6 +77,30 @@ export const createStudent = async (req, res) => {
                             seat.availability.nightLong = false;
                             seat.availability.fullDay = false;
                             seat.availability.morningLong = false;
+                        } else if (seatShift === "morning") {
+                            seat.availability.morning = false;
+                        } else if (seatShift === "afternoon") {
+                            seat.availability.afternoon = false;
+                        } else if (seatShift === "evening") {
+                            seat.availability.evening = false;
+                        } else if (seatShift === "night") {
+                            seat.availability.night = false;
+                        } else if (seatShift === "doubleMorning") {
+                            seat.availability.morning = false;
+                            seat.availability.afternoon = false;
+                            seat.availability.doubleMorning = false;
+                        } else if (seatShift === "doubleEvening") {
+                            seat.availability.afternoon = false;
+                            seat.availability.evening = false;
+                            seat.availability.doubleEvening = false;
+                        } else if (seatShift === "morningLong") {
+                            seat.availability.morning = false;
+                            seat.availability.afternoon = false;
+                            seat.availability.evening = false;
+                            seat.availability.morningLong = false;
+                        } else if (seatShift === "nightLong") {
+                            seat.availability.night = false;
+                            seat.availability.nightLong = false;
                         } else {
                             seat.availability[seatShift] = false;
                         }
@@ -90,33 +115,6 @@ export const createStudent = async (req, res) => {
                             image: imageFilename, lastPayment
                         });
                         await seat.save();
-                        //                         sendMail({
-                        //                             to: email,
-                        //                             subject: "Welcome to Bihari Library - Admission Confirmation",
-                        //                             body: `
-                        // <p>Dear ${name},</p>
-                        // <p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
-                        // <p><strong>Student Information:</strong></p>
-                        // <ul>
-                        // <li><strong>Student ID:</strong> ${sid}</li>
-                        // <li><strong>Name:</strong> ${name}</li>
-                        // <li><strong>Shift:</strong> ${shift}</li>
-                        // <li><strong>Admission Date:</strong> ${admissionDate}</li>
-                        // <li><strong>Father's Name:</strong> ${father}</li>
-                        // <li><strong>Address:</strong> ${address}</li>
-                        // <li><strong>Email:</strong> ${email}</li>
-                        // <li><strong>Password:</strong> ${password}</li>
-                        // </ul>
-                        // <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
-                        // <p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
-                        // <p>or&nbsp;</p>
-                        // <p>Copy the link Given Below and paste it into any Browser</p>
-                        // <p>https://biharilibrary.in/student-dashboard</p>
-                        // <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
-                        // <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
-                        // <p>Warm regards,</p>
-                        // <p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
-                        //                         });
 
                         return res.status(201).json({ message: "Admission Success" });
                     } else {
@@ -202,33 +200,7 @@ export const createStudent = async (req, res) => {
                             image: imageFilename, lastPayment
                         });
                         await seat.save();
-                        //                         sendMail({
-                        //                             to: email,
-                        //                             subject: "Welcome to Bihari Library - Admission Confirmation",
-                        //                             body: `<hr />
-                        // <p>Dear ${name},</p>
-                        // <p>We are thrilled to welcome you to Bihari Library Congratulations on your admission. Below are the details of your enrollment:</p>
-                        // <p><strong>Student Information:</strong></p>
-                        // <ul>
-                        // <li><strong>Student ID:</strong> ${newSid}</li>
-                        // <li><strong>Name:</strong> ${name}</li>
-                        // <li><strong>Shift:</strong> ${shift}</li>
-                        // <li><strong>Admission Date:</strong> ${admissionDate}</li>
-                        // <li><strong>Father's Name:</strong> ${father}</li>
-                        // <li><strong>Address:</strong> ${address}</li>
-                        // <li><strong>Email:</strong> ${email}</li>
-                        // <li><strong>Password:</strong> ${password}</li>
-                        // </ul>
-                        // <p>To complete your admission, please proceed with the payment of the required fee. Detailed payment instructions and deadlines will be sent to you soon.</p>
-                        // <p>You can access your student dashboard and manage your account by clicking the link below: <a href="https://biharilibrary.in/student-dashboard" target="_new" rel="noreferrer">Student Dashboard</a></p>
-                        // <p>or&nbsp;</p>
-                        // <p>Copy the link Given Below and paste it into any Browser</p>
-                        // <p>https://biharilibrary.in/student-dashboard</p>
-                        // <p>Should you have any questions or need further assistance, feel free to reach out to us at <strong>Bihari Library</strong>. We are here to support you every step of the way.</p>
-                        // <p>Once again, congratulations on your admission! We look forward to having you join our vibrant campus community.</p>
-                        // <p>Warm regards,</p>
-                        // <p><img src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/20240811_173606-scaled.webp" alt="bihari logo" width="150" height="50" /><br /><em>9608888400</em></p>`
-                        //                         });
+
 
                         return res.status(201).json({ message: "Admission Success" });
                     } else {
@@ -339,67 +311,67 @@ export const updateStudent = async (req, res) => {
         name,
         email,
         mobile,
-        aadhar,
         father,
         guardian,
         gender,
-        preparingFor,
-        dob,
         admissionDate,
-        shiftFrom,
-        shiftTo,
-        pincode,
-        village,
-        block,
-        district,
+        shift,
+        time,
+        paymentAmount,
+        address,
+        image,
+        seatNumber,
         instagram,
         facebook,
         youtube,
-        status,
-        lastPayment,
-        paymentAmount,
-        paymentMode,
-        image,
         // admin
     } = req.body;
-
+    console.log(image)
     try {
-        const imageBuffer = Buffer.from(image.split(",")[1], 'base64');
+        let imageFilename;
 
+        if (image && image.startsWith('data:image')) {
+            // If the image is a base64 string
+            const base64Image = image.split(",")[1];
+            if (!base64Image) {
+                throw new Error('Invalid image format');
+            }
+
+            const imageBuffer = Buffer.from(base64Image, 'base64');
+            // Generate a unique filename for the image
+            imageFilename = `${sid}.jpeg`;
+
+            // Write the image to a file
+            fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+        } else {
+            // If the image is not provided, use the existing image filename
+            imageFilename = `${sid}.jpeg`;
+        }
         // Assuming 'sid' or 'email' can uniquely identify a student
         const student = await Student.findOne({ $or: [{ sid }, { email }] });
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
         }
-        // Generate a unique filename for the image
-        const imageFilename = `${sid}.jpeg`;
         // Write the image to a file
-        fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+        // fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
         // Update student details
+        student.sid = sid;
         student.name = name;
         student.email = email;
         student.mobile = mobile;
-        student.aadhar = aadhar;
         student.father = father;
         student.guardian = guardian;
         student.gender = gender;
-        student.preparingFor = preparingFor;
-        student.dob = dob;
         student.admissionDate = admissionDate;
-        student.shiftFrom = shiftFrom;
-        student.shiftTo = shiftTo;
-        student.pincode = pincode;
-        student.village = village;
-        student.block = block;
-        student.district = district;
+        student.shift = shift;
+        student.address = address;
         student.instagram = instagram;
         student.facebook = facebook;
         student.youtube = youtube;
-        student.status = status;
-        student.lastPayment = lastPayment;
         student.paymentAmount = paymentAmount;
-        student.paymentMode = paymentMode;
         student.image = imageFilename;
+        student.seatNumber = seatNumber;
+        student.time = time;
         // student.admin = admin;
 
         await student.save();
