@@ -2,7 +2,6 @@ import { LayoutDashboard, UserPlus, User, MailPlus, HandCoins, IndianRupee, Armc
 
 export const MenuLinkItems = [
     {
-        label: "Panel routing",
         items: [
             {
                 id: 1,

@@ -16,6 +16,7 @@ const MenuLinks = () => {
         </div>
         <div className="flex items-center justify-center h-8 w-8 bg-black text-white font-bold rounded-full">
           BL
+          {/* <img src="./img/biharilogo.png" /> */}
         </div>
         <Link to="/" className="inline-flex flex-col gap-1">
           <p className="text-base leading-none font-semibold">Bihari Library</p>
@@ -47,17 +48,18 @@ const MenuLinks = () => {
         <div className="flex-1 overflow-y-auto flex flex-col gap-6 py-2">
           {MenuLinkItems.map((item) => (
             <ul key={item.label} className="flex flex-col">
-              <p className="px-2 text-zinc-400">{item.label}</p>
               {item.items.map((child) => (
                 <li key={child.id}>
-                  <Link
-                    to={child.href}
-                    onClick={handleOnToggleShowMenu}
-                    className='w-full flex gap-2 px-2 items-center hover:bg-gray-100 p-2'
-                  >
-                    <child.icon className="w-4 h-4" />
-                    {child.name}
-                  </Link>
+                  <div className="group w-full">
+                    <Link
+                      to={child.href}
+                      onClick={handleOnToggleShowMenu}
+                      className='w-full flex gap-2 px-2 items-center hover:bg-gray-100 p-2 hover:border-l-4 border-green-600 transition-all'
+                    >
+                      <child.icon className="w-4 h-4 group-hover:text-red-700 transition-all" />
+                      {child.name}
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
