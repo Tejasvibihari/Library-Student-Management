@@ -103,20 +103,23 @@ export const createSeat = async (req, res) => {
 // Controller to update a seat
 export const updateSeat = async (req, res) => {
     const { seatNumber } = req.params;
-    const updateData = req.body;
+    const availabilityData = req.body;
 
     try {
-        // Find the seat by seatNumber and update it with the new data
-        const updatedSeat = await Seat.findOneAndUpdate({ seatNumber }, updateData, { new: true });
+        const seat = await Seat.findOneAndUpdate(
+            { seatNumber },
+            { availability: availabilityData },
+            { new: true }
+        );
 
-        if (!updatedSeat) {
-            return res.status(404).json({ message: 'Seat not found.' });
+        if (!seat) {
+            return res.status(404).json({ message: 'Seat not found' });
         }
 
-        res.status(200).json(updatedSeat);
+        res.status(200).json(seat);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Error updating seat:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
