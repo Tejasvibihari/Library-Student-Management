@@ -7,7 +7,6 @@ import client from '../services/axiosClient';
 ChartJs.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function BarChart() {
-  // Sample data for student admissions per month
   const [chartData, setChartData] = useState({
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     datasets: [
@@ -23,7 +22,6 @@ export default function BarChart() {
           'rgba(153, 102, 255, 0.2)',
           'rgba(201, 203, 207, 0.2)'
         ],
-
         borderColor: [
           'rgb(255, 99, 132)',
           'rgb(255, 159, 64)',
@@ -37,6 +35,7 @@ export default function BarChart() {
       },
     ],
   });
+
   useEffect(() => {
     const fetchAdmissions = async () => {
       try {
@@ -67,9 +66,11 @@ export default function BarChart() {
 
     fetchAdmissions();
   }, []);
+
   // Options for the chart
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
@@ -79,9 +80,21 @@ export default function BarChart() {
         text: 'Student Admissions Per Month',
       },
     },
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 90,
+          minRotation: 45,
+        },
+      },
+      y: {
+        beginAtZero: true,
+      },
+    },
   };
+
   return (
-    <div className='p-4 border shadow-lg'>
+    <div className='chart-container'>
       <Bar data={chartData} options={options} />
     </div>
   );

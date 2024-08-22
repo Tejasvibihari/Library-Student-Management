@@ -11,3 +11,24 @@
 .hello {
     background-image: linear-gradient(135deg, transparent 0%, transparent 17%, rgba(0, 83, 201, 0.6) 17%, rgba(0, 83, 201, 0.6) 59%, transparent 59%, transparent 64%, rgba(34, 81, 222, 0.6) 64%, rgba(34, 81, 222, 0.6) 100%), linear-gradient(45deg, transparent 0%, transparent 2%, rgb(87, 146, 234) 2%, rgb(87, 146, 234) 46%, rgb(114, 178, 239) 46%, rgb(114, 178, 239) 54%, transparent 54%, transparent 63%, rgb(7, 48, 216) 63%, rgb(7, 48, 216) 100%), linear-gradient(90deg, rgb(176, 173, 173), rgb(176, 173, 173));
 }
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    /* Adjust height as needed */
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
+        /* Adjust height for mobile view */
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 250px;
+        /* Adjust height for smaller mobile view */
+    }
+}
