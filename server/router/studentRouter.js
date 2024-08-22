@@ -1,5 +1,5 @@
 import express from 'express'
-import { createStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission } from '../controllers/studentController.js'
+import { createStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth } from '../controllers/studentController.js'
 
 
 
@@ -16,5 +16,6 @@ router.get('/getallstudent', GetAllStudent);
 router.get('/getstudent', GetStudent);
 router.post('/updatestudent', updateStudent);
 router.post('/bulk-admission', bulkStudentAdmission);
+router.get('/get-admission-month', getAdmissionMonth);
 
 export default router

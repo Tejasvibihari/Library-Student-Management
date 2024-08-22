@@ -14,50 +14,18 @@ export default function DashboardCard({ allStudent }) {
     }, [allStudent])
     return (
         <>
-            <div className='grid grid-cols-1 md:grid-cols-3 my-4'>
-                <div className='flex flex-col md:flex-row gap-4 p-2 my-4 col-span-2 w-full rounded-sm'>
-                    <div className='flex flex-col gap-4 w-full'>
-                        <OverviewCard icon="Users" title="Total Student" value={allStudent.length} link="student-detail" />
 
-                    </div>
-                    <div className='flex flex-col gap-4 w-full'>
-                        <OverviewCard icon="CalendarArrowDown" title="Pending Student" value={pendingStudent} link="student-detail" />
-                        {/* <OverviewCard title="Active Student" value={activeStudent} /> */}
-                    </div>
-                </div>
-                <div>
-                    {/* <div className='rounded-sm bg-white'>
-                        <div className='flex items-center justify-between'>
+            <div className='grid grid-cols-2 gap-2 p-4 md:grid-cols-4 w-full rounded-sm'>
+                <div className='flex flex-col gap-4 w-full'>
+                    <OverviewCard icon="Users" title="Total Student" value={allStudent.length} link="student-detail" />
 
-                            <div className='text-[#1b2c3f] p-4 font-semibold font-[inter]'>
-                                New Admission
-                            </div>
-                            <Link className='p-4 text-[#818995] font-semibold text-xs underline font-[inter]'>
-                                View All
-                            </Link>
-                        </div>
-                        <hr />
-                        <div>
-                            <div className='flex items-center gap-4 p-4 w-full'>
-                                <div className=''>
-                                    <img src='./img/idDp.jpg' className='rounded-full' width='50px' />
-                                </div>
-                                <div className='flex justify-between w-full'>
-                                    <div className='text-[#1b2c3f] font-bold font-[inter] my-2'>
-                                        Tejasvi Kumar
-                                    </div>
-                                    <div className=' my-2'>
-                                        Status
-                                    </div>
-                                    <div className='text-[#1b2c3f] font-bold font-[inter] my-2'>
-                                        10th
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
                 </div>
-            </div >
+                <div className='flex flex-col gap-4 w-full'>
+                    <OverviewCard icon="CalendarArrowDown" title="Pending Student" value={pendingStudent} link="student-detail" />
+                    {/* <OverviewCard title="Active Student" value={activeStudent} /> */}
+                </div>
+            </div>
+
         </>
     )
 }

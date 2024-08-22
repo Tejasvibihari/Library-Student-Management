@@ -10,6 +10,7 @@ import Chart from "../components/BarChart";
 import { useEffect, useState } from "react";
 import client from "../services/axiosClient";
 import { useSelector } from "react-redux";
+import BarChart from "../components/BarChart";
 
 export default function Home() {
     const adminId = useSelector(state => state.admin.currentAdmin._id)
@@ -35,6 +36,9 @@ export default function Home() {
 
                 <DashboardCard allStudent={Student} />
                 {/* <Chart /> */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                    <BarChart />
+                </div>
                 < PaymentStudentTable allStudent={Student} />
             </div>
             {/* </SideBar > */}

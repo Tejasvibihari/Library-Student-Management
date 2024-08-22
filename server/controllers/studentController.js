@@ -409,3 +409,15 @@ export const bulkStudentAdmission = async (req, res) => {
         res.status(500).json({ message: "An error occurred while admitting the students", error: error.message });
     }
 };
+
+
+// Get Student Record of Admission Month for making chart
+
+export const getAdmissionMonth = async (req, res) => {
+    try {
+        const students = await Student.find({}, 'admissionDate');
+        res.json(students);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+}
