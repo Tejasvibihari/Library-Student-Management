@@ -9,19 +9,19 @@ import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
 import { useEffect, useState } from 'react';
 
-export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, addmissionDate, shift, time, address, lastPayment, paymentAmount, nextPayment, seatNumber }) {
-    const [status, setStatus] = useState('Pending');
+export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, addmissionDate, shift, time, address, lastPayment, paymentAmount, nextPayment, seatNumber, status }) {
+    // const [status, setStatus] = useState('Pending');
 
-    useEffect(() => {
-        const handleStatusChange = () => {
-            if (!nextPayment || nextPayment < new Date()) {
-                setStatus('Payment Due')
-            } else {
-                setStatus('Active')
-            }
-        }
-        handleStatusChange()
-    }, [nextPayment])
+    // useEffect(() => {
+    //     const handleStatusChange = () => {
+    //         if (!nextPayment || nextPayment < new Date()) {
+    //             setStatus('Payment Due')
+    //         } else {
+    //             setStatus('Active')
+    //         }
+    //     }
+    //     handleStatusChange()
+    // }, [nextPayment])
 
     return (
         <>
@@ -43,10 +43,10 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                             </div>
 
                             <div className='mt-4'>
-                                <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Payment Due" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
+                                <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                     {status}
                                     <span className='ml-2 mr-2'>
-                                        {status === "Active" ? <DoneIcon /> : status === "Payment Due" ? <ReportIcon /> : <CancelIcon />}
+                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}
                                     </span>
                                 </div>
                             </div>

@@ -71,7 +71,7 @@ export default function PaymentStudentTable({ allStudent }) {
     // const [allStudent, setAllStudent] = useState('')
 
     const [status, setStatus] = useState('Pending');
-    
+
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -145,9 +145,9 @@ export default function PaymentStudentTable({ allStudent }) {
                                         {data.paymentAmount}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${!data.nextPayment || data.nextPayment < new Date() ? "border-yellow-600 bg-yellow-800" : "border-green-600 bg-green-800"}  flex items-center justify-center`}>
+                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${data.status === "Pending" ? "border-yellow-600 bg-yellow-800" : data.status === "Active" ? "border-green-600 bg-green-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                             {/* {data.nextPayment < new Date() ? "Pending" : "Active"} */}
-                                            {!data.nextPayment || data.nextPayment < new Date() ? "Payment Due" : "Active"}
+                                            {data.status === "Active" ? "Active" : data.status === "Pending" ? "Pending" : data.status === "Deactive" ? "Deactive" : null}
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">

@@ -7,7 +7,7 @@ import studentAuthRouter from './router/studentAuthRouter.js';
 import mailRouter from './router/mailRouter.js';
 import paymentRouter from './router/paymentRoute.js';
 import seatRouter from './router/seatRoute.js';
-// import './utils/scheduler/PaymentStatus.js';
+import './utils/scheduler/PaymentStatus.js';
 import './utils/scheduler/seatStatus.js';
 import dotenv from 'dotenv';
 import fs from 'fs';

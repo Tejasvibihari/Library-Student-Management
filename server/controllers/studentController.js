@@ -192,17 +192,7 @@ export const GetAllStudent = async (req, res) => {
     let query = {};
     if (sid) query.sid = sid;
     if (name) query.name = name;
-    if (status) {
-        if (status === "Pending") {
-            // query.status = status;
-            query.nextPayment = { $lte: new Date() }; // Check if nextPayment is less than or equal to today
-        } else if (status === "Active") {
-            // query.status = status;
-            query.nextPayment = { $gt: new Date() }; // Check if nextPayment is greater than today
-        } else {
-            query.status = status;
-        }
-    }
+    if (status) query.status = status;
     console.log(query)
     try {
         // Use the constructed query object to filter data
