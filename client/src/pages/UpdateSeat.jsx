@@ -58,7 +58,7 @@ export default function UpdateSeat() {
                                 7AM-11AM
                             </span>
                         </div>
-                        {/* <div>
+                        <div>
                             <RadioGroup
                                 aria-labelledby="demo-radio-buttons-group-label"
                                 defaultValue={seatData && seatData.availability && seatData.availability.morning ? "vacant" : "occupied"}
@@ -67,7 +67,7 @@ export default function UpdateSeat() {
                                 <FormControlLabel value="occupied" control={<Radio />} label="Occupied" />
                                 <FormControlLabel value="vacant" control={<Radio />} label="Vacant" />
                             </RadioGroup>
-                        </div> */}
+                        </div>
                     </div>
                     <div>
                         <div className={`p-7 flex justify-center ${seatData && seatData.availability && seatData.availability.afternoon ? "bg-green-400" : "bg-red-400"}  rounded-lg`}>

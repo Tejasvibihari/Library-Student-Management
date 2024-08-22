@@ -148,6 +148,13 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                         <div className='mx-1'>
                             <Link to={`/student-admin-dashboard/${studentId}`}>
                                 <button className='p-2 w-full  rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
+                                    <ReceiptText size={17} className='mr-2' />Delete Student
+                                </button>
+                            </Link>
+                        </div>
+                        <div className='mx-1'>
+                            <Link to={`/student-admin-dashboard/${studentId}`}>
+                                <button className='p-2 w-full  rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
                                     <ReceiptText size={17} className='mr-2' />Payment Detail
                                 </button>
                             </Link>
