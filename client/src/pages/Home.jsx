@@ -32,14 +32,16 @@ export default function Home() {
         <>
             {/* <SideBar> */}
             <Breadcrumbs title="Home" subTitle="Dshboard" />
-            <div className="">
+            <div className=" bg-gray-200">
 
                 <DashboardCard allStudent={Student} />
                 {/* <Chart /> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
                     <BarChart />
                 </div>
-                < PaymentStudentTable allStudent={Student} />
+                <div className="p-4">
+                    <PaymentStudentTable allStudent={Student} />
+                </div>
             </div>
             {/* </SideBar > */}
         </>

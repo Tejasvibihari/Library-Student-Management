@@ -11,7 +11,7 @@ export default function Sidebar() {
     }
 
     return (
-        <nav>
+        <nav className="sticky top-0 bg-white shadow-md z-50">
             <div className="h-12 p-2 flex items-center justify-between border-b border-b-zinc-200">
                 <MenuLinks />
                 <div className="md:flex flex items-center gap-2 ">

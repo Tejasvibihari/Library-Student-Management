@@ -96,7 +96,7 @@ export default function BarChart() {
   };
 
   return (
-    <div className='chart-container'>
+    <div className='chart-container bg-white p-4 shadow-lg rounded-md'>
       <Bar data={chartData} options={options} />
     </div>
   );
