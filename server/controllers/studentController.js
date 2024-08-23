@@ -96,7 +96,7 @@ export const createStudent = async (req, res) => {
                 gender, admissionDate, shift, time, paymentAmount, address,
                 image: imageFilename, lastPayment
             });
-            await seat.save();
+
 
             sendMail({
                 to: email,
@@ -434,3 +434,42 @@ export const getAdmissionMonth = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 }
+
+// Alternate
+export const updateStudentStatus = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
+
+        const students = await Student.find();
+
+        for (const student of students) {
+            const nextPaymentDateString = student.nextPayment ? student.nextPayment : '1970-01-01T00:00:00.000Z';
+            const nextPaymentDate = new Date(nextPaymentDateString);
+            nextPaymentDate.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
+
+            const fiveDaysAgo = new Date();
+            fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+            fiveDaysAgo.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
+
+            if (nextPaymentDate <= today) {
+                if (nextPaymentDate <= fiveDaysAgo) {
+                    student.status = "Deactive";
+                } else {
+                    student.status = "Pending";
+                }
+            } else {
+                student.status = "Active";
+            }
+
+            await student.save();
+
+            console.log(`Status updated to "${student.status}" for student ID: ${student.sid}`);
+        }
+
+        res.status(200).json({ message: 'Student statuses updated successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
