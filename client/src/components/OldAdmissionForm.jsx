@@ -363,9 +363,11 @@ export default function OldAdmissionForm() {
                                         <label htmlFor="seat">Seat</label>
                                         <select required className="p-2 border rounded-md w-full" value={seatNumber} onChange={(e) => setSeatNumber(e.target.value)}>
                                             <option value="" disabled>Select One</option>
+                                            <option value="Other">Other</option>
                                             {Array.isArray(vacantSeat) ? vacantSeat.map((seat, index) => (
                                                 <option key={index} value={seat.seatNumber}>{seat.seatNumber}</option>
                                             )) : null}
+
                                         </select>
                                     </div>
                                     <div>

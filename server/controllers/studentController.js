@@ -31,7 +31,7 @@ export const createStudent = async (req, res) => {
         seatNumber,
         seatShift
     } = req.body;
-
+    console.log(seatNumber)
     try {
         let imageFilename = null;
         let password;
@@ -44,8 +44,12 @@ export const createStudent = async (req, res) => {
             return res.status(400).json({ message: 'Student already exists' });
         }
 
-        if (!seat || !seat.availability[seatShift]) {
-            return res.status(400).json({ message: 'Seat not available' });
+        if (seatNumber !== 'Other') {
+            const seat = await Seat.findOne({ seatNumber });
+
+            if (!seat || !seat.availability[seatShift]) {
+                return res.status(400).json({ message: 'Seat not available' });
+            }
         }
 
         if (image && typeof image === 'string') {
@@ -77,7 +81,12 @@ export const createStudent = async (req, res) => {
 
         if (sid >= 1 && sid <= 326) {
             // Handle old student admissions
-            updateSeatAvailability(seat, seatShift);
+            if (seatNumber !== 'Other') {
+                const seat = await Seat.findOne({ seatNumber });
+                updateSeatAvailability(seat, seatShift);
+                await seat.save();
+            }
+
 
             password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
             const hashedPassword = await bcrypt.hash(password, 12);
@@ -123,7 +132,11 @@ export const createStudent = async (req, res) => {
             const lastStudent = await Student.findOne().sort({ sid: -1 });
             const newSid = lastStudent ? lastStudent.sid + 1 : 327;
 
-            updateSeatAvailability(seat, seatShift);
+            if (seatNumber !== 'Other') {
+                const seat = await Seat.findOne({ seatNumber });
+                updateSeatAvailability(seat, seatShift);
+                await seat.save();
+            }
 
             password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
             const hashedPassword = await bcrypt.hash(password, 12);
@@ -133,7 +146,7 @@ export const createStudent = async (req, res) => {
                 gender, admissionDate, shift, time, paymentAmount, address,
                 image: imageFilename, lastPayment
             });
-            await seat.save();
+
 
             sendMail({
                 to: email,
