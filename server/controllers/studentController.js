@@ -38,7 +38,7 @@ export const createStudent = async (req, res) => {
 
         const student = await Student.findOne({ sid });
         const studentEmail = await Student.findOne({ email });
-        const seat = await Seat.findOne({ seatNumber });
+        // const seat = await Seat.findOne({ seatNumber });
 
         if (student || studentEmail) {
             return res.status(400).json({ message: 'Student already exists' });
