@@ -60,7 +60,7 @@ export default function StudentUpdateForm() {
     const [formData, setFormData] = useState({})
     const [seatNumber, setSeatNumber] = useState("")
     const [compressImage, setCompressImage] = useState("")
-    const [nextPaymentDate, setNextPaymentDate] = useState("")
+    const [nextPayment, setNextPayment] = useState("")
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -164,7 +164,7 @@ export default function StudentUpdateForm() {
                     const formattedNextPaymentDate = safeFormatDate(response.data.nextPayment);
                     // Set state with the safely formatted dates or fallback values
                     setAdmissionDate(formattedAdmissionDate);
-                    setNextPaymentDate(formattedNextPaymentDate)
+                    setNextPayment(formattedNextPaymentDate)
                 } catch (error) {
                     console.log(error);
                 }
@@ -198,12 +198,12 @@ export default function StudentUpdateForm() {
                 image: compressImage,
                 admin: userId,
                 seatNumber,
-                nextPayment: nextPaymentDate,
+                nextPayment,
 
             })
         }
         handleChange()
-    }, [sid, name, email, mobile, father, guardian, gender, seatNumber, nextPaymentDate,
+    }, [sid, name, email, mobile, father, guardian, gender, seatNumber, nextPayment,
         admissionDate, shift, time, address, compressImage, userId, addressArray, instagram, facebook, youtube, status, paymentAmount])
 
 
@@ -334,8 +334,8 @@ export default function StudentUpdateForm() {
                                         <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
                                     </div>
                                     <div>
-                                        <label >Next Payment Date</label>
-                                        <input required className="p-2 border rounded-md w-full" value={nextPaymentDate} onChange={(e) => setNextPaymentDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
+                                        <label>Next Payment Date</label>
+                                        <input className="p-2 border rounded-md w-full" value={nextPayment} onChange={(e) => setNextPayment(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
                                     </div>
                                 </div>
                                 <div className='border p-2 rounded-sm'>
