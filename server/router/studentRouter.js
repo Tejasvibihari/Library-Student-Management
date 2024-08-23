@@ -1,5 +1,5 @@
 import express from 'express'
-import { createStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth } from '../controllers/studentController.js'
+import { createOldStudent, createNewStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth } from '../controllers/studentController.js'
 
 
 
@@ -7,7 +7,8 @@ const router = express.Router()
 
 
 
-router.post("/createstudent", createStudent)
+router.post("/create-old-student", createOldStudent)
+router.post("/create-new-student", createNewStudent)
 
 router.post('/login', StudentLogin);
 router.post('/logout', StudentLogOut);

@@ -147,7 +147,7 @@ export default function NewAdmissionForm() {
         e.preventDefault()
         try {
             setLoading(true)
-            const response = await client.post("/api/student/createstudent", formData)
+            const response = await client.post("/api/student/create-new-student", formData)
             console.log(response.data.message)
             setLoading(false)
             handleSnackOpen()

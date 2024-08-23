@@ -150,7 +150,7 @@ export default function OldAdmissionForm() {
         e.preventDefault()
         try {
             setLoading(true)
-            const response = await client.post("/api/student/createstudent", formData)
+            const response = await client.post("/api/student/create-old-student", formData)
             console.log(response.data.message)
             setLoading(false)
             handleSnackOpen()
