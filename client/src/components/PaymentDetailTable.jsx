@@ -24,6 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -55,7 +56,8 @@ export default function PaymentDetailTable({ data }) {
     const [open, setOpen] = React.useState(false);
     const [selectedStudentId, setSelectedStudentId] = useState(null);
     const [snackOpen, setSnackOpen] = React.useState(false);
-    const [alertMessage, setAlertMessage] = useState('')
+    const [alertMessage, setAlertMessage] = useState('');
+
     const handleSnackClick = () => {
         setSnackOpen(true);
     };
@@ -67,6 +69,7 @@ export default function PaymentDetailTable({ data }) {
 
         setSnackOpen(false);
     };
+
     const handleDialogOpen = (_id) => {
         setSelectedStudentId(_id);
         setOpen(true);
@@ -79,15 +82,14 @@ export default function PaymentDetailTable({ data }) {
     const handleConfirmDelete = async () => {
         try {
             const res = await client.delete(`/api/payment/deletePayment/${selectedStudentId}`);
-            console.log(res.data.message)
+            console.log(res.data.message);
             setStudentData(prevData => prevData.filter(student => student._id !== selectedStudentId));
-            setAlertMessage(res.data.message)
+            setAlertMessage(res.data.message);
             setOpen(false);
-            handleSnackClick()
-
+            handleSnackClick();
         } catch (error) {
             console.error('Error deleting student:', error);
-            handleSnackClick()
+            handleSnackClick();
         }
     };
 
@@ -127,7 +129,7 @@ export default function PaymentDetailTable({ data }) {
                 >
                     {alertMessage}
                 </Alert>
-            </Snackbar >
+            </Snackbar>
             {!data ? <div>No Data Found</div> : <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
@@ -141,7 +143,7 @@ export default function PaymentDetailTable({ data }) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data.map((row) => {
+                        {data.slice().reverse().map((row) => {
                             const relatedData = studentData.find(item => item.sid === row.sid);
                             return (
                                 <StyledTableRow key={row._id}>
