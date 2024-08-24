@@ -12,6 +12,7 @@ export default function StudentDetail() {
     const [allStudent, setAllStudent] = useState([])
     const [sid, setSid] = useState('');
     const [studentName, setStudentName] = useState('')
+    const [seatNumber, setSeatNumber] = useState('')
     const [active, setActive] = useState(false)
     const [pending, setPending] = useState(false)
     const [deactive, setDeactive] = useState(false)
@@ -41,6 +42,7 @@ export default function StudentDetail() {
                 params: {
                     sid: sid,
                     name: studentName,
+                    seatNumber,
                     status: active ? "Active" : pending ? "Pending" : deactive ? "Deactive" : null,
                 }
             })
@@ -56,14 +58,18 @@ export default function StudentDetail() {
         <>
             {/* <SideBar> */}
             <Breadcrumbs title="Student Details" subTitle="Student" />
-            <div className='grid grid-cols-1 md:grid-cols-8 gap-4 mt-5 border p-4 shadow-md'>
+            <div className='grid grid-cols-1 md:grid-cols-10 gap-4 mt-5 border p-4 shadow-md'>
                 <div className='col-span-2'>
                     <label htmlFor="studentId" className="block text-sm font-medium text-gray-700">Student ID</label>
-                    <input onChange={(e) => setSid(e.target.value)} value={sid} type="text" id="studentId" name="studentId" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <input placeholder='Enter Student SID' onChange={(e) => setSid(e.target.value)} value={sid} type="text" id="studentId" name="studentId" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div className='col-span-2'>
                     <label htmlFor="studentName" className="block text-sm font-medium text-gray-700">Student Name</label>
-                    <input onChange={(e) => setStudentName(e.target.value)} value={studentName} type="text" id="studentName" name="studentName" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <input placeholder='Enter Student Name' onChange={(e) => setStudentName(e.target.value)} value={studentName} type="text" id="studentName" name="studentName" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                </div>
+                <div className='col-span-2'>
+                    <label htmlFor="seatNumber" className="block text-sm font-medium text-gray-700">Seat Number</label>
+                    <input placeholder='Enter Seat Number' onChange={(e) => setSeatNumber(e.target.value)} value={seatNumber} type="text" id="seatNumber" name="seatNumber" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <fieldset className="col-span-2 flex justify-start items-center">
                     <legend className="text-sm font-medium text-gray-700">Status</legend>

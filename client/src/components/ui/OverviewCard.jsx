@@ -23,7 +23,7 @@ export default function OverviewCard({ title, value, icon, link }) {
     }, [value]);
     return (
         <>
-            <div className='p-4 bg-white border shadow-lg rounded-md'>
+            <div className='p-4 bg-white border-green-700 border-solid border-[1px] shadow-lg rounded-md'>
                 <div className='grid grid-cols-2 gap-4'>
                     <div>
                         <p className='text-[#818995] font-semibold font-[inter] text-sm my-2 border-l-green-900 border-l-4 pl-1'>
