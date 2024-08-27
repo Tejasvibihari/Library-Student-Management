@@ -11,10 +11,13 @@ import { useEffect, useState } from "react";
 import client from "../services/axiosClient";
 import { useSelector } from "react-redux";
 import BarChart from "../components/BarChart";
+import { IndianRupee } from 'lucide-react';
+import PiChart from "../components/PiChart";
 
 export default function Home() {
     const adminId = useSelector(state => state.admin.currentAdmin._id)
     const [Student, setAllStudent] = useState([])
+
     useEffect(() => {
         const getAllStudent = async () => {
             try {
@@ -26,7 +29,10 @@ export default function Home() {
                 console.log(error)
             }
         }
+
         getAllStudent()
+
+
     }, [adminId])
     return (
         <>
@@ -36,8 +42,13 @@ export default function Home() {
 
                 <DashboardCard allStudent={Student} />
                 {/* <Chart /> */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-                    <BarChart />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 justify-center items-center">
+                    <div>
+                        <BarChart />
+                    </div>
+                    <div>
+                        <PiChart />
+                    </div>
                 </div>
                 <div className="p-4">
                     <PaymentStudentTable allStudent={Student} />

@@ -16,7 +16,6 @@ export const createOldStudent = async (req, res) => {
     const {
         sid, name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
     } = req.body;
-    console.log(seatNumber)
     try {
         let imageFilename = null;
         let password;
@@ -28,14 +27,6 @@ export const createOldStudent = async (req, res) => {
         if (student || studentEmail) {
             return res.status(400).json({ message: 'Student already exists' });
         }
-
-        // if (seatNumber !== 'Other') {
-        //     const seat = await Seat.findOne({ seatNumber });
-
-        //     if (!seat || !seat.availability[seatShift]) {
-        //         return res.status(400).json({ message: 'Seat not available' });
-        //     }
-        // }
 
         if (image && typeof image === 'string') {
             const base64String = image.split(",")[1];
@@ -67,17 +58,21 @@ export const createOldStudent = async (req, res) => {
         password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
         const hashedPassword = await bcrypt.hash(password, 12);
 
+        if (seatNumber !== 'Other') {
+            const seat = await Seat.findOne({ seatNumber });
+            if (seat) {
+                updateSeatAvailability(seat, seatShift);
+                await seat.save();
+            }
+            return res.status(404).json({ message: "Seat Not Found" });
+        }
+
         await Student.create({
             sid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
             gender, admissionDate, shift, time, paymentAmount, address,
             image: imageFilename, lastPayment
         });
 
-        if (seatNumber !== 'Other') {
-            const seat = await Seat.findOne({ seatNumber });
-            updateSeatAvailability(seat, seatShift);
-            await seat.save();
-        }
         sendMail({
             to: email,
             subject: "Welcome to Bihari Library - Admission Confirmation",

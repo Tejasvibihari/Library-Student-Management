@@ -25,6 +25,7 @@ import Sidebar from './components/Sidebar'
 import StudentIdCard from './components/StudentIdCard'
 import StudentProtectedRoute from './pages/StudentProtectedRoute'
 import UpdateSeat from './pages/UpdateSeat'
+import LandingPage from './pages/LandingPage'
 
 
 
@@ -49,7 +50,7 @@ export default function App() {
             <Route path="/student-id" element={<StudentId />} />
           </Route>
 
-
+          <Route path="/landing-page" element={<LandingPage />} />
 
           {/* Sidebar menu Start  */}
 
