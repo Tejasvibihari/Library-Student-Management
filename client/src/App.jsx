@@ -50,12 +50,12 @@ export default function App() {
             <Route path="/student-id" element={<StudentId />} />
           </Route>
 
-          <Route path="/landing-page" element={<LandingPage />} />
+          <Route path="/" element={<LandingPage />} />
 
           {/* Sidebar menu Start  */}
 
           <Route element={<AdminProtectedRoute />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/admin-dashboard" element={<Home />} />
             <Route path="/admin-student-admission" element={<AdminStudentAdmission />} />
             <Route path="/student-update/:_id" element={<StudentUpdate />} />
             <Route path="/email" element={<Email />} />

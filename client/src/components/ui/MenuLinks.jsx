@@ -18,7 +18,7 @@ const MenuLinks = () => {
           BL
           {/* <img src="./img/biharilogo.png" /> */}
         </div>
-        <Link to="/" className="inline-flex flex-col gap-1">
+        <Link to="/admin-dashboard" className="inline-flex flex-col gap-1">
           <p className="text-base leading-none font-semibold">Bihari Library</p>
           <p className="text-xxs leading-none text-zinc-400">
             A unit of Bihari Traders
@@ -36,7 +36,7 @@ const MenuLinks = () => {
           }`}
       >
         <Link
-          to="/"
+          to="/admin-dashboard"
           onClick={handleOnToggleShowMenu}
           className="inline-flex flex-col gap-1 p-2"
         >

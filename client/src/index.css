@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baskervville+SC&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,4 +32,58 @@
         height: 250px;
         /* Adjust height for smaller mobile view */
     }
+}
+
+.bg-hero-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Adjust the color and opacity as needed */
+    z-index: 1;
+}
+
+.bg-hero-pattern {
+    background-image: url('./img/herbackground.webp');
+
+}
+
+/* Ensure your content is positioned above the overlay */
+.bg-hero-overlay .content {
+    position: relative;
+    z-index: 2;
+}
+
+.transparent-text-outline {
+    -webkit-text-stroke: 1px white;
+    /* Adjust the width and color as needed */
+    color: transparent;
+}
+
+/* Style for the overlay */
+.image-container::after {
+    content: 'Your Content Here';
+    /* Overlay content */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    /* Text color */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Show the overlay on hover */
+.image-container:hover::after {
+    opacity: 1;
 }

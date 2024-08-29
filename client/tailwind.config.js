@@ -6,14 +6,12 @@ export default {
   ],
   theme: {
     extend: {
-      extend: {
-        fontFamily: {
-          'inter': ['Inter', 'sans-serif'],
-          'cedarville-cursive': ['Cedarville Cursive', 'cursive'],
-        }
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+        'cedarville-cursive': ['Cedarville Cursive', 'cursive'],
+        'baskervville-sc': ['Baskervville SC', 'serif'],
       },
     },
-
   },
   plugins: [],
 }
