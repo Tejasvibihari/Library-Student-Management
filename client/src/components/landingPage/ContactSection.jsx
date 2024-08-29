@@ -11,7 +11,7 @@ export default function Contact() {
                         Contact Us
                     </h1>
                     <form className="grid grid-cols-1 space-y-4">
-                        <div className='flex gap-4'>
+                        <div className='flex gap-4 md:flex-row flex-col'>
                             <div className='w-full'>
                                 <label className="block text-sm font-medium text-white">Last Name</label>
                                 <input placeholder='First Name' type="text" className="mt-1 block w-full px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />

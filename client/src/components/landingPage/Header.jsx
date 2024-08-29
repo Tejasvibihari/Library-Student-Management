@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, LayoutDashboard, X } from 'lucide-react'; // Import the Menu and X icons from lucide-react
+import { Menu, LayoutDashboard, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Header() {
@@ -53,7 +53,7 @@ export default function Header() {
             <header className={`bg-gray-100 fixed top-0 left-0 w-full z-50 transition-shadow ${isScrolled ? 'shadow-md' : ''}`}>
                 <div className='max-w-7xl mx-auto flex justify-between items-center p-2'>
                     <div className='flex items-center'>
-                        <img src='./img/biharilogo.png' alt='Company Logo' className='h-17 w-52 mr-4' />
+                        <img src='/img/biharilogo.png' alt='Company Logo' className='h-17 w-52 mr-4' />
                     </div>
                     <div className='flex items-center space-x-8'>
                         <button className='md:hidden' onClick={toggleSidebar}>

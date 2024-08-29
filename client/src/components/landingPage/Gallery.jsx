@@ -22,7 +22,7 @@ export default function Gallery() {
                 <h1 className='font-bold text-2xl mb-16 font-[inter] md:text-left tracking-[.2em] md:border-r-0 md:pl-2 md:border-l-teal-600 md:border-l-4 border-l-4 border-r-4 pl-2 border-l-red-600 border-r-red-600 text-center'>
                     Gallery
                 </h1>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2">
                     {images.map((src, index) => (
                         <div key={index} className="relative w-full pb-full bg-gray-200">
                             <img
