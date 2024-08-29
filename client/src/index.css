@@ -47,8 +47,8 @@
 }
 
 .bg-hero-pattern {
-    background-image: url('./img/herbackground.webp');
-
+    background-image: url('/img/herbackground.webp');
+    /* Ensure the path is correct relative to the public directory */
 }
 
 /* Ensure your content is positioned above the overlay */
