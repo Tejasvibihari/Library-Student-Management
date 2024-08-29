@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { MapPin, Phone, Mail, Building, Settings, Images, Link2, LayoutDashboard } from 'lucide-react'
+import { MapPin, Phone, Mail, Building, Settings, Images, Link2, LayoutDashboard, Network } from 'lucide-react'
 
 export default function Footer() {
     return (
@@ -35,6 +35,9 @@ export default function Footer() {
                                 </Link>
                                 <Link to="/admin-dashboard">
                                     <li className='flex mb-4'><LayoutDashboard size={20} className='text-primary mr-3' />Dashboard</li>
+                                </Link>
+                                <Link to="/6024841_21.html">
+                                    <li className='flex mb-4'><Network size={20} className='text-primary mr-3' />Sitemap</li>
                                 </Link>
 
                             </ul>
