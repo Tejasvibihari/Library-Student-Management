@@ -36,9 +36,9 @@ export default function Footer() {
                                 <Link to="/admin-dashboard">
                                     <li className='flex mb-4'><LayoutDashboard size={20} className='text-primary mr-3' />Dashboard</li>
                                 </Link>
-                                <Link to="/6024841_21.html">
+                                <a href="/6024841_21.html">
                                     <li className='flex mb-4'><Network size={20} className='text-primary mr-3' />Sitemap</li>
-                                </Link>
+                                </a>
 
                             </ul>
                         </div>
