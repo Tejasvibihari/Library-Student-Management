@@ -8,6 +8,7 @@ import Payment from '../models/paymentModel.js';
 import Seat from '../models/seatModel.js';
 import { fileURLToPath } from 'url';
 import sharp from 'sharp'
+import { oldAdmission, newAdmission } from './EmailTamplet.js';
 // Define __dirname for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -199,7 +200,7 @@ export const createNewStudent = async (req, res) => {
         return res.status(201).json({ message: "Admission Success" });
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ error, message: 'Internal Server Error' });
     }
 }
 

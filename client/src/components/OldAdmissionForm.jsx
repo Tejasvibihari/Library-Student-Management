@@ -152,6 +152,7 @@ export default function OldAdmissionForm() {
             setLoading(true)
             const response = await client.post("/api/student/create-old-student", formData)
             console.log(response.data.message)
+            console.log(response)
             setLoading(false)
             handleSnackOpen()
             setAlertStatus(response.data.message)
@@ -167,13 +168,13 @@ export default function OldAdmissionForm() {
             setAdmissionDate("")
             setShift("")
             setTime('')
-            // setToAmPm("")
             setAddress("")
             setCroppedImage("")
             setSeatNumber("")
             setSeatShift("")
         } catch (error) {
             setLoading(false)
+            console.log(error)
             if (error.response && error.response.data && error.response.data.message) {
                 setAlertStatus(error.response.data.message);
                 handleSnackOpen()
