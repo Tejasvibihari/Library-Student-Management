@@ -170,6 +170,7 @@ export default function NewAdmissionForm() {
 
         } catch (error) {
             setLoading(false)
+            console.log(error)
             if (error.response && error.response.data && error.response.data.message) {
                 setAlertStatus(error.response.data.message);
                 handleSnackOpen()
