@@ -456,41 +456,49 @@ export const getAdmissionMonth = async (req, res) => {
     }
 }
 
-// Alternate
-// export const updateStudentStatus = async (req, res) => {
-//     try {
-//         const today = new Date();
-//         today.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
+export const deleteStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-//         const students = await Student.find();
+        // Find the student by ID
+        const student = await Student.findById(id);
 
-//         for (const student of students) {
-//             const nextPaymentDateString = student.nextPayment ? student.nextPayment : '1970-01-01T00:00:00.000Z';
-//             const nextPaymentDate = new Date(nextPaymentDateString);
-//             nextPaymentDate.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
 
-//             const fiveDaysAgo = new Date();
-//             fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-//             fiveDaysAgo.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
+        // Retrieve the seat number and shift from the student profile
+        const { seatNumber, shift } = student;
 
-//             if (nextPaymentDate <= today) {
-//                 if (nextPaymentDate <= fiveDaysAgo) {
-//                     student.status = "Deactive";
-//                 } else {
-//                     student.status = "Pending";
-//                 }
-//             } else {
-//                 student.status = "Active";
-//             }
+        // Find the seat by seat number
+        const seat = await Seat.findOne({ seatNumber });
 
-//             await student.save();
+        if (seat) {
+            // Update the seat availability based on the student's shift
+            deleteSeatAvailability(seat, shift);
+            await seat.save();
+        }
 
-//             console.log(`Status updated to "${student.status}" for student ID: ${student.sid}`);
-//         }
+        // Delete the student profile
+        await Student.findByIdAndDelete(id);
 
-//         res.status(200).json({ message: 'Student statuses updated successfully' });
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-// };
+        res.status(200).json({ message: 'Student deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting student:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+const deleteSeatAvailability = (seat, seatShift) => {
+    const shifts = {
+        fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
+        morning: ['morning'],
+        afternoon: ['afternoon'],
+        evening: ['evening'],
+        night: ['night'],
+        doubleMorning: ['morning', 'afternoon', 'doubleMorning'],
+        doubleEvening: ['afternoon', 'evening', 'doubleEvening'],
+        morningLong: ['morning', 'afternoon', 'evening', 'morningLong'],
+        nightLong: ['night', 'nightLong']
+    };
+    shifts[seatShift].forEach(shift => seat.availability[shift] = true);
+};
