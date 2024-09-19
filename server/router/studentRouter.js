@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOldStudent, createNewStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth, deleteStudent } from '../controllers/studentController.js';
+import { createOldStudent, createNewStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth, trashStudent, trash } from '../controllers/studentController.js';
 
 const router = express.Router();
 
@@ -16,6 +16,7 @@ router.post('/bulk-admission', bulkStudentAdmission);
 router.get('/get-admission-month', getAdmissionMonth);
 
 // Add the delete route
-router.delete('/delete', deleteStudent);
+router.get('/delete', trashStudent);
+router.get('/trash-Student', trash);
 
 export default router;

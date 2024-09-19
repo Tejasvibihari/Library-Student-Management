@@ -11,7 +11,7 @@ const MenuLinks = () => {
   return (
     <>
       <div className="inline-flex items-center gap-3 py-2">
-        <div onClick={handleOnToggleShowMenu}>
+        <div onClick={handleOnToggleShowMenu} className="cursor-pointer">
           <MenuIcon className="w-4 h-4" />
         </div>
         <div className="flex items-center justify-center h-8 w-8 bg-black text-white font-bold rounded-full">

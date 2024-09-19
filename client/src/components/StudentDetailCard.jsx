@@ -17,7 +17,7 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
     const handleDelete = async () => {
         try {
             setLoading(true);
-            const res = await client.delete(`/api/student/delete`, {
+            const res = await client.get(`/api/student/delete`, {
                 params: {
                     studentId,
                 }

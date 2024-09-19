@@ -17,6 +17,7 @@ export const createOldStudent = async (req, res) => {
     const {
         sid, name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
     } = req.body;
+    console.log(seatShift)
     try {
         let imageFilename = null;
         let password;
@@ -222,12 +223,12 @@ const updateSeatAvailability = (seat, seatShift) => {
 export const GetAllStudent = async (req, res) => {
     const { sid, name, status, seatNumber } = req.query;
     // Construct a dynamic query object
-    let query = {};
+    let query = { status: { $ne: 'Trash' } }; // Exclude students with status 'Trash'
+
     if (sid) query.sid = sid;
     if (name) query.name = name;
     if (status) query.status = status;
     if (seatNumber) query.seatNumber = seatNumber;
-    console.log(query)
     try {
         // Use the constructed query object to filter data
         const students = await Student.find(query);
@@ -237,6 +238,15 @@ export const GetAllStudent = async (req, res) => {
         res.status(500).json({ message: 'An error occurred', error });
     }
 };
+export const trash = async (req, res) => {
+    try {
+        const students = await Student.find({ status: "Trash" })
+        res.status(200).json(students);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred', error });
+    }
+}
 export const GetStudent = async (req, res) => {
     const { _id } = req.query;
 
@@ -455,10 +465,33 @@ export const getAdmissionMonth = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 }
+const getShiftLabel = (time) => {
+    console.log(time)
+    if (time === "07:00AM - 11:00AM") {
+        return "morning";
+    } else if (time === "11:00AM - 03:00PM") {
+        return "afternoon";
+    } else if (time === "03:00PM - 07:00PM") {
+        return "evening";
+    } else if (time === "07:00PM - 11:00PM") {
+        return "night";
+    } else if (time === "07:00PM - 07:00AM") {
+        return "nightLong";
+    } else if (time === "07:00AM - 03:00PM") {
+        return "doubleMorning";
+    } else if (time === "11:00AM - 07:00PM") {
+        return "doubleEvening";
+    } else if (time === "07:00AM - 07:00PM") {
+        return "morningLong";
+    } else {
+        return "fullDay";
+    }
+};
 
-export const deleteStudent = async (req, res) => {
+export const trashStudent = async (req, res) => {
     try {
         const { studentId } = req.query;
+
         // Find the student by ID
         const student = await Student.findOne({ _id: studentId });
 
@@ -467,19 +500,22 @@ export const deleteStudent = async (req, res) => {
         }
 
         // Retrieve the seat number and shift from the student profile
-        const { seatNumber, shift } = student;
+        const { seatNumber, time } = student;
+
+        // Map the shift time to the appropriate shift label
+        const shiftLabel = getShiftLabel(time);
 
         // Find the seat by seat number
         const seat = await Seat.findOne({ seatNumber });
 
         if (seat) {
             // Update the seat availability based on the student's shift
-            deleteSeatAvailability(seat, shift);
+            deleteSeatAvailability(seat, shiftLabel);
             await seat.save();
         }
-
+        student.status = "Trash"
         // Delete the student profile
-        await Student.findByIdAndDelete(studentId);
+        await student.save();
 
         res.status(200).json({ message: 'Student deleted successfully' });
     } catch (error) {
@@ -488,7 +524,7 @@ export const deleteStudent = async (req, res) => {
     }
 };
 
-export const deleteSeatAvailability = (seat, seatShift) => {
+export const deleteSeatAvailability = (seat, shiftLabel) => {
     const shifts = {
         fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
         morning: ['morning'],
@@ -500,5 +536,29 @@ export const deleteSeatAvailability = (seat, seatShift) => {
         morningLong: ['morning', 'afternoon', 'evening', 'morningLong'],
         nightLong: ['night', 'nightLong']
     };
-    shifts[seatShift].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
+
+    if (!shifts[shiftLabel]) {
+        throw new Error(`Invalid seat shift: ${shiftLabel}`);
+    }
+    // for (let i = 0; i < shifts[shiftLabel].length; i++) {
+    //     console.log(shiftLabel)
+    //     const shift = shifts[shiftLabel][i];
+    //     seat.availability[shift] = true;
+    //     console.log(shift)
+    // }
+    shifts[shiftLabel].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
 };
+// export const deleteSeatAvailability = (seat, seatShift) => {
+//     const validShifts = [
+//         'morning', 'afternoon', 'evening', 'night',
+//         'doubleMorning', 'doubleEvening', 'nightLong',
+//         'fullDay', 'morningLong'
+//     ];
+
+//     if (!validShifts.includes(seatShift)) {
+//         throw new Error(`Invalid seat shift: ${seatShift}`);
+//     }
+
+//     // Set availability to true for the specific shift
+//     seat.availability[seatShift] = true;
+// };

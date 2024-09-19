@@ -26,6 +26,7 @@ import StudentIdCard from './components/StudentIdCard'
 import StudentProtectedRoute from './pages/StudentProtectedRoute'
 import UpdateSeat from './pages/UpdateSeat'
 import LandingPage from './pages/LandingPage'
+import TrashStudent from './pages/TrashStudent'
 
 
 
@@ -67,6 +68,7 @@ export default function App() {
             <Route path="/student-admin-dashboard/:_id" element={<AdminStudentDashboard />} />
             <Route path="/seat" element={<Seats />} />
             <Route path="/update-seat" element={<UpdateSeat />} />
+            <Route path="/trash" element={<TrashStudent />} />
           </Route>
           {/* </Sidebar> */}
 
