@@ -16,6 +16,6 @@ router.post('/bulk-admission', bulkStudentAdmission);
 router.get('/get-admission-month', getAdmissionMonth);
 
 // Add the delete route
-router.delete('/delete/:id', deleteStudent);
+router.delete('/delete', deleteStudent);
 
 export default router;

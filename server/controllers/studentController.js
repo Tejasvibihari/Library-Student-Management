@@ -458,10 +458,9 @@ export const getAdmissionMonth = async (req, res) => {
 
 export const deleteStudent = async (req, res) => {
     try {
-        const { id } = req.params;
-
+        const { studentId } = req.query;
         // Find the student by ID
-        const student = await Student.findById(id);
+        const student = await Student.findOne({ _id: studentId });
 
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
@@ -480,7 +479,7 @@ export const deleteStudent = async (req, res) => {
         }
 
         // Delete the student profile
-        await Student.findByIdAndDelete(id);
+        await Student.findByIdAndDelete(studentId);
 
         res.status(200).json({ message: 'Student deleted successfully' });
     } catch (error) {
@@ -488,7 +487,8 @@ export const deleteStudent = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-const deleteSeatAvailability = (seat, seatShift) => {
+
+export const deleteSeatAvailability = (seat, seatShift) => {
     const shifts = {
         fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
         morning: ['morning'],
@@ -500,5 +500,5 @@ const deleteSeatAvailability = (seat, seatShift) => {
         morningLong: ['morning', 'afternoon', 'evening', 'morningLong'],
         nightLong: ['night', 'nightLong']
     };
-    shifts[seatShift].forEach(shift => seat.availability[shift] = true);
+    shifts[seatShift].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
 };
