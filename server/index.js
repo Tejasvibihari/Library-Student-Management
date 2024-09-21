@@ -7,6 +7,7 @@ import studentAuthRouter from './router/studentAuthRouter.js';
 import mailRouter from './router/mailRouter.js';
 import paymentRouter from './router/paymentRoute.js';
 import seatRouter from './router/seatRoute.js';
+import updateRouter from './router/updateRoute.js'
 import './utils/scheduler/PaymentStatus.js';
 // import './utils/scheduler/seatStatus.js';
 import dotenv from 'dotenv';
@@ -63,6 +64,7 @@ app.use('/api/student/auth', studentAuthRouter);
 app.use('/api/mail/', mailRouter);
 app.use('/api/payment/', paymentRouter);
 app.use('/api/seat/', seatRouter);
+app.use('/api/update/', updateRouter);
 
 // Define the uploads directory path
 const uploadsDir = path.join(__dirname, 'uploads');

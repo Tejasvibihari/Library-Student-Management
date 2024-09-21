@@ -540,25 +540,6 @@ export const deleteSeatAvailability = (seat, shiftLabel) => {
     if (!shifts[shiftLabel]) {
         throw new Error(`Invalid seat shift: ${shiftLabel}`);
     }
-    // for (let i = 0; i < shifts[shiftLabel].length; i++) {
-    //     console.log(shiftLabel)
-    //     const shift = shifts[shiftLabel][i];
-    //     seat.availability[shift] = true;
-    //     console.log(shift)
-    // }
+
     shifts[shiftLabel].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
 };
-// export const deleteSeatAvailability = (seat, seatShift) => {
-//     const validShifts = [
-//         'morning', 'afternoon', 'evening', 'night',
-//         'doubleMorning', 'doubleEvening', 'nightLong',
-//         'fullDay', 'morningLong'
-//     ];
-
-//     if (!validShifts.includes(seatShift)) {
-//         throw new Error(`Invalid seat shift: ${seatShift}`);
-//     }
-
-//     // Set availability to true for the specific shift
-//     seat.availability[seatShift] = true;
-// };

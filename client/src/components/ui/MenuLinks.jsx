@@ -1,15 +1,67 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MenuIcon, LogOutIcon } from "lucide-react";
+import { MenuIcon, LogOutIcon, ArrowBigUpDash } from "lucide-react";
 import { MenuLinkItems } from './MenuList'
+import CircularLoading from "./CircularLoading";
+import client from "../../services/axiosClient";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const MenuLinks = () => {
   const [showMenu, setShowMenu] = useState(false);
-
   const handleOnToggleShowMenu = () => setShowMenu((prev) => !prev);
+  const [loading, setLoading] = useState(false)
+  const [alertStatus, setAlertStatus] = useState("")
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const instantUpdate = async () => {
+    try {
+      setLoading(true)
+      const response = await client.post('/api/update/update-student')
+      console.log(response)
+      setAlertStatus(response.data.message)
+      setLoading(false)
+      handleClick()
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+      if (error.response && error.response.data && error.response.data.message) {
+        setAlertStatus(error.response.data.message);
+        handleClick()
+      } else if (error.message) {
+        setAlertStatus(error.message);
+        handleClick()
+      } else {
+        setAlertStatus('An unknown error occurred');
+        handleClick()
+      }
+    }
+  }
 
   return (
     <>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert
+          onClose={handleClose}
+          {...alertStatus === "Updated Success" ? { severity: "success" } : { severity: "error" }}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {alertStatus}
+        </Alert>
+      </Snackbar>
       <div className="inline-flex items-center gap-3 py-2">
         <div onClick={handleOnToggleShowMenu} className="cursor-pointer">
           <MenuIcon className="w-4 h-4" />
@@ -65,10 +117,20 @@ const MenuLinks = () => {
             </ul>
           ))}
         </div>
+        <hr className="bg-gray-400 h-[2px] my-4" />
+        <div className="my-2">
+          <button onClick={instantUpdate} className='p-2 w-full border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
+
+            {loading ? <div className='flex items-center justify-center'><span className='mr-2'>Please Wait..</span><CircularLoading size={25} /></div> :
+              <div className='flex items-center justify-center w-full'>
+                <ArrowBigUpDash size={17} className='mr-2' />Instatnt System Update</div>}
+          </button>
+        </div>
         <div
           onClick={handleOnToggleShowMenu}
           className="mt-auto w-full gap-2 px-2 text-red-600 flex items-center cursor-pointer"
         >
+
           <LogOutIcon className="w-4 h-4" />
           Sign out
         </div>

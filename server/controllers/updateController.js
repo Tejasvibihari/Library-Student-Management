@@ -1,7 +1,6 @@
-import Student from "../../models/studentModel.js";
-import Seat from "../../models/seatModel.js";
-import cron from 'node-cron';
-import { sendMail } from "../mailer.js";
+import Student from '../models/studentModel.js';
+import Seat from '../models/seatModel.js';
+
 
 const getShiftLabel = (time) => {
     console.log(time)
@@ -27,8 +26,7 @@ const getShiftLabel = (time) => {
 };
 
 
-
-const task = async () => {
+export const updatePaymentStatus = async (req, res) => {
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
@@ -48,6 +46,7 @@ const task = async () => {
             fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
             fiveDaysAgo.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
 
+            // Map the shift time to the appropriate shift label
             const shiftLabel = getShiftLabel(student.time);
             const seat = await Seat.findOne({ seatNumber: student.seatNumber });
             if (nextPaymentDate <= today) {
@@ -66,15 +65,18 @@ const task = async () => {
 
             await student.save();
 
-            console.log(`Status updated to "${student.status}" for student ID: ${student.sid}`);
+            // console.log(`Status updated to "${student.status}" for student ID: ${student.sid}`);
         }
 
+        res.status(200).json({ message: "Updated Success" });
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "An error occurred", error });
     }
 };
 
 export const deleteSeatAvailability = (seat, shiftLabel) => {
+    console.log(seat, shiftLabel)
     const shifts = {
         fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
         morning: ['morning'],
@@ -92,9 +94,5 @@ export const deleteSeatAvailability = (seat, shiftLabel) => {
     }
 
     shifts[shiftLabel].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
+
 };
-
-// Schedule the task to run every day at 6 AM
-cron.schedule('0 6 * * *', task);
-// cron.schedule('*/5 * * * *', task);
-
