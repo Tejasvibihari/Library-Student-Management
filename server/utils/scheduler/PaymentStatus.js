@@ -12,6 +12,10 @@ const task = async () => {
         const students = await Student.find();
 
         for (const student of students) {
+            // Skip students whose status is "Trash"
+            if (student.status === "Trash") {
+                continue;
+            }
             const nextPaymentDateString = student.nextPayment ? student.nextPayment : '1970-01-01T00:00:00.000Z';
             const nextPaymentDate = new Date(nextPaymentDateString);
             nextPaymentDate.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate comparison
