@@ -1,4 +1,4 @@
-import { LayoutDashboard, UserPlus, User, MailPlus, HandCoins, IndianRupee, Armchair, Ghost } from "lucide-react";
+import { LayoutDashboard, UserPlus, User, Globe, MailPlus, HandCoins, IndianRupee, Armchair, Ghost } from "lucide-react";
 
 export const MenuLinkItems = [
     {
@@ -56,6 +56,12 @@ export const MenuLinkItems = [
                 icon: Ghost,
                 name: "Trash Student",
                 href: "/trash",
+            },
+            {
+                id: 9,
+                icon: Globe,
+                name: "Visit Website",
+                href: "/",
             },
         ],
     },
