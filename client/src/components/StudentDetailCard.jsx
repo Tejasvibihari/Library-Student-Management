@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CrossIcon, Instagram, Trash } from 'lucide-react';
+import { CrossIcon, Instagram, Trash, MonitorCheck } from 'lucide-react';
 import { Youtube } from 'lucide-react';
 import { Facebook } from 'lucide-react';
 import { Link } from "react-router-dom";
@@ -30,6 +30,7 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
             setLoading(false);
         }
     };
+
 
     return (
         <>
@@ -123,13 +124,17 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                     </div>
                     {/* Personal detail end Here */}
                     <div className='flex justify-end mt-2'>
-                        <div className='mx-1'>
-                            <button
-                                onClick={() => setShowDeleteDialog(true)}
-                                className='p-2 w-full rounded-md flex justify-center items-center text-white bg-[#962041] hover:bg-[#8e54e9e6]'>
-                                <Trash size={17} className='mr-2' />Delete Student
-                            </button>
-                        </div>
+
+
+                        {status !== "Trash" &&
+                            <div className='mx-1'>
+                                <button
+                                    onClick={() => setShowDeleteDialog(true)}
+                                    className='p-2 w-full rounded-md flex justify-center items-center text-white bg-[#962041] hover:bg-[#8e54e9e6]'>
+                                    <Trash size={17} className='mr-2' />Delete Student
+                                </button>
+                            </div>
+                        }
                         <div className='mx-1'>
                             <Link to={`/student-admin-dashboard/${studentId}`}>
                                 <button className='p-2 w-full rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>

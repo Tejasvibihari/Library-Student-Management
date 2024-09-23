@@ -6,6 +6,6 @@ export default function AdminProtectedRoute() {
     // console.log(currentAdmin.role)
 
     return (
-        isAuthenticated === true ? <Outlet /> : <Navigate to="/signup" />
+        isAuthenticated === true ? <Outlet /> : <Navigate to="/signin" />
     )
 }
