@@ -68,7 +68,7 @@ export default function StudentIdCard({ sid, name, father, mobile, preparingFor,
                 <div className="relative rounded-md overflow-hidden shadow-lg">
                     <div className="w-72 h-[30rem]" style={{ backgroundImage: `url('/img/idbackground.png')`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2  mt-4">
                         <div className="flex items-center justify-center">
-                            <img src="./img/biharilogo.png" className="my-4 w-[170px]" />
+                            <img src="\img\biharilogo.png" alt="Bihari Logo" className="my-4 w-[170px]" />
 
                         </div>
                         {image ? <img src={image} className="rounded-full w-32 border-gray-400 border-4 mx-auto" /> :

@@ -337,6 +337,16 @@ export default function StudentUpdateForm() {
                                         <label>Next Payment Date</label>
                                         <input className="p-2 border rounded-md w-full" value={nextPayment} onChange={(e) => setNextPayment(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
                                     </div>
+                                    <div>
+                                        <label>Status</label>
+                                        <select className="p-2 border rounded-md w-full" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                            <option value="" disabled selected>Select One</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Deactive">Deactive</option>
+                                            <option value="Trash">Trash</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className='border p-2 rounded-sm'>
                                     <h3>Shift</h3>
@@ -440,10 +450,9 @@ export default function StudentUpdateForm() {
                                     father={father}
                                     mobile={mobile}
                                     village={address}
-
                                     addmissionDate={admissionDate}
                                     // image={compressImage === `${sid}.jpeg` ? `https://api.biharilibrary.in/uploads/${compressImage}` : compressImage}
-                                    image={compressImage === `${sid}.jpeg` ? `http://localhost:3000/uploads/${compressImage}` : compressImage}
+                                    image={compressImage === `${sid}.jpeg` ? `http://api.biharilibrary.in/uploads/${compressImage}` : compressImage}
                                 />
                             </div>
                         </div>

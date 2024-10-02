@@ -27,6 +27,7 @@ import StudentProtectedRoute from './pages/StudentProtectedRoute'
 import UpdateSeat from './pages/UpdateSeat'
 import LandingPage from './pages/LandingPage'
 import TrashStudent from './pages/TrashStudent'
+import SuccessReview from './components/SuccessReview'
 
 
 
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
 
           {/* Sidebar menu Start  */}
+          <Route path="/success-review" element={<SuccessReview />} />
 
           <Route element={<AdminProtectedRoute />}>
             <Route path="/admin-dashboard" element={<Home />} />

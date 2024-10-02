@@ -15,6 +15,7 @@ import CircularLoading from './ui/CircularLoading';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import StudentIdCard from './StudentIdCard';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -30,6 +31,7 @@ export default function OldAdmissionForm() {
     const [loading, setLoading] = useState(false);
     const [snackOpen, setSnackOpen] = React.useState(false);
     const [alertStatus, setAlertStatus] = useState('')
+    const navigate = useNavigate()
 
     // Form State 
     const [sid, setSid] = useState("");
@@ -172,6 +174,7 @@ export default function OldAdmissionForm() {
             setCroppedImage("")
             setSeatNumber("")
             setSeatShift("")
+            navigate("/success-review")
         } catch (error) {
             setLoading(false)
             console.log(error)
