@@ -325,7 +325,8 @@ export const updateStudent = async (req, res) => {
         instagram,
         facebook,
         youtube,
-        nextPayment
+        nextPayment,
+        status
         // admin
     } = req.body;
     console.log(image)
@@ -375,6 +376,7 @@ export const updateStudent = async (req, res) => {
         student.seatNumber = seatNumber;
         student.time = time;
         student.nextPayment = nextPayment;
+        student.status = status
         // student.admin = admin;
 
         await student.save();
