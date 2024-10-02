@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CrossIcon, Instagram, Trash, MonitorCheck } from 'lucide-react';
+import { CrossIcon, Instagram, Trash, MonitorCheck, IndianRupee } from 'lucide-react';
 import { Youtube } from 'lucide-react';
 import { Facebook } from 'lucide-react';
 import { Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import formatDate from '../utils/FormateDate';
 import client from '../services/axiosClient';
+import CircularLoading from './ui/CircularLoading';
 
 export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, addmissionDate, shift, time, address, lastPayment, paymentAmount, nextPayment, seatNumber, status }) {
     const [loading, setLoading] = useState(false);
@@ -146,6 +147,16 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                             <Link to={`/student-update/${studentId}`}>
                                 <button className='p-2 w-full rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
                                     <UserCog size={17} className='mr-2' />Update Student
+                                </button>
+                            </Link>
+                        </div>
+                        <div className='mx-1'>
+                            <Link to={`/make-payment/${studentId}`}>
+                                <button type='submit' className='p-2 w-md  rounded-md flex justify-center items-center text-white bg-green-800 hover:bg-green-700'>
+
+                                    {loading ? <div className='flex items-center justify-center'><span className='mr-2'>Please Wait..</span><CircularLoading size={25} /></div> :
+                                        <div className='flex items-center'>
+                                            <IndianRupee size={17} className='mr-2' />Make Payment</div>}
                                 </button>
                             </Link>
                         </div>
