@@ -1,16 +1,38 @@
 import Avatar from '@mui/material/Avatar';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
+import client from '../services/axiosClient';
+import { useEffect, useState } from 'react';
 
 export default function OnlineStatusCard() {
+    const [allStudent, setAllStudent] = useState([])
+    const [loading, setLoading] = useState(false)
 
+    useEffect(() => {
+        const handleFilter = async () => {
+            setLoading(true)
+            try {
+                const response = await client.get("/api/student/getallstudent", {
+                    params: {
+                        status: "Pending",
+                    }
+                })
+                setAllStudent(response.data)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+                setLoading(false)
+            }
+        }
+        handleFilter()
+    }, [])
 
 
     // Avatar Green Dot 
     const StyledBadge = styled(Badge)(({ theme }) => ({
         '& .MuiBadge-badge': {
-            backgroundColor: '#44b700',
-            color: '#44b700',
+            backgroundColor: '#f44336',
+            color: '#f44336',
             boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
             '&::after': {
                 position: 'absolute',
@@ -30,7 +52,7 @@ export default function OnlineStatusCard() {
                 opacity: 1,
             },
             '100%': {
-                transform: 'scale(2.4)',
+                transform: 'scale(5)',
                 opacity: 0,
             },
         },
@@ -40,25 +62,36 @@ export default function OnlineStatusCard() {
             <div className='w-full rounded-md shadow-sm bg-white h-[37rem] overflow-auto'>
                 <div>
                     <div className='flex justify-between items-center p-3 border-b'>
-                        <h1 className='text-lg font-semibold border-l-4 pl-1 border-green-800 font-[inter]'>Online Student</h1>
+                        <h1 className='text-lg font-semibold border-l-4 pl-1 border-red-800 font-[inter]'>Pending Student</h1>
                     </div>
-                    <div className='p-3 border-b hover:bg-gray-50 hover:border-l-2 hover:border-l-green-500'>
-                        <div className='flex items-center'>
-                            <div>
-                                <StyledBadge
-                                    overlap="circular"
-                                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                    variant="dot"
-                                >
-                                    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                                </StyledBadge>
-                            </div>
-                            <div >
-                                <h5 className='font-semibold text-sm pl-2 text-gray-800'>Tejasvi Kumar</h5>
-                                <p className='font-normal text-xs pl-2 text-gray-600'>+91 6205731150</p>
-                            </div>
-                        </div>
-                    </div>
+                    {allStudent.length === 0 ?
+                        <div className='flex items-center justify-center p-4 font-inter font-semibold'>
+                            Nothing Pending Student Found
+                        </div> :
+                        allStudent.map((student, i) => {
+                            return (
+                                <div key={i} className='p-3 border-b hover:bg-gray-50 hover:border-l-2 hover:border-l-red-500 cursor-pointer'>
+                                    <div className='flex items-center'>
+                                        <div>
+                                            <StyledBadge
+                                                overlap="circular"
+                                                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                                variant="dot"
+                                            >
+                                                <Avatar alt={student.name} src={`https://api.biharilibrary.in/uploads/${student.image}`} />
+                                            </StyledBadge>
+                                        </div>
+                                        <div >
+                                            <h5 className='font-semibold text-sm pl-2 text-gray-800'>{student.name}</h5>
+                                            <p className='font-normal text-xs pl-2 text-gray-600'>+91 {student.mobile}</p>
+                                            <p className='font-normal text-xs pl-2 text-gray-600'>{student.email}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+
                 </div>
             </div>
         </>

@@ -1,15 +1,16 @@
 import express from 'express';
 import Student from '../models/studentModel.js'
 import Mail from '../models/mailModel.js';
-
+import { sendMail } from '../utils/mailer.js';
 // GET email details by adminId
 export const GetMail = async (req, res) => {
     const { adminId } = req.query;
 
+    console.log(adminId)
     try {
         // Assuming there's a field in your Email model that references the admin's ID
         const emailDetails = await Mail.find({ admin: adminId });
-
+        console.log(emailDetails)
         if (!emailDetails) {
             return res.status(404).json({ message: 'Email details not found' });
         }
@@ -22,11 +23,12 @@ export const GetMail = async (req, res) => {
 };
 
 export const getStudentEmail = async (req, res) => {
-    const { admin } = req.query.adminId; // Extract adminId from query parameters
+    // const { admin } = req.query.adminId; // Extract adminId from query parameters
 
     try {
         // Find all students by adminId
-        const students = await Student.find({ adminId: admin });
+        const students = await Student.find();
+        console.log(students)
         if (!students || students.length === 0) {
             // If no students are found, send a 404 response
             return res.status(404).json({ message: 'No students found' });
@@ -47,22 +49,45 @@ export const getStudentEmail = async (req, res) => {
 
 export const sendEmail = async (req, res) => {
     const { to, subject, body, admin } = req.body;
+    console.log("to", to)
+    console.log("subject", subject)
+    console.log("body", body)
+    console.log("admin", admin)
 
     try {
         // Find students to get their names and emails
-        const students = await Student.find({ admin: admin });
+        const students = await Student.find();
         if (students.length === 0) {
             return res.status(404).json({ message: 'Students not found' });
         }
 
         let recipients;
         if (to === 'All') {
-            // If 'to' is 'All', use all student emails
             recipients = students.map(student => student.email);
+            console.log(recipients)
+            console.log("All student sent")
+        } else if (to === "Active") {
+            recipients = students
+                .filter(student => student.status === 'Active')
+                .map(student => student.email)
+            console.log(recipients)
+        } else if (to === "Pending") {
+            recipients = students
+                .filter(student => student.status === "Pending")
+                .map(student => student.email)
+        } else if (to === "Deactive") {
+            recipients = students
+                .filter(student => student.status === "Deactive")
+                .map(student => student.email)
+        } else if (to === "Trash") {
+            recipients = students
+                .filter(student => student.status === "Trash")
+                .map(student => student.email)
         } else {
-            // Otherwise, split 'to' into individual emails
             recipients = to.split(',').map(email => email.trim());
         }
+        // send Mail
+        await sendMail({ to: recipients, subject, body });
 
         // Create a Mail document for each recipient
         const mailPromises = recipients.map(async (recipient) => {

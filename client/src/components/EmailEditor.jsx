@@ -43,7 +43,8 @@ export default function EmailEditor() {
     useEffect(() => {
         const getStudentEmail = async () => {
             try {
-                const response = await client.get('/api/mail/getstudentemail', { params: { adminId } })
+                const response = await client.get('/api/mail/getstudentemail')
+                // console.log(response.data.studentEmails)
                 setEmails(response.data.studentEmails)
             } catch (error) {
                 console.log(error)
@@ -51,19 +52,19 @@ export default function EmailEditor() {
         }
         getStudentEmail()
 
-    }, [adminId])
+    }, [])
 
     // Send Email
 
     const handleClick = async (e) => {
         e.preventDefault()
-        // setContent(editorContent)
         const updatedMailData = {
             to,
             subject,
             body: editorContent,
-            admin: to// Use the latest editor content directly
+            admin: adminId // Use the latest editor content directly
         };
+
         console.log(updatedMailData.body)
         try {
             setLoading(true)
@@ -120,6 +121,10 @@ export default function EmailEditor() {
                             />
                             <datalist id="membership-types">
                                 <option value="All"></option>
+                                <option value="Active"></option>
+                                <option value="Pending"></option>
+                                <option value="Deactive"></option>
+                                <option value="Trash"></option>
                                 {emails.map((email, i) => {
                                     return <option key={i} value={email}></option>
                                 })}

@@ -25,7 +25,7 @@ const mailSchema = new mongoose.Schema({
         ref: 'Admin', // Assuming you have an Admin model
         required: true // Set to true if every mail must be associated with an admin, otherwise remove this line
     }
-});
+}, { timestamps: true }); // Enable timestamps
 
 const Mail = mongoose.model('Mail', mailSchema);
 
