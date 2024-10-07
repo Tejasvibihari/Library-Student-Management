@@ -44,7 +44,7 @@ export default function EmailDetail() {
     return (
         <>
 
-            <div className='grid md:grid-cols-3 gap-3'>
+            <div className='grid md:grid-cols-3 grid-cols-1 gap-3'>
                 <div>
                     <div className='p-2 pb-3 bg-white rounded-lg shadow-lg'>
                         <div className='border-b py-3'>
@@ -71,7 +71,7 @@ export default function EmailDetail() {
                                 <div className='flex items-center justify-center font-inter font-semibold p-4'>No Email Found</div>
                             ) : (
                                 <div className="overflow-auto h-[26rem]">
-                                    {emails.map((data, i) => (
+                                    {emails.slice(0, 15).map((data, i) => (
                                         <div key={i} className="border-b">
                                             <div onClick={() => viewMail(data._id)} className="grid grid-cols-5 py-2 cursor-pointer">
                                                 <Avatar alt={data.name} src={`https://api.biharilibrary.in/uploads/${data.image}`} />
