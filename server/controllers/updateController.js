@@ -1,9 +1,10 @@
 import Student from '../models/studentModel.js';
 import Seat from '../models/seatModel.js';
+import { sendMail } from '../utils/mailer.js';
 
 
 const getShiftLabel = (time) => {
-    console.log(time)
+    // console.log(time)
     if (time === "07:00AM - 11:00AM") {
         return "morning";
     } else if (time === "11:00AM - 03:00PM") {
@@ -58,6 +59,27 @@ export const updatePaymentStatus = async (req, res) => {
                     }
                 } else {
                     student.status = "Pending";
+
+                    sendMail({
+                        to: student.email,
+                        subject: "Fee Due Reminder - Bihari Library",
+                        body: `<p>Dear ${student.name},</p>
+<p>&nbsp;</p>
+<p>We hope you're doing well! This is a gentle reminder that your membership fee at <strong>Bihari Library</strong> is due. Please submit the fee by the due date to continue enjoying uninterrupted access to our study and co-working facilities.</p>
+<p>&nbsp;</p>
+<p>Here are your details:</p>
+<ul>
+<li><strong>Student ID (SID):</strong> ${student.sid}</li>
+<li><strong>Shift:</strong> ${student.time}</li>
+<li><strong>Seat Number:</strong> ${student.seatNumber}</li>
+</ul>
+<p>To avoid any disruption to your access, kindly ensure the payment is made on or before the due date. If you&rsquo;ve already made the payment, please disregard this email.</p>
+<p>For payment-related questions or assistance, feel free to contact us at 9608888400.</p>
+<p>Thank you for your attention, and we appreciate your prompt action on this matter.</p>
+<p>Best regards,<br /><br />Bihari Library<br />biharilibrary@mail.com<br />9608888400</p>
+<p><img src="https://biharilibrary.in/img/biharilogo.png" alt="Bihari Logo" width="150" height="" /></p>`})
+
+
                 }
             } else {
                 student.status = "Active";
@@ -76,7 +98,7 @@ export const updatePaymentStatus = async (req, res) => {
 };
 
 export const deleteSeatAvailability = (seat, shiftLabel) => {
-    console.log(seat, shiftLabel)
+    // console.log(seat, shiftLabel)
     const shifts = {
         fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
         morning: ['morning'],
