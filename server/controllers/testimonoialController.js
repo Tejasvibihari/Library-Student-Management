@@ -2,7 +2,7 @@ import Testimonial from '../models/testimonialModel.js';
 
 export const addTestimonial = async (req, res) => {
     const { review, studentId } = req.body;
-    console.log(review, studentId);
+
     try {
         const existingTestimonial = await Testimonial.findOne({ studentId });
         if (existingTestimonial) {
@@ -29,3 +29,17 @@ export const getTestimonial = async (req, res) => {
         console.log(error);
     }
 }
+export const deleteTestimonial = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const testimonial = await Testimonial.findByIdAndDelete(id);
+        console.log("deleteed")
+        if (!testimonial) {
+            return res.status(404).json({ message: 'Testimonial not found' });
+        }
+        res.status(200).json({ message: 'Testimonial deleted successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+};

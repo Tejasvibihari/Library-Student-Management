@@ -6,7 +6,7 @@ import TestimonialReviewCard from '../components/TestimonialReviewCard';
 
 export default function ViewTestimonial() {
     const [testimonials, setTestimonials] = useState([])
-    console.log(testimonials)
+
     const getTestimonials = async () => {
         try {
             const response = await client.get("/api/testimonial/get-testimonial");
@@ -25,6 +25,9 @@ export default function ViewTestimonial() {
         } catch (error) {
             console.log(error);
         }
+    };
+    const handleDelete = (id) => {
+        setTestimonials(testimonials.filter(testimonial => testimonial._id !== id));
     };
 
     useEffect(() => {
@@ -47,6 +50,7 @@ export default function ViewTestimonial() {
                                         sid={testimonial.student.sid}
                                         review={testimonial.review}
                                         img={`https://api.biharilibrary.in/uploads/${testimonial.student.image}`}
+                                        onDelete={handleDelete}
                                     />
                                 </div>
                             );
