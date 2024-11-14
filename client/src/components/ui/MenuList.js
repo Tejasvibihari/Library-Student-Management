@@ -64,10 +64,16 @@ export const MenuLinkItems = [
                 href: "/",
             },
             {
-                id: 9,
+                id: 10,
                 icon: Star,
                 name: "Add Testimonial",
                 href: "/add-testimonial",
+            },
+            {
+                id: 11,
+                icon: Star,
+                name: "View Testimonial",
+                href: "/view-testimonial",
             }
         ],
     },

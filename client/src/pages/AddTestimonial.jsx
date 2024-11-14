@@ -111,7 +111,8 @@ export default function AddTestimonial() {
                     {allStudent.map((student, index) => {
                         return (<div key={index} className=''>
                             <TestimonialProfileCard
-                                id={student.sid}
+                                id={student._id}
+                                sid={student.sid}
                                 name={student.name}
                                 img={`https://api.biharilibrary.in/uploads/${student.image}`}
                             />

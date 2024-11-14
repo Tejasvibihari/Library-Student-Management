@@ -1,7 +1,7 @@
 import React from 'react'
 import Slider from "react-slick";
 
-export default function Testimonial() {
+export default function Testimonial({ testimonials }) {
 
     // const settings = {
     //     className: "center",
@@ -11,6 +11,7 @@ export default function Testimonial() {
     //     slidesToShow: 3,
     //     speed: 500
     // };
+    console.log(testimonials);
     const settings = {
         dots: false,
         infinite: true,
@@ -18,6 +19,7 @@ export default function Testimonial() {
         slidesToShow: 1,
         slidesToScroll: 1
     };
+
     return (
         <>
             <div className='px-16 flex items-center justify-center'>
@@ -25,40 +27,27 @@ export default function Testimonial() {
                     Student Says About Us
                 </h1>
             </div>
-            <div className='max-w-6xl mx-auto my-8'>
+            <div className='max-w-6xl mx-auto my-8 p-4'>
                 <div className="slider-container">
                     <Slider {...settings}>
-                        <div className='P-4 max-h-96'>
-                            <div className='flex flex-col items-center justify-center'>
-                                <div className='flex items-center justify-center'>
-                                    <img src='./img/femaledp.jpg' className='rounded-full w-24' />
+                        {testimonials.map((testimonial, index) => {
+                            return (
+                                <div className='P-4 max-h-96 shadow-2xl' key={index}>
+                                    <div className='flex flex-col items-center justify-center p-4'>
+                                        <div className='flex items-center justify-center'>
+                                            <img src={`https://api.biharilibrary.in/uploads/${testimonial.student.image}`} className='rounded-full w-24' />
+                                        </div>
+                                        <div className='my-4 font-inter font-semibold text-xl'>
+                                            {testimonial.student.name}
+                                        </div>
+                                        <p className='max-w-4xl mx-auto text-center font-cedarville-cursive text-xl'>
+                                            {testimonial.review}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className='my-4 font-inter font-semibold text-xl'>
-                                    Tejasvi Kumar
-                                </div>
-                                <p className='max-w-4xl mx-auto text-center font-cedarville-cursive text-xl'>
-                                    Enhanced Learning for Students: E-learning platforms offer interactive and personalized learning experiences, helping students of all ages learn more effectively at their own pace.
-
-                                    Crisis Management: In emergencies, the digital world enables rapid response through alerts, GPS tracking, and online communication, which helps save lives and resources.
-
-                                </p>
-                            </div>
-                        </div>
-                        <div>
-                            <h3>2</h3>
-                        </div>
-                        <div>
-                            <h3>3</h3>
-                        </div>
-                        <div>
-                            <h3>4</h3>
-                        </div>
-                        <div>
-                            <h3>5</h3>
-                        </div>
-                        <div>
-                            <h3>6</h3>
-                        </div>
+                            )
+                        }
+                        )}
                     </Slider>
                 </div>
             </div>
