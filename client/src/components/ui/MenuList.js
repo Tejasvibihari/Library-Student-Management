@@ -1,4 +1,4 @@
-import { LayoutDashboard, UserPlus, User, Globe, MailPlus, HandCoins, IndianRupee, Armchair, Ghost } from "lucide-react";
+import { LayoutDashboard, UserPlus, User, Globe, MailPlus, HandCoins, IndianRupee, Armchair, Ghost, Star } from "lucide-react";
 
 export const MenuLinkItems = [
     {
@@ -63,6 +63,12 @@ export const MenuLinkItems = [
                 name: "Visit Website",
                 href: "/",
             },
+            {
+                id: 9,
+                icon: Star,
+                name: "Add Testimonial",
+                href: "/add-testimonial",
+            }
         ],
     },
 ];

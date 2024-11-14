@@ -28,6 +28,7 @@ import UpdateSeat from './pages/UpdateSeat'
 import LandingPage from './pages/LandingPage'
 import TrashStudent from './pages/TrashStudent'
 import SuccessReview from './components/SuccessReview'
+import AddTestimonial from './pages/AddTestimonial'
 
 
 
@@ -71,6 +72,7 @@ export default function App() {
             <Route path="/seat" element={<Seats />} />
             <Route path="/update-seat" element={<UpdateSeat />} />
             <Route path="/trash" element={<TrashStudent />} />
+            <Route path="/add-testimonial" element={<AddTestimonial />} />
           </Route>
           {/* </Sidebar> */}
 
