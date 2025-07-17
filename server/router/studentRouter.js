@@ -19,4 +19,6 @@ router.get('/get-admission-month', getAdmissionMonth);
 router.get('/delete', trashStudent);
 router.get('/trash-Student', trash);
 
+router.get('/temp-api', 
+
 export default router;
