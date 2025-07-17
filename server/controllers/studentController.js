@@ -545,7 +545,7 @@ export const deleteSeatAvailability = (seat, shiftLabel) => {
 
     shifts[shiftLabel].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
 };
-import Student from "../models/Student.js";
+
 
 export const tempApiForPayment = async (req, res) => {
   try {
