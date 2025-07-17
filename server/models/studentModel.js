@@ -22,6 +22,7 @@ const StudentSchema = new mongoose.Schema({
     paymentAmount: { type: Number },
     nextPayment: { type: Date },
     lastPayment: { type: Date },
+    paymentDue:{type:Number},
 
     image: { type: String }, // Assuming image is stored as a URL or base64 string
     isOnline: { type: Boolean, default: false },
