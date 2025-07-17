@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOldStudent, createNewStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth, trashStudent, trash } from '../controllers/studentController.js';
+import { tempApiForPayment, createOldStudent, createNewStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth, trashStudent, trash } from '../controllers/studentController.js';
 
 const router = express.Router();
 
