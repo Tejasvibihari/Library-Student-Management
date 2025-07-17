@@ -545,31 +545,31 @@ export const deleteSeatAvailability = (seat, shiftLabel) => {
 
     shifts[shiftLabel].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
 };
-import Student from "../models/Student.js";
+
 
 export const tempApiForPayment = async (req, res) => {
-  try {
-    // Find all active students
-    const activeStudents = await Student.find({ status: "Active" });
+    try {
+        // Find all active students
+        const activeStudents = await Student.find({ status: "Active" });
 
-    if (activeStudents.length === 0) {
-      return res.status(404).json({ message: "No active students found." });
+        if (activeStudents.length === 0) {
+            return res.status(404).json({ message: "No active students found." });
+        }
+
+        // Update each student's paymentDue to 0
+        const updateResults = await Promise.all(
+            activeStudents.map(student =>
+                Student.findByIdAndUpdate(student._id, { paymentDue: 0 }, { new: true })
+            )
+        );
+
+        res.status(200).json({
+            message: `${updateResults.length} students updated successfully.`,
+            updatedStudents: updateResults,
+        });
+    } catch (error) {
+        console.error("Error updating paymentDue:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    // Update each student's paymentDue to 0
-    const updateResults = await Promise.all(
-      activeStudents.map(student =>
-        Student.findByIdAndUpdate(student._id, { paymentDue: 0 }, { new: true })
-      )
-    );
-
-    res.status(200).json({
-      message: `${updateResults.length} students updated successfully.`,
-      updatedStudents: updateResults,
-    });
-  } catch (error) {
-    console.error("Error updating paymentDue:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
 };
 
