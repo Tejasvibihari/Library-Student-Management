@@ -11,7 +11,7 @@ import formatDate from '../utils/FormateDate';
 import client from '../services/axiosClient';
 import CircularLoading from './ui/CircularLoading';
 
-export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, addmissionDate, shift, time, address, lastPayment, paymentAmount, nextPayment, seatNumber, status }) {
+export default function StudentDetailCard({ studentId, sid, src, facebookLink, instaLink, youtubeLink, othLink, name, email, mobile, father, guardian, gender, addmissionDate, shift, time, address, lastPayment, paymentAmount, nextPayment, seatNumber, status, paymentDue }) {
     const [loading, setLoading] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -50,11 +50,14 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                             <div>
                                 <span className='font-semibold font-[inter] text-sm leading-6'>Next Payment:- <span className='font-normal text-gray-100'>{formatDate(nextPayment)}</span></span>
                             </div>
+                            <div>
+                                <span className='font-semibold font-[inter] text-sm leading-6'>Payment Due:- <span className='font-normal text-gray-100'>{paymentDue}</span></span>
+                            </div>
                             <div className='mt-4'>
                                 <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                     {status}
                                     <span className='ml-2 mr-2'>
-                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}
+                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}   
                                     </span>
                                 </div>
                             </div>

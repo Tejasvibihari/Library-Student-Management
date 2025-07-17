@@ -118,3 +118,69 @@ export const deleteSeatAvailability = (seat, shiftLabel) => {
     shifts[shiftLabel].forEach(shift => seat.availability[shift] = true); // Set availability to true when deleting
 
 };
+
+
+// Helper function to calculate full month cycles between two dates
+function calculateMonthCycles(fromDate, toDate) {
+    let months =
+        (toDate.getFullYear() - fromDate.getFullYear()) * 12 +
+        (toDate.getMonth() - fromDate.getMonth());
+
+    // If day of 'toDate' is >= day of 'fromDate', count the extra month
+    if (toDate.getDate() >= fromDate.getDate()) {
+        months += 1;
+    }
+
+    return months > 0 ? months : 0;
+}
+
+export const cronUpdateDeactivePendingPayments = async (req, res) => {
+    try {
+        const today = new Date();
+
+        const students = await Student.find({
+            status: { $in: ['Pending', 'Deactive'] }
+        });
+
+        const updatedStudents = [];
+
+        for (let student of students) {
+            if (!student.nextPayment || !student.paymentAmount) continue;
+
+            const nextPayDate = new Date(student.nextPayment);
+
+            // If the nextPayment is after today, skip
+            if (nextPayDate > today) continue;
+
+            const monthsMissed = calculateMonthCycles(nextPayDate, today);
+
+            if (monthsMissed > 0) {
+                const missedAmount = monthsMissed * student.paymentAmount;
+
+                student.paymentDue = -missedAmount;
+                student.status = 'Pending';
+
+                // Move nextPayment forward by missed cycles
+                student.nextPayment.setMonth(student.nextPayment.getMonth() + monthsMissed);
+
+                await student.save();
+
+                updatedStudents.push({
+                    sid: student.sid,
+                    name: student.name,
+                    missedAmount: -missedAmount,
+                    monthsMissed,
+                });
+            }
+        }
+
+        return res.status(200).json({
+            message: 'Updated paymentDue for Deactive and Pending students',
+            updatedCount: updatedStudents.length,
+            updatedStudents
+        });
+    } catch (err) {
+        console.error('cronUpdateDeactivePendingPayments error:', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

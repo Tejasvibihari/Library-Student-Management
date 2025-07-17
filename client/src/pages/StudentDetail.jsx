@@ -138,7 +138,7 @@ export default function StudentDetail() {
                                 paymentAmount={student.paymentAmount}
                                 nextPayment={student.nextPayment}
                                 seatNumber={student.seatNumber}
-
+                                paymentDue={student.paymentDue}
                             />
                         ))
                     ) : (
