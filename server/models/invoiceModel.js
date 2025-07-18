@@ -44,19 +44,6 @@ const invoiceSchema = new Schema({
     remainingDue: {
         type: Number,
         default: 0
-    },
-
-    // Optional field to record payment mode
-    paymentMode: {
-        type: String,
-        enum: ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'],
-        default: 'Cash'
-    },
-
-    // Optional notes or reason for extra/partial payments
-    note: {
-        type: String,
-        trim: true
     }
 
 }, {

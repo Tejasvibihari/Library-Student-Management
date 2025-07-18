@@ -52,14 +52,14 @@ export const payment = async (req, res) => {
 
         // Step 7: Create invoice
         const invoice = new Invoice({
+            student: student._id, // required
             sid: student.sid,
-            name: student.name,
-            fromDate,
-            toDate,
+            cycleStart: fromDate, // rename from fromDate
+            cycleEnd: toDate,     // rename from toDate
             paymentDate: today,
-            paidAmount: cycleAmount,
-            dueAmount: student.paymentDue,
-            extraPaymentDue: student.extraPaymentDue || 0,
+            amountPaid: cycleAmount,
+            extraAmountPaid: extraPaymentAmount || 0,
+            remainingDue: student.paymentDue,
         });
 
         await invoice.save();
