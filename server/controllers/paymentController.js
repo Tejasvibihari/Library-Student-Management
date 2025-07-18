@@ -10,7 +10,7 @@ import Invoice from "../models/invoiceModel.js"
 
 export const payment = async (req, res) => {
     const { sid, extraPaymentAmount } = req.body;
-
+    console.log(req.body);
     if (!sid) {
         return res.status(400).json({ error: 'Student ID (sid) is required.' });
     }
@@ -53,18 +53,18 @@ export const payment = async (req, res) => {
         await student.save();
 
         // Create invoice
-        const invoice = new Invoice({
-            sid: student.sid,
-            name: student.name,
-            fromDate,
-            toDate,
-            paymentDate: today,
-            paidAmount: totalPaid,
-            dueAmount: student.paymentDue,
-            extraPaymentDue: student.extraPaymentDue,
-        });
+        // const invoice = new Invoice({
+        //     sid: student.sid,
+        //     name: student.name,
+        //     fromDate,
+        //     toDate,
+        //     paymentDate: today,
+        //     paidAmount: totalPaid,
+        //     dueAmount: student.paymentDue,
+        //     extraPaymentDue: student.extraPaymentDue,
+        // });
 
-        await invoice.save();
+        // await invoice.save();
 
         return res.status(200).json({
             message: 'Payment cycle updated and invoice created successfully.',
