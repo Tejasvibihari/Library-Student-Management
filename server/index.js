@@ -9,6 +9,8 @@ import paymentRouter from './router/paymentRoute.js';
 import seatRouter from './router/seatRoute.js';
 import updateRouter from './router/updateRoute.js'
 import testimonialRouter from './router/testimonialRoute.js';
+import invoiceRouter from './router/invoiceRouter.js';
+
 import './utils/scheduler/PaymentStatus.js';
 // import './utils/scheduler/seatStatus.js';
 import dotenv from 'dotenv';
@@ -67,6 +69,7 @@ app.use('/api/payment/', paymentRouter);
 app.use('/api/seat/', seatRouter);
 app.use('/api/update/', updateRouter);
 app.use('/api/testimonial/', testimonialRouter);
+app.use('/api/invoice/', invoiceRouter);
 
 // Define the uploads directory path
 const uploadsDir = path.join(__dirname, 'uploads');
