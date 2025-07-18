@@ -139,7 +139,7 @@ export const cronUpdateDeactivePendingPayments = async (req, res) => {
         const today = new Date();
 
         const students = await Student.find({
-            status: { $in: ['Pending', 'Deactive'] }
+            status: { $in: ['Active','Pending', 'Deactive'] }
         });
 
         const updatedStudents = [];

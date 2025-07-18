@@ -51,13 +51,13 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                                 <span className='font-semibold font-[inter] text-sm leading-6'>Next Payment:- <span className='font-normal text-gray-100'>{formatDate(nextPayment)}</span></span>
                             </div>
                             <div>
-                                <span className='font-semibold font-[inter] text-sm leading-6'>Payment Due:- <span className='font-normal text-gray-100'>{paymentDue}</span></span>
+                                <span className='font-semibold font-[inter] text-sm leading-6'>Payment Due:- <span className={`font-normal ${paymentDue < 0 ? 'text-red-700' : "text-green-900"}`}>{paymentDue}</span></span>
                             </div>
                             <div className='mt-4'>
                                 <div className={`border rounded-full p-1 text-center ${status === "Active" ? "border-green-600 bg-green-800" : status === "Pending" ? "border-yellow-600 bg-yellow-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
                                     {status}
                                     <span className='ml-2 mr-2'>
-                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}   
+                                        {status === "Active" ? <DoneIcon /> : status === "Pending" ? <ReportIcon /> : <CancelIcon />}
                                     </span>
                                 </div>
                             </div>
@@ -165,29 +165,31 @@ export default function StudentDetailCard({ studentId, sid, src, facebookLink, i
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Delete Confirmation Dialog */}
-            {showDeleteDialog && (
-                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-                    <div className='bg-white p-4 rounded-md shadow-md'>
-                        <h2 className='text-lg font-semibold'>Confirm Deletion</h2>
-                        <p>Are you sure you want to delete this student?</p>
-                        <div className='flex justify-end mt-4'>
-                            <button
-                                onClick={() => setShowDeleteDialog(false)}
-                                className='mr-2 p-2 rounded-md bg-gray-300 hover:bg-gray-400'>
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className='p-2 rounded-md bg-red-600 text-white hover:bg-red-700'>
-                                {loading ? 'Deleting...' : 'Confirm'}
-                            </button>
+            {
+                showDeleteDialog && (
+                    <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
+                        <div className='bg-white p-4 rounded-md shadow-md'>
+                            <h2 className='text-lg font-semibold'>Confirm Deletion</h2>
+                            <p>Are you sure you want to delete this student?</p>
+                            <div className='flex justify-end mt-4'>
+                                <button
+                                    onClick={() => setShowDeleteDialog(false)}
+                                    className='mr-2 p-2 rounded-md bg-gray-300 hover:bg-gray-400'>
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className='p-2 rounded-md bg-red-600 text-white hover:bg-red-700'>
+                                    {loading ? 'Deleting...' : 'Confirm'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </>
     );
 }
