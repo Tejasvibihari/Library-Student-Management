@@ -9,8 +9,8 @@ import Invoice from "../models/invoiceModel.js"
 // New Payment Controller
 
 export const payment = async (req, res) => {
-    const { sid, extraPaymentAmount } = req.body;
-    console.log(req.body);
+    const { sid, extraPaymentAmount = 0 } = req.body;
+
     if (!sid) {
         return res.status(400).json({ error: 'Student ID (sid) is required.' });
     }
@@ -24,50 +24,48 @@ export const payment = async (req, res) => {
 
         const today = new Date();
         const cycleAmount = student.paymentAmount;
-        const totalPaid = cycleAmount;
 
-        // Save previous nextPayment as fromDate
-        const fromDate = student.nextPayment ? new Date(student.nextPayment) : new Date(student.admissionDate);
-
-        // Update nextPayment by 1 month
+        // Step 1: Get FROM and TO dates for current cycle
+        const fromDate = student.nextPayment || student.admissionDate;
         const toDate = new Date(fromDate);
         toDate.setMonth(toDate.getMonth() + 1);
-        student.nextPayment = toDate;
 
-        // Update last payment date
+        // Step 2: Update student.nextPayment and student.lastPayment
+        student.nextPayment = toDate;
         student.lastPayment = today;
 
-        // Update extra payment field
+        // Step 3: Add extra payment if any
         if (extraPaymentAmount > 0) {
-            student.extraPaymentDue = (student.extraPaymentDue) + extraPaymentAmount;
+            student.extraPaymentDue = (student.extraPaymentDue || 0) + extraPaymentAmount;
         }
 
-        // Reduce paymentDue
-        student.paymentDue = student.paymentDue - totalPaid;
-        // if (student.paymentDue < 0) student.paymentDue = 0;
+        // Step 4: Add this cycle's paymentAmount towards paymentDue
+        // Eg. if paymentDue = -1000 and cycleAmount = 500 => new paymentDue = -500
+        student.paymentDue = (student.paymentDue || 0) + cycleAmount;
 
-        // Update status
+        // Step 5: Do NOT cap paymentDue at 0 — allow negative to show dues
+
+        // Step 6: Update status
         student.status = student.paymentDue >= 0 ? 'Active' : 'Pending';
 
-        // Save student
         await student.save();
 
-        // Create invoice
-        // const invoice = new Invoice({
-        //     sid: student.sid,
-        //     name: student.name,
-        //     fromDate,
-        //     toDate,
-        //     paymentDate: today,
-        //     paidAmount: totalPaid,
-        //     dueAmount: student.paymentDue,
-        //     extraPaymentDue: student.extraPaymentDue,
-        // });
+        // Step 7: Create invoice
+        const invoice = new Invoice({
+            sid: student.sid,
+            name: student.name,
+            fromDate,
+            toDate,
+            paymentDate: today,
+            paidAmount: cycleAmount,
+            dueAmount: student.paymentDue,
+            extraPaymentDue: student.extraPaymentDue || 0,
+        });
 
-        // await invoice.save();
+        await invoice.save();
 
         return res.status(200).json({
-            message: 'Payment cycle updated and invoice created successfully.',
+            message: 'Payment processed and invoice created.',
             student: {
                 sid: student.sid,
                 name: student.name,
@@ -83,6 +81,7 @@ export const payment = async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 
 export const createPayment = async (req, res) => {
