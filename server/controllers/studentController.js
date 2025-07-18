@@ -72,7 +72,7 @@ export const createOldStudent = async (req, res) => {
         await Student.create({
             sid, name, email, seatNumber, password: hashedPassword, mobile, father, guardian,
             gender, admissionDate, shift, time, paymentAmount, address,
-            image: imageFilename, lastPayment
+            image: imageFilename, lastPayment, paymentDue: paymentAmount, status: "Pending"
         });
 
         sendMail({

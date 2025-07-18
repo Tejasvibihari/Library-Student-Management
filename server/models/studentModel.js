@@ -23,7 +23,7 @@ const StudentSchema = new mongoose.Schema({
     nextPayment: { type: Date },
     lastPayment: { type: Date },
     paymentDue: { type: Number },
-
+    extraPaymentDue: { type: Number, default: 0 }, // Assuming this is the extra payment amount due
     image: { type: String }, // Assuming image is stored as a URL or base64 string
     isOnline: { type: Boolean, default: false },
     // Assuming paymentDate is the same as lastPayment, if not, add it as well

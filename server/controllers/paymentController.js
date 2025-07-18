@@ -1,8 +1,91 @@
 import Payment from '../models/paymentModel.js'; // Adjust the path as necessary
 import Student from '../models/studentModel.js'; // Adjust the path as necessary
 import { sendMail } from '../utils/mailer.js';
+import Invoice from "../models/invoiceModel.js"
 // import { addMonths } from 'date-fns';
 // Create a new payment
+
+
+// New Payment Controller
+
+export const payment = async (req, res) => {
+    const { sid, extraPaymentAmount } = req.body;
+
+    if (!sid) {
+        return res.status(400).json({ error: 'Student ID (sid) is required.' });
+    }
+
+    try {
+        const student = await Student.findOne({ sid });
+
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found.' });
+        }
+
+        const today = new Date();
+        const cycleAmount = student.paymentAmount;
+        const totalPaid = cycleAmount;
+
+        // Save previous nextPayment as fromDate
+        const fromDate = student.nextPayment ? new Date(student.nextPayment) : new Date(student.admissionDate);
+
+        // Update nextPayment by 1 month
+        const toDate = new Date(fromDate);
+        toDate.setMonth(toDate.getMonth() + 1);
+        student.nextPayment = toDate;
+
+        // Update last payment date
+        student.lastPayment = today;
+
+        // Update extra payment field
+        if (extraPaymentAmount > 0) {
+            student.extraPaymentDue = (student.extraPaymentDue) + extraPaymentAmount;
+        }
+
+        // Reduce paymentDue
+        student.paymentDue = student.paymentDue - totalPaid;
+        // if (student.paymentDue < 0) student.paymentDue = 0;
+
+        // Update status
+        student.status = student.paymentDue >= 0 ? 'Active' : 'Pending';
+
+        // Save student
+        await student.save();
+
+        // Create invoice
+        const invoice = new Invoice({
+            sid: student.sid,
+            name: student.name,
+            fromDate,
+            toDate,
+            paymentDate: today,
+            paidAmount: totalPaid,
+            dueAmount: student.paymentDue,
+            extraPaymentDue: student.extraPaymentDue,
+        });
+
+        await invoice.save();
+
+        return res.status(200).json({
+            message: 'Payment cycle updated and invoice created successfully.',
+            student: {
+                sid: student.sid,
+                name: student.name,
+                paymentDue: student.paymentDue,
+                extraPaymentDue: student.extraPaymentDue,
+                nextPayment: student.nextPayment,
+                status: student.status
+            },
+            invoice
+        });
+
+    } catch (err) {
+        console.error('Error updating payment cycle:', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
 export const createPayment = async (req, res) => {
     const { sid, payment_date, amount, months_paid_for, admissionDate } = req.body;
     try {
