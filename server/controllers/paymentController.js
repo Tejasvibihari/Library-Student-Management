@@ -75,8 +75,7 @@ export const payment = async (req, res) => {
                 extraPaymentDue: student.extraPaymentDue,
                 nextPayment: student.nextPayment,
                 status: student.status
-            },
-            invoice
+            }
         });
 
     } catch (err) {
