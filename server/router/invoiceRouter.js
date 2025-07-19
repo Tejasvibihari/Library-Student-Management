@@ -5,7 +5,7 @@ import { getAllInvoices } from '../controllers/invoiceController.js';
 const router = express.Router();
 
 // Define the route for updating payment status
-router.post('/getAllInvoice', getAllInvoices);
+router.get('/getallinvoice', getAllInvoices);
 
 
 
