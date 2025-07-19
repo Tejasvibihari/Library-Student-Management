@@ -1,6 +1,6 @@
 // controllers/invoiceController.js
 
-import Invoice from '../models/Invoice.js';
+import Invoice from '../models/invoiceModel.js';
 
 // GET: Get all invoices
 export const getAllInvoices = async (req, res) => {
