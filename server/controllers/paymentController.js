@@ -41,7 +41,9 @@ export const payment = async (req, res) => {
 
         // Step 4: Add this cycle's paymentAmount towards paymentDue
         // Eg. if paymentDue = -1000 and cycleAmount = 500 => new paymentDue = -500
-        student.paymentDue = (student.paymentDue || 0) + cycleAmount;
+        const remainingDue = (student.paymentDue || 0) + cycleAmount;
+        student.paymentDue = remainingDue;
+
 
         // Step 5: Do NOT cap paymentDue at 0 — allow negative to show dues
 
