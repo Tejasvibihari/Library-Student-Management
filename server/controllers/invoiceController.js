@@ -23,7 +23,7 @@ export const getInvoiceBySid = async (req, res) => {
             return res.status(404).json({ message: 'No invoices found for this SID' });
         }
 
-        res.status(200).json(invoices);
+        return res.status(200).json(invoices);
     } catch (error) {
         console.error('Error fetching invoices by SID:', error);
         res.status(500).json({ message: 'Server error' });
