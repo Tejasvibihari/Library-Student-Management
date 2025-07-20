@@ -1066,11 +1066,6 @@ export const createPayment = async (req, res) => {
                            📞 9608888400 | 🌐 www.biharilibrary.in</p>
                     </div>
                 </div>
-                
-                <div class="invoice-badge">
-                    <h1>INVOICE</h1>
-                    <p>Payment Receipt</p>
-                </div>
             </div>
         </div>
         
@@ -1150,7 +1145,6 @@ export const createPayment = async (req, res) => {
             <table class="payment-table">
                 <thead>
                     <tr>
-                        <th>Description</th>
                         <th>Shift</th>
                         <th>Duration</th>
                         <th>Amount</th>
@@ -1158,10 +1152,6 @@ export const createPayment = async (req, res) => {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
-                            <strong>Library Fee</strong><br>
-                            <small style="color: #64748b;">Monthly subscription fee</small>
-                        </td>
                         <td>${student.shift}<br><small style="color: #64748b;">${student.time}</small></td>
                         <td>
                             ${new Date(cycleStart).toLocaleDateString('en-IN', {
