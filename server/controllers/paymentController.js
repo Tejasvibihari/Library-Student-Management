@@ -445,10 +445,6 @@ export const payment = async (req, res) => {
                     <h3>📄 Invoice Details</h3>
                     <div class="info-card">
                         <div class="info-row">
-                            <span class="info-label">Invoice Number:</span>
-                            <span class="info-value">#${invoiceNumber || 'INV-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 10000)).padStart(4, '0')}</span>
-                        </div>
-                        <div class="info-row">
                             <span class="info-label">Payment Date:</span>
                             <span class="info-value">${new Date(today).toLocaleDateString('en-IN', {
                 year: 'numeric',
