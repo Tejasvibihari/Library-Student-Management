@@ -597,7 +597,7 @@ export const payment = async (req, res) => {
             
             <div class="footer">
                 <div class="seal-section">
-                    <img class="seal" src="https://marudhardentalclinic.com/wp-content/uploads/2024/08/sealpng.webp" alt="Official Seal" />
+                    <img class="seal" src="https://biharilibrary.in/img/seal.webp" alt="Official Seal" />
                     <p style="margin-top: 10px; color: #64748b; font-size: 12px;">Official Seal</p>
                 </div>
                 
