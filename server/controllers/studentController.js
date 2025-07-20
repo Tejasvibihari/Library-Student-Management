@@ -113,7 +113,7 @@ export const createNewStudent = async (req, res) => {
     const {
         sid, name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
     } = req.body;
-    console.log(seatNumber)
+    console.log(req.body)
     try {
         let imageFilename = null;
         let password;
@@ -155,7 +155,7 @@ export const createNewStudent = async (req, res) => {
             console.error("Invalid image: image is either undefined or not a string.");
             return res.status(400).json({ message: 'Invalid image' });
         }
-
+        console.log(seatNumber)
 
         if (seatNumber !== 'Other') {
             const seat = await Seat.findOne({ seatNumber });
@@ -206,6 +206,7 @@ export const createNewStudent = async (req, res) => {
 }
 
 const updateSeatAvailability = (seat, seatShift) => {
+    console.log(seat, seatShift, "updateSeatAvailability called");
     const shifts = {
         fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
         morning: ['morning'],
