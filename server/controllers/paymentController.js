@@ -499,7 +499,7 @@ export const payment = async (req, res) => {
             </div>
             
             <div class="cycle-info">
-                📅 Payment Cycle: ${new Date(cycleStart).toLocaleDateString('en-IN', {
+                📅 Payment Cycle: ${new Date(fromDate).toLocaleDateString('en-IN', {
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric'
@@ -530,7 +530,7 @@ export const payment = async (req, res) => {
                             ${new Date(cycleStart).toLocaleDateString('en-IN', {
                 day: 'numeric',
                 month: 'short'
-            })} - ${new Date(cycleEnd).toLocaleDateString('en-IN', {
+            })} - ${new Date(toDate).toLocaleDateString('en-IN', {
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric'
