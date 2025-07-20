@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Define the route for updating payment status
 router.get('/getallinvoice', getAllInvoices);
-router.get('/getinvoicebysid/:sid', getInvoiceBySid);
 
+router.get('/getinvoicebysid/:sid', getInvoiceBySid);
 
 export default router;
