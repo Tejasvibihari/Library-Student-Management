@@ -7,7 +7,6 @@ import Invoice from "../models/invoiceModel.js"
 
 
 // New Payment Controller
-
 export const payment = async (req, res) => {
     const { sid, extraPaymentAmount = 0 } = req.body;
 
@@ -44,7 +43,6 @@ export const payment = async (req, res) => {
         const remainingDue = (student.paymentDue || 0) + cycleAmount;
         student.paymentDue = remainingDue;
 
-
         // Step 5: Do NOT cap paymentDue at 0 — allow negative to show dues
 
         // Step 6: Update status
@@ -66,6 +64,50 @@ export const payment = async (req, res) => {
 
         await invoice.save();
 
+        // Prepare template variables
+        const templateVars = {
+            paymentDate: new Date(today).toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }),
+            sid: student.sid,
+            studentName: student.name,
+            fatherName: student.father,
+            shift: student.shift,
+            timing: student.time,
+            seatNumber: student.seatNumber,
+            address: student.address,
+            cycleStart: new Date(fromDate).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }),
+            cycleEnd: new Date(toDate).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }),
+            cycleStartShort: new Date(fromDate).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short'
+            }),
+            cycleEndShort: new Date(toDate).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }),
+            amountPaid: cycleAmount,
+            extraAmountPaid: extraPaymentAmount || 0,
+            totalPaid: cycleAmount + (extraPaymentAmount || 0),
+            remainingDue: student.paymentDue,
+            isStatusPaid: student.paymentDue >= 0,
+            statusText: student.paymentDue >= 0 ? 'Paid' : 'Due',
+            statusClass: student.paymentDue >= 0 ? 'status-paid' : 'status-due',
+            hasExtraPayment: extraPaymentAmount > 0,
+            hasRemainingDue: student.paymentDue < 0,
+            remainingDueAmount: Math.abs(student.paymentDue) // Show as positive for display
+        };
 
         sendMail({
             to: student.email,
@@ -448,20 +490,16 @@ export const payment = async (req, res) => {
                     <div class="info-card">
                         <div class="info-row">
                             <span class="info-label">Payment Date:</span>
-                            <span class="info-value">${new Date(today).toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })}</span>
+                            <span class="info-value">${templateVars.paymentDate}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Student ID:</span>
-                            <span class="info-value">${sid}</span>
+                            <span class="info-value">${templateVars.sid}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Status:</span>
-                            <span class="payment-status ${remainingDue > 0 ? 'status-paid' : 'status-due'}">
-                                ${remainingDue > 0 ? 'Paid' : 'Due'}
+                            <span class="payment-status ${templateVars.statusClass}">
+                                ${templateVars.statusText}
                             </span>
                         </div>
                     </div>
@@ -472,42 +510,34 @@ export const payment = async (req, res) => {
                     <div class="info-card">
                         <div class="info-row">
                             <span class="info-label">Name:</span>
-                            <span class="info-value">${student.name}</span>
+                            <span class="info-value">${templateVars.studentName}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Father's Name:</span>
-                            <span class="info-value">${student.father}</span>
+                            <span class="info-value">${templateVars.fatherName}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Shift:</span>
-                            <span class="info-value">${student.shift}</span>
+                            <span class="info-value">${templateVars.shift}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Timing:</span>
-                            <span class="info-value">${student.time}</span>
+                            <span class="info-value">${templateVars.timing}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Seat Number:</span>
-                            <span class="info-value">${student.seatNumber}</span>
+                            <span class="info-value">${templateVars.seatNumber}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Address:</span>
-                            <span class="info-value">${student.address}</span>
+                            <span class="info-value">${templateVars.address}</span>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="cycle-info">
-                📅 Payment Cycle: ${new Date(fromDate).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            })} - ${new Date(cycleEnd).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            })}
+                📅 Payment Cycle: ${templateVars.cycleStart} - ${templateVars.cycleEnd}
             </div>
             
             <table class="payment-table">
@@ -525,20 +555,13 @@ export const payment = async (req, res) => {
                             <strong>Library Fee</strong><br>
                             <small style="color: #64748b;">Monthly subscription fee</small>
                         </td>
-                        <td>${student.shift}<br><small style="color: #64748b;">${student.time}</small></td>
+                        <td>${templateVars.shift}<br><small style="color: #64748b;">${templateVars.timing}</small></td>
                         <td>
-                            ${new Date(cycleStart).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short'
-            })} - ${new Date(toDate).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            })}
+                            ${templateVars.cycleStartShort} - ${templateVars.cycleEndShort}
                         </td>
-                        <td class="amount">₹${amountPaid.toLocaleString('en-IN')}</td>
+                        <td class="amount">₹${templateVars.amountPaid.toLocaleString('en-IN')}</td>
                     </tr>
-                    ${extraAmountPaid > 0 ? `
+                    ${templateVars.hasExtraPayment ? `
                     <tr>
                         <td>
                             <strong>Extra Payment</strong><br>
@@ -546,7 +569,7 @@ export const payment = async (req, res) => {
                         </td>
                         <td>-</td>
                         <td>-</td>
-                        <td class="amount">₹${extraAmountPaid.toLocaleString('en-IN')}</td>
+                        <td class="amount">₹${templateVars.extraAmountPaid.toLocaleString('en-IN')}</td>
                     </tr>
                     ` : ''}
                 </tbody>
@@ -556,27 +579,27 @@ export const payment = async (req, res) => {
                 <table class="summary-table">
                     <tr>
                         <td class="summary-label">Subtotal:</td>
-                        <td class="summary-value">₹${amountPaid.toLocaleString('en-IN')}</td>
+                        <td class="summary-value">₹${templateVars.amountPaid.toLocaleString('en-IN')}</td>
                     </tr>
-                    ${extraAmountPaid > 0 ? `
+                    ${templateVars.hasExtraPayment ? `
                     <tr>
                         <td class="summary-label">Extra Amount:</td>
-                        <td class="summary-value">₹${extraAmountPaid.toLocaleString('en-IN')}</td>
+                        <td class="summary-value">₹${templateVars.extraAmountPaid.toLocaleString('en-IN')}</td>
                     </tr>
                     ` : ''}
                     <tr>
                         <td class="summary-label">Total Paid:</td>
-                        <td class="summary-value">₹${(amountPaid + extraAmountPaid).toLocaleString('en-IN')}</td>
+                        <td class="summary-value">₹${templateVars.totalPaid.toLocaleString('en-IN')}</td>
                     </tr>
-                    ${remainingDue > 0 ? `
+                    ${templateVars.hasRemainingDue ? `
                     <tr>
                         <td class="summary-label" style="color: #dc2626;">Remaining Due:</td>
-                        <td class="summary-value" style="color: #dc2626;">₹${remainingDue.toLocaleString('en-IN')}</td>
+                        <td class="summary-value" style="color: #dc2626;">₹${templateVars.remainingDueAmount.toLocaleString('en-IN')}</td>
                     </tr>
                     ` : ''}
                     <tr>
                         <td class="summary-label">Grand Total:</td>
-                        <td class="summary-value">₹${(amountPaid + extraAmountPaid).toLocaleString('en-IN')}</td>
+                        <td class="summary-value">₹${templateVars.totalPaid.toLocaleString('en-IN')}</td>
                     </tr>
                 </table>
             </div>
@@ -600,7 +623,8 @@ export const payment = async (req, res) => {
     </div>
 </body>
 </html>`
-        })
+        });
+
         return res.status(200).json({
             message: 'Payment processed and invoice created.',
             student: {
