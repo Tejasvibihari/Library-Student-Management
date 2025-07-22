@@ -445,7 +445,7 @@ export const cronUpdateDeactivePendingPayments = async (req, res) => {
 cron.schedule('0 5 * * *', cronUpdateDeactivePendingPayments, {
     timezone: "Asia/Kolkata"
 });
-console.log('Payment reminder cron job scheduled for 5:00 AM daily (IST)');
+// console.log('Payment reminder cron job scheduled for 5:00 AM daily (IST)');
 // From Here Old code Logic
 // const getShiftLabel = (time) => {
 //     console.log(time)
