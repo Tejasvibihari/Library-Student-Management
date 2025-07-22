@@ -33,6 +33,7 @@ export const getInvoiceBySid = async (req, res) => {
 
 export const deleteInvoiceById = async (req, res) => {
     const { id, sid } = req.params;
+    console.log('Deleting invoice with ID:', id, 'for SID:', sid);
 
     try {
         // First, get the invoice details before deleting
