@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/admin/auth/', adminRouter);
-app.use('/api/student/', studentRouter);
+app.use('/api/student', studentRouter);
 app.use('/api/student/auth', studentAuthRouter);
 app.use('/api/mail/', mailRouter);
 app.use('/api/payment/', paymentRouter);
