@@ -44,7 +44,8 @@ export const deleteInvoiceById = async (req, res) => {
         }
 
         // Get the student details
-        const student = await Student.findOne(sid);
+        const student = await Student.findOne({ sid: parseInt(sid) });
+
 
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
