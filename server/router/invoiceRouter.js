@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllInvoices, getInvoiceBySid } from '../controllers/invoiceController.js';
+import { deleteInvoiceById, getAllInvoices, getInvoiceBySid } from '../controllers/invoiceController.js';
 
 
 const router = express.Router();
@@ -8,5 +8,6 @@ const router = express.Router();
 router.get('/getallinvoice', getAllInvoices);
 
 router.get('/getinvoicebysid/:sid', getInvoiceBySid);
+router.delete('/deleteinvoice/:id/:sid', deleteInvoiceById);
 
 export default router;

@@ -606,6 +606,18 @@ export const GetStudent = async (req, res) => {
         res.status(500).json({ message: 'An error occurred', error });
     }
 };
+export const GetStudentBySid = async (req, res) => {
+    const { sid } = req.params;
+
+    try {
+        // Use the constructed query object to filter data
+        const student = await Student.findOne({ sid });
+        res.status(200).json(student);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred', error });
+    }
+};
 
 // Login Student 
 export const StudentLogin = async (req, res) => {
