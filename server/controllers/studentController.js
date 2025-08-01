@@ -107,7 +107,8 @@ export const createOldStudent = async (req, res) => {
         console.log(error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
-}export const createNewStudent = async (req, res) => {
+}
+export const createNewStudent = async (req, res) => {
     const {
         sid, name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
     } = req.body;
