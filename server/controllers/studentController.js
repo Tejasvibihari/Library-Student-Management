@@ -716,11 +716,16 @@ export const GetOnlineStudent = async (req, res) => {
 };
 
 // Update Student Detail
+import fs from 'fs';
+import path from 'path';
+import Student from '../models/Student.js'; // adjust path if needed
+
 export const updateStudent = async (req, res) => {
     const {
         sid,
         name,
         email,
+        password,
         mobile,
         father,
         guardian,
@@ -728,73 +733,106 @@ export const updateStudent = async (req, res) => {
         admissionDate,
         shift,
         time,
-        paymentAmount,
-        address,
-        image,
         seatNumber,
+        address,
         instagram,
         facebook,
         youtube,
+        status,
+        paymentAmount,
         nextPayment,
-        status
-        // admin
+        lastPayment,
+        paymentDue,
+        extraPaymentDue,
+        image,
+        isOnline
     } = req.body;
-    console.log(image)
+
     try {
+        if (!sid) {
+            return res.status(400).json({ message: "SID is required for updating the student" });
+        }
+
         let imageFilename;
 
-        if (image && image.startsWith('data:image')) {
-            // If the image is a base64 string
-            const base64Image = image.split(",")[1];
-            if (!base64Image) {
-                throw new Error('Invalid image format');
+        /** ----- IMAGE HANDLING ----- */
+        if (image) {
+            if (image.startsWith('data:image')) {
+                // Handle base64 image
+                try {
+                    const base64Image = image.split(",")[1];
+                    if (!base64Image) {
+                        return res.status(400).json({ message: "Invalid image format" });
+                    }
+
+                    const imageBuffer = Buffer.from(base64Image, 'base64');
+                    imageFilename = `${sid}.jpeg`;
+
+                    fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
+                } catch (err) {
+                    return res.status(400).json({ message: "Failed to process image", error: err.message });
+                }
+            } else {
+                // If it's an existing filename or URL
+                imageFilename = image;
             }
-
-            const imageBuffer = Buffer.from(base64Image, 'base64');
-            // Generate a unique filename for the image
-            imageFilename = `${sid}.jpeg`;
-
-            // Write the image to a file
-            fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-        } else {
-            // If the image is not provided, use the existing image filename
-            imageFilename = `${sid}.jpeg`;
         }
-        // Assuming 'sid' or 'email' can uniquely identify a student
-        const student = await Student.findOne({ $or: [{ sid }, { email }] });
-        if (!student) {
-            return res.status(404).json({ message: "Student not found" });
+
+        /** ----- UPDATE LOGIC ----- */
+        const updatedStudent = await Student.findOneAndUpdate(
+            { $or: [{ sid }, { email }] }, // find by sid or email
+            {
+                $set: {
+                    sid,
+                    name,
+                    email,
+                    ...(password && { password }), // only update if provided
+                    mobile,
+                    father,
+                    guardian,
+                    gender,
+                    admissionDate,
+                    shift,
+                    time,
+                    seatNumber,
+                    address,
+                    instagram,
+                    facebook,
+                    youtube,
+                    status,
+                    paymentAmount,
+                    nextPayment,
+                    lastPayment,
+                    paymentDue,
+                    extraPaymentDue,
+                    ...(imageFilename && { image: imageFilename }),
+                    ...(typeof isOnline === 'boolean' && { isOnline })
+                }
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "Student not found with the given SID or email" });
         }
-        // Write the image to a file
-        // fs.writeFileSync(path.join('./uploads', imageFilename), imageBuffer);
-        // Update student details
-        student.sid = sid;
-        student.name = name;
-        student.email = email;
-        student.mobile = mobile;
-        student.father = father;
-        student.guardian = guardian;
-        student.gender = gender;
-        student.admissionDate = admissionDate;
-        student.shift = shift;
-        student.address = address;
-        student.instagram = instagram;
-        student.facebook = facebook;
-        student.youtube = youtube;
-        student.paymentAmount = paymentAmount;
-        student.image = imageFilename;
-        student.seatNumber = seatNumber;
-        student.time = time;
-        student.nextPayment = nextPayment;
-        student.status = status
-        // student.admin = admin;
 
-        await student.save();
-
-        res.status(200).json({ message: "Student details updated successfully" });
+        return res.status(200).json({ message: "Student details updated successfully", student: updatedStudent });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "An error occurred while updating the student details", error: error.message });
+        console.error("Update Student Error:", error);
+
+        // Mongoose validation errors
+        if (error.name === "ValidationError") {
+            const validationErrors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ message: "Validation failed", errors: validationErrors });
+        }
+
+        // Duplicate key errors (like unique email)
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(400).json({ message: `Duplicate value for field: ${field}` });
+        }
+
+        return res.status(500).json({ message: "An error occurred while updating the student details", error: error.message });
     }
 };
 
