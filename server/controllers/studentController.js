@@ -716,9 +716,7 @@ export const GetOnlineStudent = async (req, res) => {
 };
 
 // Update Student Detail
-import fs from 'fs';
-import path from 'path';
-import Student from '../models/Student.js'; // adjust path if needed
+
 
 export const updateStudent = async (req, res) => {
     const {
