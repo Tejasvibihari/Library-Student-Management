@@ -159,34 +159,85 @@ export const createNewStudent = async (req, res) => {
             });
         }
 
-        // Generate new SID with transaction safety
-        const session = await Student.startSession();
-        let lastStudent;
+        // Generate new SID - compatible with both standalone and replica set MongoDB
+        const useTransactions = process.env.MONGODB_USE_TRANSACTIONS === 'true';
+        let attempts = 0;
+        const maxAttempts = 5;
 
-        try {
-            await session.withTransaction(async () => {
-                lastStudent = await Student.findOne()
-                    .sort({ sid: -1 })
-                    .session(session);
-                newSid = lastStudent ? lastStudent.sid + 1 : 327;
+        if (useTransactions) {
+            // For replica sets - use transactions
+            const session = await Student.startSession();
+            try {
+                await session.withTransaction(async () => {
+                    const lastStudent = await Student.findOne()
+                        .sort({ sid: -1 })
+                        .session(session);
+                    newSid = lastStudent ? lastStudent.sid + 1 : 327;
 
-                // Reserve the SID by creating a temporary record
-                await Student.create([{
-                    sid: newSid,
-                    name: 'TEMP_PLACEHOLDER',
-                    email: `temp_${Date.now()}@placeholder.com`,
-                    mobile: '0000000000',
-                    father: 'TEMP',
-                    gender: 'Other',
-                    admissionDate: new Date(),
-                    shift: 'Morning',
-                    paymentAmount: 0,
-                    address: 'TEMP',
-                    status: 'TEMP_PLACEHOLDER'
-                }], { session });
-            });
-        } finally {
-            await session.endSession();
+                    await Student.create([{
+                        sid: newSid,
+                        name: 'TEMP_PLACEHOLDER',
+                        email: `temp_${Date.now()}_${Math.random()}@placeholder.com`,
+                        mobile: '0000000000',
+                        father: 'TEMP',
+                        gender: 'Other',
+                        admissionDate: new Date(),
+                        shift: 'Morning',
+                        paymentAmount: 0,
+                        address: 'TEMP',
+                        status: 'TEMP_PLACEHOLDER'
+                    }], { session });
+                });
+            } finally {
+                await session.endSession();
+            }
+        } else {
+            // For standalone MongoDB - use retry mechanism
+            while (attempts < maxAttempts) {
+                try {
+                    const lastStudent = await Student.findOne()
+                        .sort({ sid: -1 })
+                        .select('sid');
+
+                    newSid = lastStudent ? lastStudent.sid + 1 : 327;
+
+                    // Try to create a temporary placeholder to reserve the SID
+                    await Student.create({
+                        sid: newSid,
+                        name: 'TEMP_PLACEHOLDER',
+                        email: `temp_${Date.now()}_${Math.random()}@placeholder.com`,
+                        mobile: '0000000000',
+                        father: 'TEMP',
+                        gender: 'Other',
+                        admissionDate: new Date(),
+                        shift: 'Morning',
+                        paymentAmount: 0,
+                        address: 'TEMP',
+                        status: 'TEMP_PLACEHOLDER'
+                    });
+
+                    // If we get here, the SID is successfully reserved
+                    break;
+
+                } catch (sidError) {
+                    attempts++;
+
+                    // If it's a duplicate key error, try again with next SID
+                    if (sidError.code === 11000 && attempts < maxAttempts) {
+                        console.log(`SID ${newSid} already exists, retrying... (attempt ${attempts})`);
+                        // Add random delay to prevent race conditions
+                        await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
+                        continue;
+                    }
+
+                    // If we've exhausted attempts or it's a different error, throw
+                    throw new Error(`Failed to generate unique SID after ${attempts} attempts: ${sidError.message}`);
+                }
+            }
+
+            if (attempts >= maxAttempts) {
+                throw new Error(`Failed to generate unique SID after ${maxAttempts} attempts`);
+            }
         }
 
         // Handle image processing
