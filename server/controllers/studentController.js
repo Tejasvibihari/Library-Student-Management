@@ -107,266 +107,121 @@ export const createOldStudent = async (req, res) => {
         console.log(error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
-}
-export const createNewStudent = async (req, res) => {
+}export const createNewStudent = async (req, res) => {
     const {
-        sid, name, email, mobile, father, guardian, gender,
-        admissionDate, shift, time, paymentAmount, address,
-        image, lastPayment, seatNumber, seatShift
+        sid, name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
     } = req.body;
 
-    // Input validation
-    const requiredFields = {
-        name, email, mobile, father, gender,
-        admissionDate, shift, paymentAmount, address
-    };
-
-    for (const [field, value] of Object.entries(requiredFields)) {
-        if (!value || (typeof value === 'string' && value.trim() === '')) {
-            return res.status(400).json({
-                message: `${field} is required and cannot be empty`
-            });
-        }
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: 'Invalid email format' });
-    }
-
-    // Mobile validation (assuming 10 digits)
-    const mobileRegex = /^\d{10}$/;
-    if (!mobileRegex.test(mobile.toString())) {
-        return res.status(400).json({ message: 'Mobile number must be 10 digits' });
-    }
-
-    let imageFilename = null;
-    let tempImagePath = null;
-    let newSid = null;
-    let createdStudent = null;
-
     try {
-        // Check if student already exists
-        const [existingStudent, existingEmail] = await Promise.all([
-            Student.findOne({ sid }),
-            Student.findOne({ email: email.toLowerCase().trim() })
-        ]);
+        let imageFilename = null;
+        let password;
 
-        if (existingStudent || existingEmail) {
-            return res.status(400).json({
-                message: 'Student with this ID or email already exists'
-            });
+        // Check if student already exists
+        const student = await Student.findOne({ sid });
+        const studentEmail = await Student.findOne({ email });
+
+        // Handle new student Sid Generation with simple retry
+        let newSid;
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        while (attempts < maxAttempts) {
+            const lastStudent = await Student.findOne().sort({ sid: -1 });
+            newSid = lastStudent ? lastStudent.sid + 1 : 327;
+
+            // Check if this SID already exists
+            const existingSid = await Student.findOne({ sid: newSid });
+            if (!existingSid) {
+                break; // SID is unique, we can use it
+            }
+            attempts++;
+            if (attempts >= maxAttempts) {
+                return res.status(500).json({ message: 'Unable to generate unique student ID' });
+            }
         }
 
-        // Generate new SID - compatible with both standalone and replica set MongoDB
-        const useTransactions = process.env.MONGODB_USE_TRANSACTIONS === 'true';
-        let attempts = 0;
-        const maxAttempts = 5;
-
-        if (useTransactions) {
-            // For replica sets - use transactions
-            const session = await Student.startSession();
-            try {
-                await session.withTransaction(async () => {
-                    const lastStudent = await Student.findOne()
-                        .sort({ sid: -1 })
-                        .session(session);
-                    newSid = lastStudent ? lastStudent.sid + 1 : 327;
-
-                    await Student.create([{
-                        sid: newSid,
-                        name: 'TEMP_PLACEHOLDER',
-                        email: `temp_${Date.now()}_${Math.random()}@placeholder.com`,
-                        mobile: '0000000000',
-                        father: 'TEMP',
-                        gender: 'Other',
-                        admissionDate: new Date(),
-                        shift: 'Morning',
-                        paymentAmount: 0,
-                        address: 'TEMP',
-                        status: 'TEMP_PLACEHOLDER'
-                    }], { session });
-                });
-            } finally {
-                await session.endSession();
-            }
-        } else {
-            // For standalone MongoDB - use retry mechanism
-            while (attempts < maxAttempts) {
-                try {
-                    const lastStudent = await Student.findOne()
-                        .sort({ sid: -1 })
-                        .select('sid');
-
-                    newSid = lastStudent ? lastStudent.sid + 1 : 327;
-
-                    // Try to create a temporary placeholder to reserve the SID
-                    await Student.create({
-                        sid: newSid,
-                        name: 'TEMP_PLACEHOLDER',
-                        email: `temp_${Date.now()}_${Math.random()}@placeholder.com`,
-                        mobile: '0000000000',
-                        father: 'TEMP',
-                        gender: 'Other',
-                        admissionDate: new Date(),
-                        shift: 'Morning',
-                        paymentAmount: 0,
-                        address: 'TEMP',
-                        status: 'TEMP_PLACEHOLDER'
-                    });
-
-                    // If we get here, the SID is successfully reserved
-                    break;
-
-                } catch (sidError) {
-                    attempts++;
-
-                    // If it's a duplicate key error, try again with next SID
-                    if (sidError.code === 11000 && attempts < maxAttempts) {
-                        console.log(`SID ${newSid} already exists, retrying... (attempt ${attempts})`);
-                        // Add random delay to prevent race conditions
-                        await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
-                        continue;
-                    }
-
-                    // If we've exhausted attempts or it's a different error, throw
-                    throw new Error(`Failed to generate unique SID after ${attempts} attempts: ${sidError.message}`);
-                }
-            }
-
-            if (attempts >= maxAttempts) {
-                throw new Error(`Failed to generate unique SID after ${maxAttempts} attempts`);
-            }
+        if (student || studentEmail) {
+            return res.status(400).json({ message: 'Student already exists' });
         }
 
         // Handle image processing
         if (image && typeof image === 'string') {
-            try {
-                const base64Match = image.match(/^data:image\/(jpeg|jpg|png);base64,(.+)$/);
-                if (!base64Match) {
-                    throw new Error('Invalid image format. Only JPEG, JPG, and PNG are supported.');
-                }
-
-                const base64String = base64Match[2];
+            const base64String = image.split(",")[1];
+            if (base64String) {
                 const imageBuffer = Buffer.from(base64String, 'base64');
-
-                // Check image size (limit to 10MB)
-                if (imageBuffer.length > 10 * 1024 * 1024) {
-                    throw new Error('Image size too large. Maximum 10MB allowed.');
-                }
-
                 imageFilename = `${newSid}.jpeg`;
                 const uploadsDir = path.join(__dirname, '../uploads');
-                tempImagePath = path.join(uploadsDir, imageFilename);
 
-                // Ensure uploads directory exists
+                // Create uploads directory if it doesn't exist
                 if (!fs.existsSync(uploadsDir)) {
                     fs.mkdirSync(uploadsDir, { recursive: true });
                 }
 
-                // Process and save image
-                const compressedBuffer = await sharp(imageBuffer)
-                    .jpeg({ quality: 80, mozjpeg: true })
-                    .resize(800, 800, {
-                        fit: 'inside',
-                        withoutEnlargement: true
-                    })
-                    .toBuffer();
-
-                await fs.promises.writeFile(tempImagePath, compressedBuffer);
-
-            } catch (imageError) {
-                console.error('Image processing error:', imageError);
-                // Cleanup temp student record
-                if (newSid) {
-                    await Student.deleteOne({ sid: newSid, status: 'TEMP_PLACEHOLDER' });
+                try {
+                    const compressedBuffer = await sharp(imageBuffer)
+                        .jpeg({ quality: 80 })
+                        .toBuffer();
+                    fs.writeFileSync(path.join(uploadsDir, imageFilename), compressedBuffer);
+                } catch (err) {
+                    console.error('Error compressing the image:', err);
+                    return res.status(500).json({ message: 'Error processing image' });
                 }
-                return res.status(400).json({
-                    message: `Image processing failed: ${imageError.message}`
-                });
+            } else {
+                console.error("Invalid image format: base64 string is missing.");
+                return res.status(400).json({ message: 'Invalid image format' });
             }
         } else {
-            // Cleanup temp student record if no image provided
-            if (newSid) {
-                await Student.deleteOne({ sid: newSid, status: 'TEMP_PLACEHOLDER' });
-            }
-            return res.status(400).json({
-                message: 'Student image is required'
-            });
+            console.error("Invalid image: image is either undefined or not a string.");
+            return res.status(400).json({ message: 'Invalid image' });
         }
 
         // Handle seat availability
         if (seatNumber && seatNumber !== 'Other') {
             try {
                 const seat = await Seat.findOne({ seatNumber });
-                if (!seat) {
-                    throw new Error(`Seat ${seatNumber} not found`);
+                if (seat) {
+                    updateSeatAvailability(seat, seatShift);
+                    await seat.save();
                 }
-
-                // Check if seat is available for the requested shift
-                if (!updateSeatAvailability(seat, seatShift)) {
-                    throw new Error(`Seat ${seatNumber} is not available for ${seatShift} shift`);
-                }
-
-                await seat.save();
             } catch (seatError) {
-                console.error('Seat handling error:', seatError);
-                // Cleanup
-                if (tempImagePath && fs.existsSync(tempImagePath)) {
-                    await fs.promises.unlink(tempImagePath);
-                }
-                if (newSid) {
-                    await Student.deleteOne({ sid: newSid, status: 'TEMP_PLACEHOLDER' });
-                }
-                return res.status(400).json({
-                    message: `Seat allocation failed: ${seatError.message}`
-                });
+                console.error('Seat update error:', seatError);
+                // Continue with student creation even if seat update fails
             }
         }
 
         // Generate password
-        const password = name.trim().slice(0, 4).toUpperCase() +
-            mobile.toString().slice(-4);
+        password = name.slice(0, 4).toUpperCase() + mobile.toString().slice(-4);
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        // Update the temporary student record with actual data
-        const updateData = {
-            name: name.trim(),
-            email: email.toLowerCase().trim(),
-            mobile: mobile.toString(),
-            father: father.trim(),
-            guardian: guardian?.trim() || '',
-            gender,
-            admissionDate: new Date(admissionDate),
-            shift,
-            time: time || '',
-            paymentAmount: Number(paymentAmount),
-            address: address.trim(),
-            image: imageFilename,
-            lastPayment: lastPayment ? new Date(lastPayment) : new Date(),
-            paymentDue: -Math.abs(Number(paymentAmount)),
-            status: "Pending",
+        // Create student with all required fields
+        await Student.create({
+            sid: newSid,
+            name,
+            email,
+            seatNumber: seatNumber || 'Other', // Provide default value
             password: hashedPassword,
-            seatNumber: seatNumber || 'Other'
-        };
+            mobile,
+            father,
+            guardian: guardian || '', // Provide default value
+            gender,
+            admissionDate,
+            shift,
+            time: time || '', // Provide default value
+            paymentAmount,
+            address,
+            image: imageFilename,
+            lastPayment,
+            paymentDue: -Math.abs(paymentAmount),
+            status: "Pending"
+        });
 
-        createdStudent = await Student.findOneAndUpdate(
-            { sid: newSid, status: 'TEMP_PLACEHOLDER' },
-            updateData,
-            { new: true, runValidators: true }
-        );
-
-        if (!createdStudent) {
-            throw new Error('Failed to create student record');
-        }
-
-        // Send welcome email (non-blocking)
-        const emailPromise = sendMail({
-            to: email.toLowerCase().trim(),
-            subject: "Welcome to Bihari Library - Admission Confirmation",
-            body: `
-                <!DOCTYPE html>
+        // Send email (with error handling)
+        try {
+            await sendMail({
+                to: email,
+                subject: "Welcome to Bihari Library - Admission Confirmation",
+                body: `
+                    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -637,7 +492,7 @@ export const createNewStudent = async (req, res) => {
 
         <div class="content">
             <div class="welcome-message">
-                <h2>Dear ${name.trim()},</h2>
+                <h2>Dear ${name},</h2>
                 <p>We are absolutely thrilled to welcome you to our academic community. Congratulations on your successful admission to Bihari Library!</p>
             </div>
             
@@ -650,7 +505,7 @@ export const createNewStudent = async (req, res) => {
                     </div>
                     <div class="info-item">
                         <div class="info-label">Full Name</div>
-                        <div class="info-value">${name.trim()}</div>
+                        <div class="info-value">${name}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Study Shift</div>
@@ -658,19 +513,19 @@ export const createNewStudent = async (req, res) => {
                     </div>
                     <div class="info-item">
                         <div class="info-label">Admission Date</div>
-                        <div class="info-value">${new Date(admissionDate).toLocaleDateString()}</div>
+                        <div class="info-value">${admissionDate}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Father's Name</div>
-                        <div class="info-value">${father.trim()}</div>
+                        <div class="info-value">${father}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Address</div>
-                        <div class="info-value">${address.trim()}</div>
+                        <div class="info-value">${address}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Email</div>
-                        <div class="info-value">${email.toLowerCase().trim()}</div>
+                        <div class="info-value">${email}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Temporary Password</div>
@@ -734,69 +589,16 @@ export const createNewStudent = async (req, res) => {
     </div>
 </body>
 </html>`
-        }).catch(emailError => {
+            });
+        } catch (emailError) {
             console.error('Email sending failed:', emailError);
-            // Log but don't fail the request
-        });
+            // Don't fail the request if email fails
+        }
 
-        // Don't wait for email to complete
-        emailPromise.then(() => {
-            console.log(`Welcome email sent successfully to ${email}`);
-        }).catch(err => {
-            console.error(`Failed to send welcome email to ${email}:`, err);
-        });
-
-        return res.status(201).json({
-            message: "Admission Success",
-            studentId: newSid,
-            student: {
-                sid: createdStudent.sid,
-                name: createdStudent.name,
-                email: createdStudent.email,
-                shift: createdStudent.shift,
-                status: createdStudent.status
-            }
-        });
-
+        return res.status(201).json({ message: "Admission Success" });
     } catch (error) {
-        console.error('Student creation error:', error);
-
-        // Cleanup on error
-        try {
-            if (tempImagePath && fs.existsSync(tempImagePath)) {
-                await fs.promises.unlink(tempImagePath);
-            }
-            if (newSid) {
-                await Student.deleteOne({
-                    sid: newSid,
-                    $or: [
-                        { status: 'TEMP_PLACEHOLDER' },
-                        { name: createdStudent?.name }
-                    ]
-                });
-            }
-        } catch (cleanupError) {
-            console.error('Cleanup error:', cleanupError);
-        }
-
-        // Return appropriate error response
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({
-                message: 'Validation error',
-                details: Object.values(error.errors).map(e => e.message)
-            });
-        }
-
-        if (error.code === 11000) {
-            return res.status(400).json({
-                message: 'Duplicate entry: Student with this information already exists'
-            });
-        }
-
-        return res.status(500).json({
-            message: 'Internal Server Error',
-            error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
-        });
+        console.log(error);
+        return res.status(500).json({ error, message: 'Internal Server Error' });
     }
 }
 const updateSeatAvailability = (seat, seatShift) => {
