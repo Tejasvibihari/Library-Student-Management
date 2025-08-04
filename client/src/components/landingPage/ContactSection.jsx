@@ -32,7 +32,7 @@ export default function Contact() {
                         </div>
                         <div>
                             <button type="submit" className="bg-white text-black w-full px-10 py-3 font-semibold font-[inter] hover:bg-black hover:text-white border-2 border-white transition-all">
-                                Send Message Hello uhj
+                                Send Message Hello There
                             </button>
                         </div>
                     </form>
