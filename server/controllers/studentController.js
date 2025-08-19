@@ -140,7 +140,13 @@ export const createNewStudent = async (req, res) => {
                 const imageBuffer = Buffer.from(base64String, 'base64');
                 imageFilename = `${newSid}.jpeg`;
                 const uploadsDir = path.join(__dirname, '../uploads');
+const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
 
+    // Convert to KB / MB
+    const imageSizeInKB = imageSizeInBytes / 1024;
+    const imageSizeInMB = imageSizeInKB / 1024;
+
+    console.log(`📷 Uploaded image size: ${imageSizeInKB.toFixed(2)} KB (${imageSizeInMB.toFixed(2)} MB)`);
                 // Create uploads directory if it doesn't exist
                 if (!fs.existsSync(uploadsDir)) {
                     fs.mkdirSync(uploadsDir, { recursive: true });
