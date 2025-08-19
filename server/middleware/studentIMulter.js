@@ -26,10 +26,6 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         try {
-            // ✅ Use sid generated earlier
-            console.log("checking file ")
-            console.log(req)
-            console.log(file);
             const ext = path.extname(file.originalname);
             const fileName = `${req.sid}${ext}`;
             req.savedFileName = fileName;

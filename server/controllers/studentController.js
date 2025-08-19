@@ -117,7 +117,7 @@ export const createNewStudent = async (req, res) => {
             paymentAmount, address, lastPayment,
             seatNumber, seatShift
         } = req.body;
-        console.log(req)
+  
 
         const newSid = req.sid; // ✅ comes from multer
         const imageFilename = req.file ? req.file.filename : null;
