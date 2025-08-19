@@ -18,7 +18,7 @@ router.post('/bulk-admission', bulkStudentAdmission);
 router.get('/get-admission-month', getAdmissionMonth);
 
 // Add the delete route
-router.get('/delete', trashStudent);
+router.delete('/delete', trashStudent);
 router.get('/trash-Student', trash);
 
 router.get('/temp-api', tempApiForPayment);
