@@ -25,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 mongoose.connect(process.env.MONGODB_URL)
-    .then(() => console.log('Connected to MongoDB...'))
+    .then(() => console.log('Connected to MongoDB...', process.env.MONGODB_URL))
     .catch(err => {
         console.error(`Could not connect to MongoDB... + ${err}`);
     });
@@ -41,12 +41,12 @@ app.use((req, res, next) => {
             res.status(408).json({ error: 'Request timeout' });
         }
     });
-    
+
     // Handle request abortion
     req.on('aborted', () => {
         console.log('Request aborted by client:', req.url, req.method);
     });
-    
+
     next();
 });
 
@@ -70,15 +70,15 @@ app.use(cors({
 app.options('*', cors());
 
 // Body parsing with better error handling
-app.use(express.json({ 
+app.use(express.json({
     limit: '50mb',
     verify: (req, res, buf) => {
         req.rawBody = buf;
     }
 }));
 
-app.use(express.urlencoded({ 
-    limit: '50mb', 
+app.use(express.urlencoded({
+    limit: '50mb',
     extended: true,
     verify: (req, res, buf) => {
         req.rawBody = buf;
@@ -105,20 +105,20 @@ app.use('/api/invoice/', invoiceRouter);
 // Global error handler
 app.use((error, req, res, next) => {
     console.error('Global error handler:', error);
-    
+
     if (error.type === 'entity.parse.failed') {
         return res.status(400).json({ error: 'Invalid JSON payload' });
     }
-    
+
     if (error.message === 'Not allowed by CORS') {
         return res.status(403).json({ error: 'CORS policy violation' });
     }
-    
+
     if (error.code === 'ECONNABORTED' || error.message.includes('aborted')) {
         console.log('Request was aborted by client');
         return; // Don't send response as connection is already closed
     }
-    
+
     if (!res.headersSent) {
         res.status(500).json({ error: 'Internal server error' });
     }

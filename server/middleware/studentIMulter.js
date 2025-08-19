@@ -8,37 +8,32 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// ✅ Middleware to generate SID before multer runs
+export const generateSidMiddleware = async (req, res, next) => {
+    try {
+        const lastStudent = await Student.findOne().sort({ sid: -1 }).lean();
+        const newSid = lastStudent ? lastStudent.sid + 1 : 327;
+        req.sid = newSid;
+        next();
+    } catch (err) {
+        next(err);
+    }
+};
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
     },
-    filename: async (req, file, cb) => {
+    filename: (req, file, cb) => {
         try {
-            let newSid;
-            let attempts = 0;
-            const maxAttempts = 10;
-
-            while (attempts < maxAttempts) {
-                const lastStudent = await Student.findOne().sort({ sid: -1 });
-                newSid = lastStudent ? lastStudent.sid + 1 : 327;
-
-                const existingSid = await Student.findOne({ sid: newSid });
-                if (!existingSid) break;
-
-                attempts++;
-            }
-
-            if (attempts >= maxAttempts) {
-                return cb(new Error("Unable to generate unique student ID after multiple attempts"));
-            }
-
-            // ✅ Attach sid to request for controller usage
-            req.sid = newSid;
-
-            // ✅ Save file as sid + original extension
+            // ✅ Use sid generated earlier
+            console.log("checking file ")
+            console.log(req)
+            console.log(file);
             const ext = path.extname(file.originalname);
-            cb(null, `${newSid}${ext}`);
-
+            const fileName = `${req.sid}${ext}`;
+            req.savedFileName = fileName;
+            cb(null, fileName);
         } catch (err) {
             cb(err);
         }

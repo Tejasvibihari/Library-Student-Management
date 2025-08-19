@@ -90,12 +90,12 @@ export default function NewAdmissionForm() {
         setLoading(true);
 
         try {
-            // ✅ Convert base64 → File (only if available)
-            let imageFile = compressImage
-                ? base64ToFile(compressImage, `${name || "student"}-photo.jpg`)
+            let imageFile = croppedImage
+                ? base64ToFile(croppedImage, `${name || "student"}-photo.jpg`)
                 : null;
 
-            // ✅ Create FormData
+       
+            console.log("compressImage preview:", compressImage?.substring(0, 50));
             const formData = new FormData();
             [
                 ["name", name],
@@ -114,18 +114,30 @@ export default function NewAdmissionForm() {
             ].forEach(([key, value]) => {
                 if (value) formData.append(key, value);
             });
+            if (imageFile) {
+                console.log("Image File Created:", imageFile);
+                formData.append("image", imageFile);
+            } else {
+                console.warn("⚠️ No image file found, check compressImage value");
+            }
+       
+            console.log("Form Data:");
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(key, "=> File:", value.name, value.type, value.size + " bytes");
+                } else {
+                    console.log(key, "=>", value);
+                }
+            }
 
-            if (imageFile) formData.append("image", imageFile);
-
-            const { data } = await client.post("/api/student/create-new-student", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            const { data } = await client.post("/api/student/create-new-student", formData);
 
             console.log(data.message);
             setAlertStatus(data.message);
             handleSnackOpen();
+            navigate("/success-review");
 
-            // ✅ Reset form fields
+            // ✅ Reset form
             setName("");
             setEmail("");
             setMobile("");
@@ -138,13 +150,9 @@ export default function NewAdmissionForm() {
             setAddress("");
             setCroppedImage("");
             setSeatNumber("");
-            navigate("/success-review");
-
         } catch (error) {
             console.error(error);
-            setAlertStatus(
-                error.response?.data?.message || error.message || "An unknown error occurred"
-            );
+            setAlertStatus(error.response?.data?.message || error.message || "An unknown error occurred");
             handleSnackOpen();
         } finally {
             setLoading(false);
