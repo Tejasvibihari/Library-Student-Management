@@ -1,10 +1,11 @@
 import express from 'express';
 import { tempApiForPayment, createOldStudent, createNewStudent, StudentLogin, StudentLogOut, GetOnlineStudent, GetAllStudent, GetStudent, updateStudent, bulkStudentAdmission, getAdmissionMonth, trashStudent, trash, GetStudentBySid } from '../controllers/studentController.js';
+import { studentUpload } from '../middleware/studentIMulter.js';
 
 const router = express.Router();
 
 router.post("/create-old-student", createOldStudent);
-router.post("/create-new-student", createNewStudent);
+router.post("/create-new-student", studentUpload.single('image'), createNewStudent);
 
 router.post('/login', StudentLogin);
 router.post('/logout', StudentLogOut);
