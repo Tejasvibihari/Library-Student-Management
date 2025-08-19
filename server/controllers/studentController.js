@@ -110,60 +110,58 @@ export const createOldStudent = async (req, res) => {
 }
 export const createNewStudent = async (req, res) => {
     const {
-        sid, name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
+        name, email, mobile, father, guardian, gender, admissionDate, shift, time, paymentAmount, address, image, lastPayment, seatNumber, seatShift
     } = req.body;
 
     try {
         let imageFilename = null;
         let password;
 
-        // Check if student already exists
-       const student = await Student.findOne({
-    $or: [
-        { sid: sid },
-        { email: email }
-    ]
-});
-
-       // Handle new student Sid Generation with retry mechanism
-let newSid;
-let attempts = 0;
-const maxAttempts = 10;
-
-while (attempts < maxAttempts) {
-    try {
-        // Get the highest existing SID
-        const lastStudent = await Student.findOne().sort({ sid: -1 });
-        newSid = lastStudent ? lastStudent.sid + 1 : 327;
+        // FIRST: Check if student already exists with this email
+        const existingStudentWithEmail = await Student.findOne({ email: email });
         
-        // Check if this SID already exists
-        const existingSid = await Student.findOne({ sid: newSid });
-        
-        if (!existingSid) {
-            // SID is unique, break out of loop
-            break;
+        if (existingStudentWithEmail) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Student already exists with this email address' 
+            });
         }
-        
-        // If SID exists, increment attempts and try again
-        attempts++;
-        console.log(`SID ${newSid} already exists, attempt ${attempts}/${maxAttempts}`);
-        
-    } catch (error) {
-        console.error('Error generating SID:', error);
-        attempts++;
-    }
-}
 
-// Check if we failed to generate a unique SID
-if (attempts >= maxAttempts) {
-    return res.status(500).json({ message: 'Unable to generate unique student ID after multiple attempts' });
-}
+        // SECOND: Generate new SID with retry mechanism
+        let newSid;
+        let attempts = 0;
+        const maxAttempts = 10;
 
-// Continue with student creation using the generated newSid
-
-        if (student) {
-            return res.status(400).json({ message: 'Student already exists' });
+        while (attempts < maxAttempts) {
+            try {
+                // Get the highest existing SID
+                const lastStudent = await Student.findOne().sort({ sid: -1 });
+                newSid = lastStudent ? lastStudent.sid + 1 : 327;
+                
+                // Check if this SID already exists
+                const existingSid = await Student.findOne({ sid: newSid });
+                
+                if (!existingSid) {
+                    // SID is unique, break out of loop
+                    break;
+                }
+                
+                // If SID exists, increment attempts and try again
+                attempts++;
+                console.log(`SID ${newSid} already exists, attempt ${attempts}/${maxAttempts}`);
+                
+            } catch (error) {
+                console.error('Error generating SID:', error);
+                attempts++;
+            }
         }
+
+        // Check if we failed to generate a unique SID
+        if (attempts >= maxAttempts) {
+            return res.status(500).json({ message: 'Unable to generate unique student ID after multiple attempts' });
+        }
+
+        console.log(`Generated new SID: ${newSid}`);
 
         // Handle image processing
         if (image && typeof image === 'string') {
@@ -172,13 +170,14 @@ if (attempts >= maxAttempts) {
                 const imageBuffer = Buffer.from(base64String, 'base64');
                 imageFilename = `${newSid}.jpeg`;
                 const uploadsDir = path.join(__dirname, '../uploads');
-const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
+                const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
 
-    // Convert to KB / MB
-    const imageSizeInKB = imageSizeInBytes / 1024;
-    const imageSizeInMB = imageSizeInKB / 1024;
+                // Convert to KB / MB
+                const imageSizeInKB = imageSizeInBytes / 1024;
+                const imageSizeInMB = imageSizeInKB / 1024;
 
-    console.log(`📷 Uploaded image size: ${imageSizeInKB.toFixed(2)} KB (${imageSizeInMB.toFixed(2)} MB)`);
+                console.log(`📷 Uploaded image size: ${imageSizeInKB.toFixed(2)} KB (${imageSizeInMB.toFixed(2)} MB)`);
+                
                 // Create uploads directory if it doesn't exist
                 if (!fs.existsSync(uploadsDir)) {
                     fs.mkdirSync(uploadsDir, { recursive: true });
@@ -221,19 +220,19 @@ const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
         const hashedPassword = await bcrypt.hash(password, 12);
 
         // Create student with all required fields
-        await Student.create({
+        const createdStudent = await Student.create({
             sid: newSid,
             name,
             email,
-            seatNumber: seatNumber || 'Other', // Provide default value
+            seatNumber: seatNumber || 'Other',
             password: hashedPassword,
             mobile,
             father,
-            guardian: guardian || '', // Provide default value
+            guardian: guardian || '',
             gender,
             admissionDate,
             shift,
-            time: time || '', // Provide default value
+            time: time || '',
             paymentAmount,
             address,
             image: imageFilename,
@@ -242,13 +241,14 @@ const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
             status: "Pending"
         });
 
+        console.log(`✅ Student created successfully with SID: ${newSid}`);
+
         // Send email (with error handling)
         try {
             await sendMail({
                 to: email,
                 subject: "Welcome to Bihari Library - Admission Confirmation",
-                body: `
-                    <!DOCTYPE html>
+                body: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -617,17 +617,43 @@ const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
 </body>
 </html>`
             });
+            console.log(`📧 Email sent to: ${email}`);
         } catch (emailError) {
             console.error('Email sending failed:', emailError);
             // Don't fail the request if email fails
         }
 
-        return res.status(201).json({ message: "Admission Success" });
+        return res.status(201).json({ 
+            success: true,
+            message: "Admission Success",
+            studentId: newSid,
+            student: {
+                sid: newSid,
+                name,
+                email
+            }
+        });
+
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error, message: 'Internal Server Error' });
+        console.error('❌ Error in createNewStudent:', error);
+        
+        // Handle specific MongoDB errors
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Student already exists with this information' 
+            });
+        }
+        
+        if (!res.headersSent) {
+            return res.status(500).json({ 
+                success: false,
+                message: 'Internal Server Error',
+                error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+            });
+        }
     }
-}
+};
 const updateSeatAvailability = (seat, seatShift) => {
    
     const shifts = {
