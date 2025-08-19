@@ -118,16 +118,48 @@ export const createNewStudent = async (req, res) => {
         let password;
 
         // Check if student already exists
-        const student = await Student.findOne({ sid });
-        const studentEmail = await Student.findOne({ email });
+       const student = await Student.findOne({
+    $or: [
+        { sid: sid },
+        { email: email }
+    ]
+});
 
-        // Handle new student Sid Generation with simple retry
-        let newSid;
- const lastStudent = await Student.findOne().sort({ sid: -1 });
-            newSid = lastStudent ? lastStudent.sid + 1 : 327;
-          const existingSid = await Student.findOne({ sid: newSid });
-           return res.status(500).json({ message: 'Unable to generate unique student ID' });
-     
+       // Handle new student Sid Generation with retry mechanism
+let newSid;
+let attempts = 0;
+const maxAttempts = 10;
+
+while (attempts < maxAttempts) {
+    try {
+        // Get the highest existing SID
+        const lastStudent = await Student.findOne().sort({ sid: -1 });
+        newSid = lastStudent ? lastStudent.sid + 1 : 327;
+        
+        // Check if this SID already exists
+        const existingSid = await Student.findOne({ sid: newSid });
+        
+        if (!existingSid) {
+            // SID is unique, break out of loop
+            break;
+        }
+        
+        // If SID exists, increment attempts and try again
+        attempts++;
+        console.log(`SID ${newSid} already exists, attempt ${attempts}/${maxAttempts}`);
+        
+    } catch (error) {
+        console.error('Error generating SID:', error);
+        attempts++;
+    }
+}
+
+// Check if we failed to generate a unique SID
+if (attempts >= maxAttempts) {
+    return res.status(500).json({ message: 'Unable to generate unique student ID after multiple attempts' });
+}
+
+// Continue with student creation using the generated newSid
 
         if (student || studentEmail) {
             return res.status(400).json({ message: 'Student already exists' });
