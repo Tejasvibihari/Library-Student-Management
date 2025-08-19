@@ -74,119 +74,83 @@ export default function NewAdmissionForm() {
         setOpen(false);
     };
 
-    function compressBase64Image(base64Str, maxWidth, maxHeight, quality = 0.8) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = base64Str;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height *= maxWidth / width;
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width *= maxHeight / height;
-                        height = maxHeight;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-                resolve(compressedBase64);
-            };
-            img.onerror = (err) => {
-                reject(err);
-            };
-        });
-    }
-    compressBase64Image(croppedImage, 400, 400).then(compressedImage => {
-        console.log("Compressed image:", compressedImage);
-        setCompressImage(compressedImage)
-    }).catch(err => {
-        console.error("Error compressing image:", err);
-    });
-
-    useEffect(() => {
-        const handleChange = () => {
-            setFormData({
-                name,
-                email,
-                mobile,
-
-                father,
-                guardian,
-                gender,
-
-                admissionDate,
-                shift,
-                time,
-                paymentAmount,
-                address,
-                image: compressImage,
-                seatNumber,
-                seatShift
-            })
+    function base64ToFile(base64Str, fileName) {
+        const [meta, data] = base64Str.split(",");
+        const mime = meta.match(/:(.*?);/)[1];
+        const bstr = atob(data);
+        const u8arr = new Uint8Array(bstr.length);
+        for (let i = 0; i < bstr.length; i++) {
+            u8arr[i] = bstr.charCodeAt(i);
         }
-
-        handleChange()
-    }, [name, email, mobile, father, guardian, gender,
-        admissionDate, shift, time, paymentAmount, seatNumber, seatShift,
-        address, compressImage])
-
+        return new File([u8arr], fileName, { type: mime });
+    }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
+        setLoading(true);
+
         try {
-            setLoading(true)
-            const response = await client.post("/api/student/create-new-student", formData)
-            console.log(response.data.message)
-            setLoading(false)
-            handleSnackOpen()
-            setAlertStatus(response.data.message)
-            setName("")
-            setEmail("")
-            setMobile("")
+            // ✅ Convert base64 → File (only if available)
+            let imageFile = compressImage
+                ? base64ToFile(compressImage, `${name || "student"}-photo.jpg`)
+                : null;
 
-            setFather("")
-            setGuardian("")
-            setGender("")
+            // ✅ Create FormData
+            const formData = new FormData();
+            [
+                ["name", name],
+                ["email", email],
+                ["mobile", mobile],
+                ["father", father],
+                ["guardian", guardian],
+                ["gender", gender],
+                ["admissionDate", admissionDate],
+                ["shift", shift],
+                ["time", time],
+                ["paymentAmount", paymentAmount],
+                ["address", address],
+                ["seatNumber", seatNumber],
+                ["seatShift", seatShift],
+            ].forEach(([key, value]) => {
+                if (value) formData.append(key, value);
+            });
 
-            setAdmissionDate("")
-            setShift("")
-            setTime('')
-            // setToAmPm("")
-            setAddress("")
-            setCroppedImage("")
-            setSeatNumber("")
-            navigate("/success-review")
+            if (imageFile) formData.append("image", imageFile);
 
+            const { data } = await client.post("/api/student/create-new-student", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            console.log(data.message);
+            setAlertStatus(data.message);
+            handleSnackOpen();
+
+            // ✅ Reset form fields
+            setName("");
+            setEmail("");
+            setMobile("");
+            setFather("");
+            setGuardian("");
+            setGender("");
+            setAdmissionDate("");
+            setShift("");
+            setTime("");
+            setAddress("");
+            setCroppedImage("");
+            setSeatNumber("");
+            navigate("/success-review");
 
         } catch (error) {
-            setLoading(false)
-            console.log(error)
-            if (error.response && error.response.data && error.response.data.message) {
-                setAlertStatus(error.response.data.message);
-                handleSnackOpen()
-            } else if (error.message) {
-                setAlertStatus(error.message);
-                handleSnackOpen()
-            } else {
-                setAlertStatus('An unknown error occurred');
-                handleSnackOpen()
-            }
-
+            console.error(error);
+            setAlertStatus(
+                error.response?.data?.message || error.message || "An unknown error occurred"
+            );
+            handleSnackOpen();
+        } finally {
+            setLoading(false);
         }
-    }
+    };
+
     const handleTimeChange = (e) => {
         const selectedTime = e.target.value;
         setTime(selectedTime);
