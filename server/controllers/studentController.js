@@ -110,6 +110,7 @@ export const createOldStudent = async (req, res) => {
 }
 
 export const createNewStudent = async (req, res) => {
+    console.log("Hello from git ");
     try {
         const {
             name, email, mobile, father, guardian,
