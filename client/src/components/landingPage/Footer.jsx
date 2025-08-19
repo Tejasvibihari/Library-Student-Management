@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { MapPin, Phone, Mail, Building, Settings, Images, Link2, LayoutDashboard, Network } from 'lucide-react'
+import { MapPin, Phone, Mail, Building, Settings, Images, Link2, LayoutDashboard, Network, PhoneIcon } from 'lucide-react'
 
 export default function Footer() {
     return (
@@ -36,6 +36,16 @@ export default function Footer() {
                                 <Link to="/admin-dashboard">
                                     <li className='flex mb-4'><LayoutDashboard size={20} className='text-primary mr-3' />Dashboard</li>
                                 </Link>
+                                <a
+                                    href="/apk/application-f7fd281f-90aa-4924-ab7f-b3f745a50604.apk"
+                                    download
+                                >
+                                    <li className='flex mb-4'>
+                                        <PhoneIcon size={20} className='text-primary mr-3' />
+                                        Download App
+                                    </li>
+                                </a>
+
                                 <a href="/6024841_21.html">
                                     <li className='flex mb-4'><Network size={20} className='text-primary mr-3' />Sitemap</li>
                                 </a>
