@@ -123,23 +123,11 @@ export const createNewStudent = async (req, res) => {
 
         // Handle new student Sid Generation with simple retry
         let newSid;
-        let attempts = 0;
-        const maxAttempts = 3;
-
-        while (attempts < maxAttempts) {
-            const lastStudent = await Student.findOne().sort({ sid: -1 });
+ const lastStudent = await Student.findOne().sort({ sid: -1 });
             newSid = lastStudent ? lastStudent.sid + 1 : 327;
-
-            // Check if this SID already exists
-            const existingSid = await Student.findOne({ sid: newSid });
-            if (!existingSid) {
-                break; // SID is unique, we can use it
-            }
-            attempts++;
-            if (attempts >= maxAttempts) {
-                return res.status(500).json({ message: 'Unable to generate unique student ID' });
-            }
-        }
+          const existingSid = await Student.findOne({ sid: newSid });
+           return res.status(500).json({ message: 'Unable to generate unique student ID' });
+     
 
         if (student || studentEmail) {
             return res.status(400).json({ message: 'Student already exists' });
