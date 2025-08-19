@@ -104,7 +104,7 @@ app.use('/api/invoice/', invoiceRouter);
 
 // Global error handler
 app.use((error, req, res, next) => {
-    console.error('Global error handler:', error.message);
+    console.error('Global error handler:', error);
     
     if (error.type === 'entity.parse.failed') {
         return res.status(400).json({ error: 'Invalid JSON payload' });
