@@ -161,7 +161,7 @@ if (attempts >= maxAttempts) {
 
 // Continue with student creation using the generated newSid
 
-        if (student || studentEmail) {
+        if (student) {
             return res.status(400).json({ message: 'Student already exists' });
         }
 
