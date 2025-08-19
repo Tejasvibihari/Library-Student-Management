@@ -597,7 +597,7 @@ const imageSizeInBytes = Buffer.byteLength(base64String, 'base64');
     }
 }
 const updateSeatAvailability = (seat, seatShift) => {
-    console.log(seat, seatShift, "updateSeatAvailability called");
+   
     const shifts = {
         fullDay: ['morning', 'afternoon', 'evening', 'night', 'doubleMorning', 'doubleEvening', 'nightLong', 'fullDay', 'morningLong'],
         morning: ['morning'],
@@ -613,7 +613,7 @@ const updateSeatAvailability = (seat, seatShift) => {
 };
 
 export const GetAllStudent = async (req, res) => {
-
+    const { sid, name, status, seatNumber } = req.query;
     // Construct a dynamic query object
     let query = { status: { $ne: 'Trash' } }; // Exclude students with status 'Trash'
 
