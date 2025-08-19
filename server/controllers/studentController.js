@@ -613,7 +613,7 @@ const updateSeatAvailability = (seat, seatShift) => {
 };
 
 export const GetAllStudent = async (req, res) => {
-    const { sid, name, status, seatNumber } = req.query;
+
     // Construct a dynamic query object
     let query = { status: { $ne: 'Trash' } }; // Exclude students with status 'Trash'
 
