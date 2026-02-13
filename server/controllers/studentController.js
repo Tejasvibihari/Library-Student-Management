@@ -1,5 +1,5 @@
 import Student from '../models/studentModel.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sendMail } from '../utils/mailer.js';
 import fs from 'fs';
