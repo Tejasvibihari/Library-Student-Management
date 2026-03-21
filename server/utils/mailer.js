@@ -10,7 +10,7 @@ export const sendMail = async ({ to, subject, body }) => {
             secure: false,
             auth: {
                 user: "biharilibrary@gmail.com",
-                pass: "sjmxbccniigpnlfe", // Ensure you're using an app-specific password
+                pass: "qaewcdvgvpbqyclr", // Ensure you're using an app-specific password
                 // user: "tejasvibihari2000@gmail.com",
                 // pass: "gjnoqyfqnblqhiak", // Ensure you're using an app-specific password
             },
