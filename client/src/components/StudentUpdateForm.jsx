@@ -61,6 +61,9 @@ export default function StudentUpdateForm() {
     const [seatNumber, setSeatNumber] = useState("")
     const [compressImage, setCompressImage] = useState("")
     const [nextPayment, setNextPayment] = useState("")
+    const [fixedDiscountAmount, setFixedDiscountAmount] = useState(0)
+    const [fixedDiscountReason, setFixedDiscountReason] = useState("")
+
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -136,7 +139,7 @@ export default function StudentUpdateForm() {
     useEffect(() => {
         const getStudent = async () => {
             try {
-                const response = await client.get("/api/student/getstudent", {
+                const response = await client.get("/api/v2/student/getstudent", {
                     params: { admin: userId._id, _id }
                 })
 
@@ -147,22 +150,30 @@ export default function StudentUpdateForm() {
                 setFather(response.data.father)
                 setGuardian(response.data.guardian)
                 setGender(response.data.gender)
-                setShift(response.data.shift)
-                setTime(response.data.time)
+                setShift(response.data.shift?.label || '')
+                setTime(response.data.shift?.displayTime || '')
                 setAddress(response.data.address)
                 setCompressImage(response.data.image)
-                setStatus(response.data.status)
-                setPaymentAmount(response.data.paymentAmount)
+                
+                // Map V2 status to V1 selection values
+                const legStatus = response.data.statuses?.student;
+                if (legStatus === 'active') setStatus('Active');
+                else if (legStatus === 'pending') setStatus('Pending');
+                else if (legStatus === 'inactive') setStatus('Deactive');
+                else if (legStatus === 'trash') setStatus('Trash');
+                else setStatus('Deactive');
+
+                setPaymentAmount(response.data.shift?.amount || '')
                 setInstagram(response.data.instagram)
                 setFacebook(response.data.facebook)
                 setYoutube(response.data.youtube)
-                setSeatNumber(response.data.seatNumber)
+                setSeatNumber(response.data.seat?.seatNumber || '')
+                setFixedDiscountAmount(response.data.billing?.fixedDiscountAmount || 0)
+                setFixedDiscountReason(response.data.billing?.fixedDiscountReason || '')
 
                 try {
-                    // Safely format dates using the helper function
                     const formattedAdmissionDate = safeFormatDate(response.data.admissionDate);
-                    const formattedNextPaymentDate = safeFormatDate(response.data.nextPayment);
-                    // Set state with the safely formatted dates or fallback values
+                    const formattedNextPaymentDate = safeFormatDate(response.data.account?.validTill);
                     setAdmissionDate(formattedAdmissionDate);
                     setNextPayment(formattedNextPaymentDate)
                 } catch (error) {
@@ -199,19 +210,20 @@ export default function StudentUpdateForm() {
                 admin: userId,
                 seatNumber,
                 nextPayment,
-
+                fixedDiscountAmount,
+                fixedDiscountReason
             })
         }
         handleChange()
     }, [sid, name, email, mobile, father, guardian, gender, seatNumber, nextPayment,
-        admissionDate, shift, time, address, compressImage, userId, addressArray, instagram, facebook, youtube, status, paymentAmount])
+        admissionDate, shift, time, address, compressImage, userId, addressArray, instagram, facebook, youtube, status, paymentAmount, fixedDiscountAmount, fixedDiscountReason])
 
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             setLoading(true)
-            const response = await client.post("/api/student/updatestudent", formData)
+            const response = await client.post("/api/v2/student/updatestudent", formData)
             console.log(response.data.message)
             setLoading(false)
             handleSnackOpen()
@@ -389,7 +401,20 @@ export default function StudentUpdateForm() {
 
                                     </div>
                                 </div>
-                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
+                                <div className='border p-2 rounded-sm mt-3'>
+                                    <h3>Billing & Discount</h3>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
+                                        <div>
+                                            <label>Overall Shift Discount (Rs)</label>
+                                            <input className="p-2 border rounded-md w-full" value={fixedDiscountAmount} onChange={(e) => setFixedDiscountAmount(Number(e.target.value))} type="number" placeholder="Discount Amount" />
+                                        </div>
+                                        <div>
+                                            <label>Discount Reason</label>
+                                            <input className="p-2 border rounded-md w-full" value={fixedDiscountReason} onChange={(e) => setFixedDiscountReason(e.target.value)} type="text" placeholder="Reason" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4 mt-3'>
                                     <div>
                                         <label>Instagram</label>
                                         <input

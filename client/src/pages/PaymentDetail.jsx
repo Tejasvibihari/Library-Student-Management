@@ -10,7 +10,7 @@ export default function PaymentDetail() {
     useEffect(() => {
         const getPaymentData = async () => {
             try {
-                const res = await client.get('/api/payment/getallpayment')
+                const res = await client.get('/api/v2/payment/getallpayment')
                 console.log(res.data)
                 setAllPaymentData(res.data)
             } catch (error) {

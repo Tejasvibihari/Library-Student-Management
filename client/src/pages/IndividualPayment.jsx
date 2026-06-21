@@ -18,6 +18,9 @@ export default function IndividualPayment() {
 
     const [paymentDate, setPaymentDate] = useState('')
     const [paymentFor, setPaymentFor] = useState()
+    const [amountPaid, setAmountPaid] = useState('')
+    const [cycleStart, setCycleStart] = useState('')
+    const [cycleEnd, setCycleEnd] = useState('')
     const [paymentData, setPaymentData] = useState({})
     // SnackBar State 
     const [snackOpen, setSnackOpen] = useState(false);
@@ -40,29 +43,39 @@ export default function IndividualPayment() {
     }
     useEffect(() => {
         const getData = async () => {
-            const response = await client.get("/api/student/getstudent", {
+            const response = await client.get("/api/v2/student/getstudent", {
                 params: { _id }
             })
             setStudentData(response.data)
-        }
-        const handelPaymentChange = () => {
-            setPaymentData({
-                sid: studentData.sid,
-                payment_date: paymentDate,
-                amount: studentData.paymentAmount * paymentFor,
-                months_paid_for: paymentFor,
-                admissionDate: studentData.admissionDate
-            })
+            setAdmissionDate(safeFormatDate(response.data.admissionDate))
+            const start = safeFormatDate(response.data?.currentCycle?.nextPayment || response.data?.currentCycle?.cycleStart || response.data?.admissionDate);
+            const endDate = new Date(start);
+            if (!isNaN(endDate.getTime())) {
+                endDate.setMonth(endDate.getMonth() + 1);
+                setCycleStart(start);
+                setCycleEnd(endDate.toISOString().split('T')[0]);
+            }
         }
         getData()
-        handelPaymentChange()
-        setAdmissionDate(safeFormatDate(studentData.admissionDate))
-    }, [_id, paymentDate, paymentFor, studentData.admissionDate, studentData.paymentAmount, studentData.sid])
+    }, [_id])
+
+    useEffect(() => {
+        const payable = studentData?.shift?.feeAmount || studentData.paymentAmount || 0;
+        setPaymentData({
+            sid: studentData.sid,
+            paymentDate,
+            amountPaid: Number(amountPaid || payable * (paymentFor || 1)),
+            monthsPaidFor: Number(paymentFor || 1),
+            cycleStart,
+            cycleEnd,
+            shiftCode: studentData?.shift?.code
+        })
+    }, [paymentDate, paymentFor, amountPaid, cycleStart, cycleEnd, studentData.paymentAmount, studentData.sid, studentData?.shift?.code, studentData?.shift?.feeAmount])
 
     const handlePaymentClick = async () => {
         setLoading(true)
         try {
-            const response = await client.post('/api/payment/makepayment', paymentData)
+            const response = await client.post('/api/v2/payment/makepayment', paymentData)
             console.log(response)
             setAlertStatus(response.data.message)
             handleSnackOpen()
@@ -126,11 +139,11 @@ export default function IndividualPayment() {
                             <div className='my-4 flex gap-4'>
                                 <div className='border p-2 rounded-sm w-full'>
                                     <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Shift</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.shift}</h2>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData?.shift?.label || studentData.shift}</h2>
                                 </div>
                                 <div className='border p-2 rounded-sm w-full'>
                                     <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Time</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.time}</h2>
+                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData?.shift?.displayTime || studentData.time}</h2>
                                 </div>
                             </div>
                             <div className='my-4 flex gap-4'>
@@ -147,6 +160,16 @@ export default function IndividualPayment() {
                             </div>
                             <div className='my-4 flex gap-4'>
                                 <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Cycle Start</h3>
+                                    <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type='date' value={cycleStart} onChange={(e) => setCycleStart(e.target.value)} />
+                                </div>
+                                <div className='border p-2 rounded-sm w-full'>
+                                    <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Cycle End</h3>
+                                    <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type='date' value={cycleEnd} onChange={(e) => setCycleEnd(e.target.value)} />
+                                </div>
+                            </div>
+                            <div className='my-4 flex gap-4'>
+                                <div className='border p-2 rounded-sm w-full'>
                                     <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Payment For</h3>
                                     {/* <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.lastPayment}</h2> */}
                                     <input required className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' value={paymentFor} onChange={(e) => setPaymentFor(e.target.value)} type="number" placeholder='1 or 2 Month' />
@@ -155,8 +178,7 @@ export default function IndividualPayment() {
                             <div className='my-4 flex gap-4'>
                                 <div className='border p-2 rounded-sm w-full'>
                                     <h3 className='font-semibold text-xs text-gray-500 font-[inter]'>Amount</h3>
-                                    <h2 className='font-semibold text-sm text-[#1b2c3f] font-[inter]'>{studentData.paymentAmount * paymentFor}</h2>
-                                    {/* <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' type="number" placeholder='Enter Amount' /> */}
+                                    <input className='font-semibold text-sm text-[#1b2c3f] font-[inter] w-full p-2' value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} type="number" placeholder={`${(studentData?.shift?.feeAmount || studentData.paymentAmount || 0) * (paymentFor || 1)}`} />
                                 </div>
                             </div>
                             <button onClick={handlePaymentClick} className='p-2 w-full border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>

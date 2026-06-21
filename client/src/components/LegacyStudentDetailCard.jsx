@@ -75,6 +75,18 @@ const STUDENT_STATUS_STYLES = {
     trash: { label: 'Trash', badge: 'border-slate-600 bg-slate-800', Icon: DeleteSweepIcon }
 };
 
+// The old/legacy schema spells the inactive status "Deactive" instead
+// of v2's "inactive" — alias it so both data sources theme correctly.
+const STUDENT_STATUS_ALIASES = {
+    deactive: 'inactive',
+    deactivated: 'inactive'
+};
+
+function normalizeStudentStatus(status) {
+    const raw = String(status || 'pending').toLowerCase();
+    return STUDENT_STATUS_ALIASES[raw] || raw;
+}
+
 // ---- Helpers ----------------------------------------------------------
 
 function daysBetweenToday(dateInput) {
@@ -105,7 +117,7 @@ function formatCurrency(amount) {
     }).format(value);
 }
 
-export default function StudentDetailCard({
+export default function LegacyStudentDetailCard({
     studentId,
     sid,
     src,
@@ -159,7 +171,7 @@ export default function StudentDetailCard({
     const normalizedPaymentStatus = String(paymentStatus || 'due').toLowerCase();
     const payTheme = PAYMENT_STATUS_STYLES[normalizedPaymentStatus] || PAYMENT_STATUS_STYLES.due;
 
-    const normalizedStudentStatus = String(status || 'pending').toLowerCase();
+    const normalizedStudentStatus = normalizeStudentStatus(status);
     const studentTheme = STUDENT_STATUS_STYLES[normalizedStudentStatus] || STUDENT_STATUS_STYLES.pending;
     const StudentStatusIcon = studentTheme.Icon;
 

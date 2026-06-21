@@ -21,7 +21,7 @@ export default function Home() {
     useEffect(() => {
         const getAllStudent = async () => {
             try {
-                const response = await client.get("/api/student/getallstudent", {
+                const response = await client.get("/api/v2/student/getallstudent", {
                     params: { admin: adminId }
                 })
                 setAllStudent(response.data)

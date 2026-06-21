@@ -133,21 +133,25 @@ export default function PaymentStudentTable({ allStudent }) {
                                         {data.name}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.time}
+                                        {data.shift?.displayTime || data.time}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.lastPayment ? formatDate(data.lastPayment) : 'N/A'}
+                                        {data.account?.lastPaymentAt ? formatDate(data.account.lastPaymentAt) : (data.lastPayment ? formatDate(data.lastPayment) : 'N/A')}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.nextPayment ? formatDate(data.nextPayment) : 'N/A'}
+                                        {data.account?.validTill ? formatDate(data.account.validTill) : (data.nextPayment ? formatDate(data.nextPayment) : 'N/A')}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {data.paymentAmount}
+                                        Rs {data.shift?.amount || data.paymentAmount || 0}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className={`border text-white rounded-full p-1 text-xs text-center ${data.status === "Pending" ? "border-yellow-600 bg-yellow-800" : data.status === "Active" ? "border-green-600 bg-green-800" : "border-red-600 bg-red-800"}  flex items-center justify-center`}>
-                                            {/* {data.nextPayment < new Date() ? "Pending" : "Active"} */}
-                                            {data.status === "Active" ? "Active" : data.status === "Pending" ? "Pending" : data.status === "Deactive" ? "Deactive" : null}
+                                        <div className={`border text-white rounded-full p-1 text-xs text-center capitalize ${
+                                            (data.statuses?.payment || String(data.status).toLowerCase()) === "due" ? "border-red-600 bg-red-800" :
+                                            (data.statuses?.payment || String(data.status).toLowerCase()) === "partial" ? "border-yellow-650 bg-yellow-800" :
+                                            (data.statuses?.payment || String(data.status).toLowerCase()) === "advance" ? "border-blue-650 bg-blue-800" :
+                                            "border-green-600 bg-green-800"
+                                        } flex items-center justify-center`}>
+                                            {data.statuses?.payment || data.status}
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">

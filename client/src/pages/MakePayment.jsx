@@ -20,12 +20,12 @@ export default function MakePayment() {
     const handleFilter = async () => {
         setLoading(true)
         try {
-            const response = await client.get("/api/student/getallstudent", {
+            const response = await client.get("/api/v2/student/getallstudent", {
                 params: {
                     admin: adminId,
                     sid: sid,
                     name: studentName,
-                    status: active ? "Active" : deactive ? "Deactive" : pending ? "Pending" : null,
+                    status: active ? "active" : deactive ? "inactive" : pending ? "pending" : null,
                 }
             })
             console.log(response)
@@ -41,7 +41,7 @@ export default function MakePayment() {
     useEffect(() => {
         const getAllStudent = async () => {
             try {
-                const response = await client.get("/api/student/getallstudent", {
+                const response = await client.get("/api/v2/student/getallstudent", {
                     params: { admin: adminId }
                 })
                 setAllStudent(response.data)

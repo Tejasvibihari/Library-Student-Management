@@ -1,13 +1,50 @@
 import { useEffect, useState } from 'react'
 import SideBar from '../components/Sidebar'
-import StudentDetailCard from '../components/StudentDetailCard'
+import LegacyStudentDetailCard from '../components/LegacyStudentDetailCard'
 import client from '../services/axiosClient'
 import { useSelector } from 'react-redux'
 import Breadcrumbs from '../components/Breadcrumbs'
 import CircularLoading from '../components/ui/CircularLoading'
 import { UserPlus } from 'lucide-react';
 
-export default function StudentDetail() {
+// The old/legacy Student schema is flat — it has no statuses.payment,
+// no account.dueAmount/advanceAmount, and no dueDays/creditDays the
+// way the v2 schema does. All it gives us is paymentDue,
+// extraPaymentDue, lastPayment, and nextPayment. This derives the same
+// ledger shape LegacyStudentDetailCard expects so the card itself
+// doesn't need to know which API the data came from.
+function deriveLegacyPaymentInfo(student) {
+    const rawDue = Number(student.paymentDue || 0);
+    const extraDue = Number(student.extraPaymentDue || 0);
+    const totalDue = rawDue + extraDue;
+
+    // On legacy records a negative paymentDue was historically used to
+    // represent credit/advance rather than a true overdue balance.
+    const dueAmount = totalDue > 0 ? totalDue : 0;
+    const advanceAmount = totalDue < 0 ? Math.abs(totalDue) : 0;
+
+    let dueDays = 0;
+    let creditDays = 0;
+    if (student.nextPayment) {
+        const validTill = new Date(student.nextPayment);
+        if (!Number.isNaN(validTill.getTime())) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            validTill.setHours(0, 0, 0, 0);
+            const diffDays = Math.round((validTill - today) / (1000 * 60 * 60 * 24));
+            if (dueAmount > 0 && diffDays < 0) dueDays = Math.abs(diffDays);
+            if (advanceAmount > 0 && diffDays > 0) creditDays = diffDays;
+        }
+    }
+
+    let paymentStatus = 'paid';
+    if (dueAmount > 0) paymentStatus = 'due';
+    else if (advanceAmount > 0) paymentStatus = 'advance';
+
+    return { paymentStatus, dueAmount, advanceAmount, dueDays, creditDays };
+}
+
+export default function LegacyStudentDetail() {
     const adminId = useSelector(state => state.admin.currentAdmin._id)
     const [allStudent, setAllStudent] = useState([])
     const [sid, setSid] = useState('');
@@ -24,8 +61,7 @@ export default function StudentDetail() {
         const getAllStudent = async () => {
             setLoading(true)
             try {
-
-                const response = await client.get("/api/v2/student/getallstudent")
+                const response = await client.get("/api/student/getallstudent")
                 setAllStudent(response.data)
                 console.log(response.data)
                 setLoading(false)
@@ -36,15 +72,20 @@ export default function StudentDetail() {
         }
         getAllStudent()
     }, [adminId])
+
     const handleFilter = async () => {
         setLoading(true)
         try {
+            // The legacy /getallstudent route matches status with a plain
+            // equality check (query.status = status), and records are
+            // stored capitalized — "Active" / "Pending" / "Deactive" —
+            // not lowercase like the v2 collection.
             let statusQuery = null;
-            if (active) statusQuery = 'active';
-            else if (pending) statusQuery = 'pending';
-            else if (deactive) statusQuery = 'inactive';
+            if (active) statusQuery = 'Active';
+            else if (pending) statusQuery = 'Pending';
+            else if (deactive) statusQuery = 'Deactive';
 
-            const response = await client.get("/api/v2/student/getallstudent", {
+            const response = await client.get("/api/student/getallstudent", {
                 params: {
                     sid: sid,
                     name: studentName,
@@ -63,7 +104,7 @@ export default function StudentDetail() {
     return (
         <>
             {/* <SideBar> */}
-            <Breadcrumbs title="Student Details" subTitle="Student" />
+            <Breadcrumbs title="Legacy Student Details" subTitle="Student" />
             <div className='grid grid-cols-1 md:grid-cols-10 gap-4 mt-5 border p-4 shadow-md'>
                 <div className='col-span-2'>
                     <label htmlFor="studentId" className="block text-sm font-medium text-gray-700">Student ID</label>
@@ -116,41 +157,37 @@ export default function StudentDetail() {
                     <CircularLoading size={30} />
                 ) : (
                     allStudent && allStudent.length > 0 ? (
-                        allStudent.map((student, i) => (
-                            <StudentDetailCard
-                                key={i}
-                                studentId={student._id}
-                                sid={student.sid}
-                                name={student.name}
-                                email={student.email}
-                                mobile={student.mobile}
-                                dob={student.dob}
-                                aadhar={student.aadhar}
-                                father={student.father}
-                                guardian={student.guardian}
-                                gender={student.gender}
-                                preparingFor={student.preparingFor}
-                                addmissionDate={student.admissionDate}
-                                shift={student.shift?.label || ''}
-                                shiftTo={student.shiftTo}
-                                pincode={student.pincode}
-                                address={student.address}
-                                time={student.shift?.displayTime || ''}
-                                dist={student.district}
-                                block={student.block}
-                                src={student.image ? `${import.meta.env.VITE_BASE_URL}/uploads/${student.image}` : (student.gender === "Male" ? './img/idDp.jpg' : './img/femaledp.jpg')}
-                                status={student.statuses?.student || 'pending'}
-                                paymentStatus={student.statuses?.payment || 'due'}
-                                lastPayment={student.account?.lastPaymentAt}
-                                paymentAmount={student.shift?.amount || 0}
-                                nextPayment={student.account?.validTill}
-                                seatNumber={student.seat?.seatNumber || 'Other'}
-                                paymentDue={student.account?.dueAmount || 0}
-                                advanceAmount={student.account?.advanceAmount || 0}
-                                dueDays={student.account?.dueDays || 0}
-                                creditDays={student.account?.creditDays || 0}
-                            />
-                        ))
+                        allStudent.map((student, i) => {
+                            const paymentInfo = deriveLegacyPaymentInfo(student);
+                            return (
+                                <LegacyStudentDetailCard
+                                    key={student._id || i}
+                                    studentId={student._id}
+                                    sid={student.sid}
+                                    name={student.name}
+                                    email={student.email}
+                                    mobile={student.mobile}
+                                    father={student.father}
+                                    guardian={student.guardian}
+                                    gender={student.gender}
+                                    addmissionDate={student.admissionDate}
+                                    shift={student.shift}
+                                    time={student.time}
+                                    address={student.address}
+                                    src={student.image ? `${import.meta.env.VITE_BASE_URL}/uploads/${student.image}` : (student.gender === "Male" ? './img/idDp.jpg' : './img/femaledp.jpg')}
+                                    status={student.status}
+                                    paymentStatus={paymentInfo.paymentStatus}
+                                    lastPayment={student.lastPayment}
+                                    paymentAmount={student.paymentAmount}
+                                    nextPayment={student.nextPayment}
+                                    seatNumber={student.seatNumber}
+                                    paymentDue={paymentInfo.dueAmount}
+                                    advanceAmount={paymentInfo.advanceAmount}
+                                    dueDays={paymentInfo.dueDays}
+                                    creditDays={paymentInfo.creditDays}
+                                />
+                            );
+                        })
                     ) : (
                         <p>No students found.</p>
                     )

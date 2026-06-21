@@ -23,6 +23,12 @@ export const MenuLinkItems = [
             },
             {
                 id: 4,
+                icon: User,
+                name: "Legacy Student Detail",
+                href: "/legacy-student-detail",
+            },
+            {
+                id: 5,
                 icon: MailPlus,
                 name: "Email",
                 href: "/email",
@@ -44,6 +50,12 @@ export const MenuLinkItems = [
                 icon: Armchair,
                 name: "Seat",
                 href: "/seat",
+            },
+            {
+                id: 7,
+                icon: Armchair,
+                name: "Shift",
+                href: "/shift",
             },
             {
                 id: 7,

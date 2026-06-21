@@ -7,9 +7,9 @@ export default function DashboardCard({ allStudent }) {
     const [activeStudent, setActiveStudent] = useState()
     const [deactiveStudent, setDeactiveStudent] = useState()
     useEffect(() => {
-        const pending = allStudent.filter(student => student.status === "Pending")
-        const deactive = allStudent.filter(student => student.status === "Deactive")
-        const active = allStudent.filter(student => student.status === "Active")
+        const pending = allStudent.filter(student => student.statuses?.student === "pending")
+        const deactive = allStudent.filter(student => student.statuses?.student === "inactive" || student.statuses?.student === "left")
+        const active = allStudent.filter(student => student.statuses?.student === "active")
         console.log(pending.length)
         setPendingStudent(pending.length)
         setActiveStudent(active.length)

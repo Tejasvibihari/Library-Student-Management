@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, ChevronDown, ChevronUp } from 'lucide-react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -9,17 +8,12 @@ import DialogContentText from '@mui/material/DialogContentText';
 import Slide from '@mui/material/Slide';
 import ImageCroper from './ImageCroper';
 import { UserPlus } from 'lucide-react';
-import { useSelector } from 'react-redux';
 import client from '../services/axiosClient';
 import CircularLoading from './ui/CircularLoading';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import StudentIdCard from './StudentIdCard';
-import { Navigate, useNavigate } from 'react-router-dom';
-
-
-
-
+import { useNavigate } from 'react-router-dom';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -32,7 +26,8 @@ export default function NewAdmissionForm() {
     const [snackOpen, setSnackOpen] = React.useState(false);
     const [alertStatus, setAlertStatus] = useState('')
     const navigate = useNavigate()
-    // Form State 
+
+    // Core student fields
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
@@ -40,39 +35,42 @@ export default function NewAdmissionForm() {
     const [guardian, setGuardian] = useState("");
     const [gender, setGender] = useState("");
     const [admissionDate, setAdmissionDate] = useState("");
-    const [shift, setShift] = useState("");
-    const [time, setTime] = useState("");
-    const [paymentAmount, setPaymentAmount] = useState()
     const [address, setAddress] = useState("");
     const [croppedImage, setCroppedImage] = useState(null);
-    const [formData, setFormData] = useState({})
-    const [seatShift, setSeatShift] = useState("")
-    const [vacantSeat, setVacantSeat] = useState([])
-    const [seatNumber, setSeatNumber] = useState("")
     const [compressImage, setCompressImage] = useState("")
-    // Alert Snackbar 
-    const handleSnackOpen = () => {
-        setSnackOpen(true);
-    };
+
+    // Shift + seat
+    const [shiftOptions, setShiftOptions] = useState([])
+    const [shiftCode, setShiftCode] = useState("")
+    const [vacantSeat, setVacantSeat] = useState([])
+    const [seatNumber, setSeatNumber] = useState("Other")
+
+    // Fee payment at admission
+    const [feePaid, setFeePaid] = useState(false)
+    const [amountPaid, setAmountPaid] = useState("")
+
+    // Advanced / optional fields the controller also accepts
+    const [showAdvanced, setShowAdvanced] = useState(false)
+    const [password, setPassword] = useState("")
+    const [fixedDiscountAmount, setFixedDiscountAmount] = useState("")
+    const [fixedDiscountReason, setFixedDiscountReason] = useState("")
+    const [cycleDays, setCycleDays] = useState(30)
+
+    const selectedShift = shiftOptions.find(option => option.code === shiftCode);
+
+    const handleSnackOpen = () => setSnackOpen(true);
 
     const handleSnackClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
+        if (reason === 'clickaway') return;
         setSnackOpen(false);
     };
+
     const handleCroppedImage = (imageDataUrl) => {
         setCroppedImage(imageDataUrl);
-        console.log("Received cropped image:", imageDataUrl);
-    };
-    const handleClickOpen = () => {
-        setOpen(true);
     };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const handleClickOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     function base64ToFile(base64Str, fileName) {
         const [meta, data] = base64Str.split(",");
@@ -85,17 +83,41 @@ export default function NewAdmissionForm() {
         return new File([u8arr], fileName, { type: mime });
     }
 
+    const resetForm = () => {
+        setName("");
+        setEmail("");
+        setMobile("");
+        setFather("");
+        setGuardian("");
+        setGender("");
+        setAdmissionDate("");
+        setAddress("");
+        setCroppedImage("");
+        setCompressImage("");
+        setShiftCode("");
+        setSeatNumber("Other");
+        setFeePaid(false);
+        setAmountPaid("");
+        setPassword("");
+        setFixedDiscountAmount("");
+        setFixedDiscountReason("");
+        setCycleDays(30);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!shiftCode) {
+            setAlertStatus("Please select a shift.");
+            handleSnackOpen();
+            return;
+        }
         setLoading(true);
 
         try {
-            let imageFile = croppedImage
+            const imageFile = croppedImage
                 ? base64ToFile(croppedImage, `${name || "student"}-photo.jpg`)
                 : null;
 
-       
-            console.log("compressImage preview:", compressImage?.substring(0, 50));
             const formData = new FormData();
             [
                 ["name", name],
@@ -105,51 +127,36 @@ export default function NewAdmissionForm() {
                 ["guardian", guardian],
                 ["gender", gender],
                 ["admissionDate", admissionDate],
-                ["shift", shift],
-                ["time", time],
-                ["paymentAmount", paymentAmount],
                 ["address", address],
                 ["seatNumber", seatNumber],
-                ["seatShift", seatShift],
+                ["shiftCode", shiftCode],
+                ["feePaid", feePaid],
+                // Only send amountPaid when the fee isn't marked fully paid;
+                // when feePaid is checked the backend charges the full
+                // cycle amount itself, so an amount field here would be
+                // redundant (and is hidden in the UI in that case).
+                ["amountPaid", feePaid ? "" : amountPaid],
+                ["password", password],
+                ["fixedDiscountAmount", fixedDiscountAmount],
+                ["fixedDiscountReason", fixedDiscountReason],
+                ["cycleDays", cycleDays],
             ].forEach(([key, value]) => {
-                if (value) formData.append(key, value);
-            });
-            if (imageFile) {
-                console.log("Image File Created:", imageFile);
-                formData.append("image", imageFile);
-            } else {
-                console.warn("⚠️ No image file found, check compressImage value");
-            }
-       
-            console.log("Form Data:");
-            for (let [key, value] of formData.entries()) {
-                if (value instanceof File) {
-                    console.log(key, "=> File:", value.name, value.type, value.size + " bytes");
-                } else {
-                    console.log(key, "=>", value);
+                if (value !== "" && value !== undefined && value !== null) {
+                    formData.append(key, value);
                 }
+            });
+
+            if (imageFile) {
+                formData.append("image", imageFile);
             }
 
-            const { data } = await client.post("/api/student/create-new-student", formData);
+            const { data } = await client.post("/api/v2/student/create-new-student", formData);
 
-            console.log(data.message);
             setAlertStatus(data.message);
             handleSnackOpen();
             navigate("/success-review");
 
-            // ✅ Reset form
-            setName("");
-            setEmail("");
-            setMobile("");
-            setFather("");
-            setGuardian("");
-            setGender("");
-            setAdmissionDate("");
-            setShift("");
-            setTime("");
-            setAddress("");
-            setCroppedImage("");
-            setSeatNumber("");
+            resetForm();
         } catch (error) {
             console.error(error);
             setAlertStatus(error.response?.data?.message || error.message || "An unknown error occurred");
@@ -159,78 +166,52 @@ export default function NewAdmissionForm() {
         }
     };
 
-    const handleTimeChange = (e) => {
-        const selectedTime = e.target.value;
-        setTime(selectedTime);
-
-        // Logic to set paymentAmount based on selectedTime
-        let amount = 0;
-        switch (selectedTime) {
-            case "07:00AM - 11:00AM":
-            case "11:00AM - 03:00PM":
-            case "03:00PM - 07:00PM":
-            case "07:00PM - 11:00PM":
-                amount = 300; // Example amount for these time slots
-                break;
-            case "07:00PM - 07:00AM":
-                amount = 500; // Example amount for this time slot
-                break;
-            case "07:00AM - 03:00PM":
-            case "11:00AM - 07:00PM":
-                amount = 500; // Example amount for these time slots
-                break;
-            case "07:00AM - 07:00PM":
-                amount = 700; // Example amount for these time slots
-                break;
-            case "24 Hours":
-                amount = 1000; // Example amount for 24 Hours
-                break;
-            default:
-                amount = 0;
-        }
-        getAvailableSeats()
-        setPaymentAmount(amount);
-
-    };
     useEffect(() => {
-        const handleShiftChange = () => {
-            if (time === "07:00AM - 11:00AM") {
-                setSeatShift("morning")
-                console.log("morning")
-            } else if (time === "11:00AM - 03:00PM") {
-                setSeatShift("afternoon")
-                console.log("afternoon")
-            } else if (time === "03:00PM - 07:00PM") {
-                setSeatShift("evening")
-            } else if (time === "07:00PM - 11:00PM") {
-                setSeatShift("night")
-            } else if (time === "07:00PM - 07:00AM") {
-                setSeatShift("nightLong")
-            } else if (time === "07:00AM - 03:00PM") {
-                setSeatShift("doubleMorning")
-            } else if (time === "11:00AM - 07:00PM") {
-                setSeatShift("doubleEvening")
-            } else if (time === "07:00AM - 07:00PM") {
-                setSeatShift("morningLong")
+        const loadShifts = async () => {
+            try {
+                const response = await client.get('/api/v2/seat/shifts');
+                setShiftOptions(response.data.shifts || []);
+            } catch (error) {
+                console.error('Error fetching shifts:', error.response ? error.response.data : error.message);
             }
-            else {
-                setSeatShift("fullDay")
-            }
+        };
+        loadShifts();
+    }, []);
+
+    // Re-fetch vacant seats whenever the shift or gender changes. Seat
+    // availability is purely shift-time + status driven on the backend now
+    // (no date/cycle filtering), so admissionDate/cycleDays don't affect
+    // which seats show here - they're only used later when the booking
+    // itself is created (for invoicing/cycle records), not for availability.
+    useEffect(() => {
+        if (shiftCode) {
+            getAvailableSeats();
+        } else {
+            setVacantSeat([]);
         }
-        handleShiftChange()
-    }, [time])
+        setSeatNumber("Other");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [shiftCode, gender]);
+
     const getAvailableSeats = async () => {
         try {
-            console.log(seatShift)
-            const response = await client.get(`/api/seat/getVacantSeatsByShift`, {
-                params: { seatShift }
+            const response = await client.get(`/api/v2/seat/getVacantSeatsByShift`, {
+                params: {
+                    shiftCode,
+                    // Only meaningful once a gender has actually been chosen;
+                    // backend treats a missing/unrecognized value as "no
+                    // gender filter" and returns seats for every reservedFor.
+                    gender: gender || undefined
+                }
             });
-            setVacantSeat(response.data)
-            console.log(response.data)
+            console.log(response)
+            setVacantSeat(response.data || []);
         } catch (error) {
             console.error('Error fetching available seats:', error.response ? error.response.data : error.message);
+            setVacantSeat([]);
         }
     };
+
     return (
         <>
             <Snackbar open={snackOpen} autoHideDuration={6000} onClose={handleSnackClose}>
@@ -256,7 +237,6 @@ export default function NewAdmissionForm() {
                                     <label htmlFor="email">Email</label>
                                     <input required className="p-2 border rounded-md w-full" value={email} onChange={(e) => setEmail(e.target.value)} type="email" id="email" placeholder="Email" />
                                 </div>
-
                             </div>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-2 pb-4'>
                                 <div>
@@ -264,9 +244,9 @@ export default function NewAdmissionForm() {
                                     <input required className="p-2 border rounded-md w-full" value={mobile} onChange={(e) => setMobile(e.target.value)} type="number" id="mobile" placeholder="Mobile" />
                                 </div>
                                 <div>
-                                    <label htmlFor="aadhar">Gender</label>
+                                    <label htmlFor="gender">Gender</label>
                                     <select required className="p-2 border rounded-md w-full" value={gender} onChange={(e) => setGender(e.target.value)}>
-                                        <option value="" disabled selected>Select One</option>
+                                        <option value="" disabled>Select One</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                         <option value="Not to Say">Prefer Not To Say</option>
@@ -274,13 +254,12 @@ export default function NewAdmissionForm() {
                                 </div>
                             </div>
                             <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
-
                                 <div>
                                     <label htmlFor="father">Father's Name</label>
                                     <input required className="p-2 border rounded-md w-full" value={father} onChange={(e) => setFather(e.target.value)} type="text" id="father" placeholder="Father's Name" />
                                 </div>
                                 <div>
-                                    <label htmlFor="mother">Guardian's Mobile No.</label>
+                                    <label htmlFor="guardian">Guardian's Mobile No.</label>
                                     <input className="p-2 border rounded-md w-full" value={guardian} onChange={(e) => setGuardian(e.target.value)} type="number" id="guardian" placeholder="Guardian's Mobile No." />
                                 </div>
                                 <div>
@@ -294,67 +273,185 @@ export default function NewAdmissionForm() {
 
                             <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
                                 <div>
-                                    <label htmlFor="aadhar">Addmission Date</label>
-                                    <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="number" placeholder="Aadhar No" />
+                                    <label htmlFor="admissionDate">Admission Date</label>
+                                    <input required className="p-2 border rounded-md w-full" value={admissionDate} onChange={(e) => setAdmissionDate(e.target.value)} type="date" id="admissionDate" />
                                 </div>
                             </div>
+
                             <div className='border p-2 rounded-sm'>
                                 <h3>Shift</h3>
-                                <div className='grid grid-cols-1 md:grid-cols-4 gap-2 pb-4'>
+                                {(!gender || gender === 'Not to Say') && (
+                                    <p className='text-xs text-amber-600 mb-1'>
+                                        {gender === 'Not to Say'
+                                            ? 'Showing seats reserved for any gender, since "Prefer Not To Say" was selected.'
+                                            : 'Select a gender above to filter to seats reserved for that gender plus unreserved seats.'}
+                                    </p>
+                                )}
+                                <div className='grid grid-cols-1 md:grid-cols-3 gap-2 pb-4'>
                                     <div className='flex flex-col'>
-                                        <label>Shift</label>
-                                        <select required className="p-2 border rounded-md w-full" value={shift} onChange={(e) => setShift(e.target.value)}>
-                                            <option value="" disabled selected>Select One</option>
-                                            <option value="Morning">Morning</option>
-                                            <option value="Afternoon">Afternoon</option>
-                                            <option value="Evening">Evening</option>
-                                            <option value="Night">Night</option>
-                                            <option value="Double">Double</option>
-                                            <option value="24 Hours">24 Hours</option>
-                                        </select>
-                                    </div>
-                                    <div className='flex flex-col'>
-                                        <label htmlFor="time">Time</label>
-                                        <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
-                                            <option value="" disabled selected>Select One</option>
-                                            {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
-                                            {shift === "Morning" && <option value="07:00AM - 07:00PM">07:00AM - 07:00PM</option>}
-                                            {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
-                                            {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
-                                            {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}
-                                            {shift === "Night" && <option value="07:00PM - 07:00AM">07:00PM - 07:00AM</option>}
-                                            {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
-                                            {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
-                                            {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
+                                        <label htmlFor="shift">Shift</label>
+                                        <select
+                                            required
+                                            id="shift"
+                                            className="p-2 border rounded-md w-full"
+                                            value={shiftCode}
+                                            onChange={(e) => setShiftCode(e.target.value)}
+                                        >
+                                            <option value="" disabled>Select One</option>
+                                            {shiftOptions.map(option => (
+                                                <option key={option.code} value={option.code}>
+                                                    {option.label} ({option.startTime} - {option.endTime})
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className='flex flex-col'>
                                         <label htmlFor="seat">Seat</label>
-                                        <select required className="p-2 border rounded-md w-full" value={seatNumber} onChange={(e) => setSeatNumber(e.target.value)}>
-                                            <option value="" disabled>Select One</option>
+                                        <select
+                                            required
+                                            id="seat"
+                                            className="p-2 border rounded-md w-full"
+                                            value={seatNumber}
+                                            onChange={(e) => setSeatNumber(e.target.value)}
+                                            disabled={!shiftCode}
+                                        >
                                             <option value="Other">Other</option>
-                                            {Array.isArray(vacantSeat) ? vacantSeat.map((seat, index) => (
-                                                <option key={index} value={seat.seatNumber}>{seat.seatNumber}</option>
-                                            )) : null}
+                                            {/* Backend (/getVacantSeatsByShift) already returns only
+                                                available seats matching the selected shift's time
+                                                window and the student's gender vs each seat's
+                                                reservedFor. The available!==false filter is kept as
+                                                a defensive no-op in case that contract ever changes,
+                                                rather than trusting a single filtering layer. */}
+                                            {Array.isArray(vacantSeat) ? vacantSeat
+                                                .filter(seat => seat.available !== false)
+                                                .map((seat, index) => (
+                                                    <option key={seat._id || index} value={seat.seatNumber}>{seat.seatNumber}</option>
+                                                )) : null}
                                         </select>
                                     </div>
                                     <div>
-                                        <label>Amount Chargable</label>
-                                        <input required className="p-2 border rounded-md w-full" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} type="number" placeholder="Amount Chargable" />
+                                        <label>Amount Chargeable</label>
+                                        <input
+                                            disabled
+                                            className="p-2 border rounded-md w-full bg-slate-100"
+                                            value={selectedShift ? `Rs ${selectedShift.price}` : ''}
+                                            type="text"
+                                            placeholder="Select a shift"
+                                        />
                                     </div>
                                 </div>
                             </div>
+
+                            <div className='border p-2 rounded-sm mt-3'>
+                                <h3>Payment</h3>
+                                <div className='flex items-center gap-2 pt-1 pb-2'>
+                                    <input
+                                        id="feePaid"
+                                        type="checkbox"
+                                        checked={feePaid}
+                                        onChange={(e) => setFeePaid(e.target.checked)}
+                                        className='h-4 w-4'
+                                    />
+                                    <label htmlFor="feePaid" className='select-none'>Fee Paid (full amount received now)</label>
+                                </div>
+
+                                {feePaid ? (
+                                    <p className='text-sm text-slate-500'>
+                                        {selectedShift
+                                            ? `The full cycle amount of Rs ${selectedShift.price} will be recorded as paid and an invoice will be generated.`
+                                            : 'Select a shift to see the amount that will be recorded as paid.'}
+                                    </p>
+                                ) : (
+                                    <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
+                                        <div>
+                                            <label htmlFor="amountPaid">Amount Paid Now (optional)</label>
+                                            <input
+                                                className="p-2 border rounded-md w-full"
+                                                value={amountPaid}
+                                                onChange={(e) => setAmountPaid(e.target.value)}
+                                                type="number"
+                                                id="amountPaid"
+                                                placeholder="0"
+                                                min="0"
+                                            />
+                                            <p className='text-xs text-slate-500 mt-1'>Leave blank to mark the full amount as due.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className='mt-3'>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAdvanced((value) => !value)}
+                                    className='flex items-center gap-1 text-sm font-semibold text-[#8e54e9]'
+                                >
+                                    {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    Advanced options
+                                </button>
+
+                                {showAdvanced && (
+                                    <div className='border p-2 rounded-sm mt-2'>
+                                        <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
+                                            <div>
+                                                <label htmlFor="password">Password (optional)</label>
+                                                <input
+                                                    className="p-2 border rounded-md w-full"
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    type="text"
+                                                    id="password"
+                                                    placeholder="Auto-generated if blank"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="fixedDiscountAmount">Fixed Discount Amount</label>
+                                                <input
+                                                    className="p-2 border rounded-md w-full"
+                                                    value={fixedDiscountAmount}
+                                                    onChange={(e) => setFixedDiscountAmount(e.target.value)}
+                                                    type="number"
+                                                    id="fixedDiscountAmount"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="cycleDays">Cycle Days</label>
+                                                <input
+                                                    className="p-2 border rounded-md w-full"
+                                                    value={cycleDays}
+                                                    onChange={(e) => setCycleDays(e.target.value)}
+                                                    type="number"
+                                                    id="cycleDays"
+                                                    placeholder="30"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className='mt-2'>
+                                            <label htmlFor="fixedDiscountReason">Discount Reason</label>
+                                            <input
+                                                className="p-2 border rounded-md w-full"
+                                                value={fixedDiscountReason}
+                                                onChange={(e) => setFixedDiscountReason(e.target.value)}
+                                                type="text"
+                                                id="fixedDiscountReason"
+                                                placeholder="Optional"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <div className='grid grid-cols-3 my-3'>
                                 <div
                                     onClick={handleClickOpen}
                                     className='flex flex-col items-center border-dashed border-slate-300 border-[1px] p-4 bg-slate-200 cursor-pointer'>
                                     <ImagePlus className='mb-2' size={32} />
-                                    Uplaod Profile Image
+                                    Upload Profile Image
                                 </div>
                             </div>
                             <div className='flex justify-end'>
-                                <button type='submit' className='p-2 w-md border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
-
+                                <button type='submit' disabled={loading} className='p-2 w-md border rounded-md flex justify-center items-center text-white bg-[#8e54e9] hover:bg-[#8e54e9e6]'>
                                     {loading ? <div className='flex items-center justify-center'><span className='mr-2'>Please Wait..</span><CircularLoading size={25} /></div> :
                                         <div className='flex items-center'>
                                             <UserPlus size={17} className='mr-2' />Add Student</div>}
@@ -381,7 +478,6 @@ export default function NewAdmissionForm() {
                 onClose={handleClose}
                 aria-describedby="alert-dialog-slide-description"
             >
-                {/* <DialogTitle>{"Use Google's location service?"}</DialogTitle> */}
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
                         <ImageCroper closecroper={handleClose} onImageCrop={handleCroppedImage} />

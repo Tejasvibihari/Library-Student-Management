@@ -10,7 +10,14 @@ import seatRouter from './router/seatRoute.js';
 import updateRouter from './router/updateRoute.js'
 import testimonialRouter from './router/testimonialRoute.js';
 import invoiceRouter from './router/invoiceRouter.js';
+import studentRouterV2 from './router/v2/studentRouteV2.js';
+import paymentRouterV2 from './router/v2/paymentRouteV2.js';
+import seatRouterV2 from './router/v2/seatRouteV2.js';
+import invoiceRouterV2 from './router/v2/invoiceRouteV2.js';
+import migrationRouter from "./router/migrationRoutes.js"
+
 import './utils/scheduler/PaymentStatus.js';
+import './utils/scheduler/paymentStatusV2.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -101,7 +108,12 @@ app.use('/api/seat/', seatRouter);
 app.use('/api/update/', updateRouter);
 app.use('/api/testimonial/', testimonialRouter);
 app.use('/api/invoice/', invoiceRouter);
+app.use('/api/v2/student/', studentRouterV2);
+app.use('/api/v2/payment/', paymentRouterV2);
+app.use('/api/v2/seat/', seatRouterV2);
+app.use('/api/v2/invoice/', invoiceRouterV2);
 
+app.use("/api/v2/m/", migrationRouter)
 // Global error handler
 app.use((error, req, res, next) => {
     console.error('Global error handler:', error);

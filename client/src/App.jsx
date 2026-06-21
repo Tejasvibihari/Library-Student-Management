@@ -30,6 +30,8 @@ import TrashStudent from './pages/TrashStudent'
 import SuccessReview from './components/SuccessReview'
 import AddTestimonial from './pages/AddTestimonial'
 import ViewTestimonial from './pages/ViewTestimonial'
+import Shifts from './pages/Shifts'
+import LegacyStudentDetail from './pages/LegacyStudentDetail'
 
 
 
@@ -66,11 +68,13 @@ export default function App() {
             <Route path="/email" element={<Email />} />
             <Route path="/sendemail" element={<EmailEditor />} />
             <Route path="/student-detail" element={<StudentDetail />} />
+            <Route path="/legacy-student-detail" element={<LegacyStudentDetail />} />
             <Route path="/make-payment" element={<MakePayment />} />
             <Route path="/make-payment/:_id" element={<IndividualPayment />} />
             <Route path="/payment-detail" element={<PaymentDetail />} />
             <Route path="/student-admin-dashboard/:_id" element={<AdminStudentDashboard />} />
             <Route path="/seat" element={<Seats />} />
+            <Route path="/shift" element={<Shifts />} />
             <Route path="/update-seat" element={<UpdateSeat />} />
             <Route path="/trash" element={<TrashStudent />} />
             <Route path="/add-testimonial" element={<AddTestimonial />} />

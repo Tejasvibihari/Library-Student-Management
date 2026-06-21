@@ -80,23 +80,15 @@ export default function PaymentDetailTable({ data }) {
     };
 
     const handleConfirmDelete = async () => {
-        try {
-            const res = await client.delete(`/api/payment/deletePayment/${selectedStudentId}`);
-            console.log(res.data.message);
-            setStudentData(prevData => prevData.filter(student => student._id !== selectedStudentId));
-            setAlertMessage(res.data.message);
-            setOpen(false);
-            handleSnackClick();
-        } catch (error) {
-            console.error('Error deleting student:', error);
-            handleSnackClick();
-        }
+        setAlertMessage('V2 payment ledger is locked. Create a reversal entry instead of deleting.');
+        setOpen(false);
+        handleSnackClick();
     };
 
     useEffect(() => {
         const getStudent = async () => {
             try {
-                const response = await client.get("/api/student/getallstudent", {
+                const response = await client.get("/api/v2/student/getallstudent", {
                     params: { admin: adminId }
                 });
 
@@ -163,8 +155,8 @@ export default function PaymentDetailTable({ data }) {
                                     <StyledTableCell align="center">
                                         {relatedData ? relatedData.name : 'N/A'}
                                     </StyledTableCell>
-                                    <StyledTableCell align="center">{formatDate(row.payment_date)}</StyledTableCell>
-                                    <StyledTableCell align="center">{row.amount}</StyledTableCell>
+                            <StyledTableCell align="center">{formatDate(row.paymentDate || row.payment_date)}</StyledTableCell>
+                            <StyledTableCell align="center">{row.amountPaid || row.amount}</StyledTableCell>
                                     <StyledTableCell align="center">
                                         <div className="flex justify-center items-center cursor-pointer">
                                             <Link to="#" onClick={() => handleDialogOpen(row._id)}>

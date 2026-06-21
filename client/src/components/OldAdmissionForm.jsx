@@ -55,6 +55,7 @@ export default function OldAdmissionForm() {
     const [vacantSeat, setVacantSeat] = useState([])
     const [seatNumber, setSeatNumber] = useState("")
     const [compressImage, setCompressImage] = useState("")
+    const [shiftOptions, setShiftOptions] = useState([])
     // Alert Snackbar 
     const handleSnackOpen = () => {
         setSnackOpen(true);
@@ -152,7 +153,7 @@ export default function OldAdmissionForm() {
         e.preventDefault()
         try {
             setLoading(true)
-            const response = await client.post("/api/student/create-old-student", formData)
+            const response = await client.post("/api/v2/student/create-old-student", formData)
             console.log(response.data.message)
             console.log(response)
             setLoading(false)
@@ -191,67 +192,33 @@ export default function OldAdmissionForm() {
 
         }
     }
+    useEffect(() => {
+        const loadShifts = async () => {
+            try {
+                const response = await client.get('/api/v2/seat/shifts');
+                setShiftOptions(response.data.shifts || []);
+            } catch (error) {
+                console.error('Error fetching shifts:', error.response ? error.response.data : error.message);
+            }
+        };
+        loadShifts();
+    }, []);
+
     const handleTimeChange = (e) => {
         const selectedTime = e.target.value;
+        const selectedShift = shiftOptions.find(option => option.displayTime === selectedTime);
         setTime(selectedTime);
-
-        // Logic to set paymentAmount based on selectedTime
-        let amount = 0;
-        switch (selectedTime) {
-            case "07:00AM - 11:00AM":
-            case "11:00AM - 03:00PM":
-            case "03:00PM - 07:00PM":
-            case "07:00PM - 11:00PM":
-                amount = 300; // Example amount for these time slots
-                break;
-            case "07:00PM - 07:00AM":
-                amount = 500; // Example amount for this time slot
-                break;
-            case "07:00AM - 03:00PM":
-            case "11:00AM - 07:00PM":
-                amount = 500; // Example amount for these time slots
-                break;
-            case "07:00AM - 07:00PM":
-                amount = 700; // Example amount for these time slots
-                break;
-            case "24 Hours":
-                amount = 1000; // Example amount for 24 Hours
-                break;
-            default:
-                amount = 0;
-        }
-        getAvailableSeats()
-        setPaymentAmount(amount);
+        setSeatShift(selectedShift?.code || "");
+        setPaymentAmount(selectedShift?.price || 0);
     };
+
     useEffect(() => {
-        const handleShiftChange = () => {
-            if (time === "07:00AM - 11:00AM") {
-                setSeatShift("morning")
-            } else if (time === "11:00AM - 03:00PM") {
-                setSeatShift("afternoon")
-            } else if (time === "03:00PM - 07:00PM") {
-                setSeatShift("evening")
-            } else if (time === "07:00PM - 11:00PM") {
-                setSeatShift("night")
-            } else if (time === "07:00PM - 07:00AM") {
-                setSeatShift("nightLong")
-            } else if (time === "07:00AM - 03:00PM") {
-                setSeatShift("doubleMorning")
-            } else if (time === "11:00AM - 07:00PM") {
-                setSeatShift("doubleEvening")
-            } else if (time === "07:00AM - 07:00PM") {
-                setSeatShift("morningLong")
-            }
-            else {
-                setSeatShift("fullDay")
-            }
-        }
-        handleShiftChange()
-    }, [time])
+        if (seatShift) getAvailableSeats();
+    }, [seatShift])
+
     const getAvailableSeats = async () => {
         try {
-            console.log(seatShift)
-            const response = await client.get(`/api/seat/getVacantSeatsByShift`, {
+            const response = await client.get(`/api/v2/seat/getVacantSeatsByShift`, {
                 params: { seatShift }
             });
             setVacantSeat(response.data)
@@ -352,15 +319,9 @@ export default function OldAdmissionForm() {
                                         <label htmlFor="time">Time</label>
                                         <select required className="p-2 border rounded-md w-full" value={time} onBlur={handleTimeChange} onChange={handleTimeChange}>
                                             <option value="" disabled selected>Select One</option>
-                                            {shift === "Morning" && <option value="07:00AM - 11:00AM">07:00AM - 11:00AM</option>}
-                                            {shift === "Morning" && <option value="07:00AM - 07:00PM">07:00AM - 07:00AM</option>}
-                                            {shift === "Afternoon" && <option value="11:00AM - 03:00PM">11:00AM - 03:00PM</option>}
-                                            {shift === "Evening" && <option value="03:00PM - 07:00PM">03:00PM - 07:00PM</option>}
-                                            {shift === "Night" && <option value="07:00PM - 11:00PM">07:00PM - 11:00PM</option>}
-                                            {shift === "Night" && <option value="07:00PM - 07:00AM">07:00PM - 07:00AM</option>}
-                                            {shift === "Double" && <option value="07:00AM - 03:00PM">07:00AM - 03:00PM</option>}
-                                            {shift === "Double" && <option value="11:00AM - 07:00PM">11:00AM - 07:00PM</option>}
-                                            {shift === "24 Hours" && <option value="24 Hours">24 Hours</option>}
+                                            {shiftOptions
+                                                .filter(option => !shift || option.label.toLowerCase().includes(shift.toLowerCase()) || shift === "24 Hours")
+                                                .map(option => <option key={option.code} value={option.displayTime}>{option.displayTime}</option>)}
                                         </select>
                                     </div>
                                     <div className='flex flex-col'>
