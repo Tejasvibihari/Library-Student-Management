@@ -15,7 +15,7 @@ import paymentRouterV2 from './router/v2/paymentRouteV2.js';
 import seatRouterV2 from './router/v2/seatRouteV2.js';
 import invoiceRouterV2 from './router/v2/invoiceRouteV2.js';
 import migrationRouter from "./router/migrationRoutes.js"
-
+import dashboardRouterV2 from './router/v2/dashboardRouterV2.js';
 import './utils/scheduler/PaymentStatus.js';
 import './utils/scheduler/paymentStatusV2.js';
 import dotenv from 'dotenv';
@@ -112,6 +112,7 @@ app.use('/api/v2/student/', studentRouterV2);
 app.use('/api/v2/payment/', paymentRouterV2);
 app.use('/api/v2/seat/', seatRouterV2);
 app.use('/api/v2/invoice/', invoiceRouterV2);
+app.use('/api/v2/dashboard/', dashboardRouterV2);
 
 app.use("/api/v2/m/", migrationRouter)
 // Global error handler
