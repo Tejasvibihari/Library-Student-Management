@@ -210,7 +210,7 @@ export const getDueStudentsV2 = async (req, res) => {
 
         const [students, total] = await Promise.all([
             StudentV2.find({ 'statuses.payment': 'due' })
-                .select('sid name mobile gender account.dueAmount account.dueFrom account.validTill seat.seatNumber shift.label')
+                .select('sid name mobile gender account.dueAmount account.dueFrom account.validTill seat.seatNumber shift.label image')
                 .sort({ [sortField]: sortDir })
                 .skip((page - 1) * limit)
                 .limit(limit)
@@ -293,7 +293,7 @@ export const getRecentActivityV2 = async (req, res) => {
             StudentV2.find()
                 .sort({ createdAt: -1 })
                 .limit(limit)
-                .select('sid name shift.label admissionDate statuses.student')
+                .select('sid name shift.label admissionDate statuses.student image')
                 .lean(),
         ]);
 
