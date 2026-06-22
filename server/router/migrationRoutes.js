@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import Student from "../models/studentModel.js";          // OLD
 import Seat from "../models/seatModel.js";                // OLD
 
+import { repairMigratedStudents } from "../controllers/migrationControllerV2.js";
+
 import StudentV2 from "../models/v2/studentModelV2.js";
 import SeatV2, { SeatBookingV2 } from "../models/v2/seatModelV2.js";
 import ShiftV2 from "../models/v2/shiftModelV2.js";
@@ -397,10 +399,6 @@ router.post("/migrate-bihari-library", async (req, res) => {
     }
 });
 
-import express from "express";
-import { repairMigratedStudents } from "../controllers/migrationControllerV2.js";
-
-const router = express.Router();
 
 router.post(
     "/repair-migrated-students",
