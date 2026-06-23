@@ -12,14 +12,13 @@ function addDays(date, days) {
     d.setDate(d.getDate() + days);
     return d;
 }
-
 export const repairMigratedStudents = async (req, res) => {
     try {
-        const today = startOfDay(new Date());
+        const today = new Date();
 
         const students = await StudentV2.find({
             "statuses.student": {
-                $in: ["active", "pending"]
+                $nin: ["trash", "left"]
             }
         });
 
@@ -37,71 +36,59 @@ export const repairMigratedStudents = async (req, res) => {
                 continue;
             }
 
-            const validTill = startOfDay(lastInvoice.cycleEnd);
+            const validTill = new Date(lastInvoice.cycleEnd);
 
-            const cycleStart = startOfDay(validTill);
+            const storedBalance =
+                Number(student.account?.balanceAmount || 0);
 
-            const cycleEnd = addDays(
-                cycleStart,
-                student.billing.cycleDays || 30
-            );
+            const tempStudent = {
+                ...student.toObject(),
+                account: {
+                    ...student.account,
+                    validTill
+                }
+            };
 
-            let creditDays = 0;
-            let dueDays = 0;
-            let dueAmount = 0;
-            let dueFrom = null;
-            let paymentStatus = "paid";
-
-            if (today <= validTill) {
-
-                creditDays = Math.floor(
-                    (validTill - today) /
-                    (1000 * 60 * 60 * 24)
+            const live =
+                getLiveStudentAccount(
+                    tempStudent,
+                    today
                 );
-
-                paymentStatus = "paid";
-
-            } else {
-
-                dueDays = Math.floor(
-                    (today - validTill) /
-                    (1000 * 60 * 60 * 24)
-                );
-
-                const missedCycles = Math.max(
-                    1,
-                    Math.ceil(
-                        dueDays /
-                        (student.billing.cycleDays || 30)
-                    )
-                );
-
-                dueAmount =
-                    missedCycles *
-                    student.billing.netCycleAmount;
-
-                paymentStatus = "due";
-
-                dueFrom = validTill;
-            }
 
             await StudentV2.updateOne(
                 { _id: student._id },
                 {
                     $set: {
-                        "statuses.payment": paymentStatus,
 
-                        "account.validTill": validTill,
+                        "statuses.payment":
+                            live.paymentStatus,
 
-                        "account.creditDays": creditDays,
-                        "account.dueDays": dueDays,
+                        "statuses.student":
+                            live.studentStatus,
 
-                        "account.dueAmount": dueAmount,
+                        "account.balanceAmount":
+                            live.balanceAmount,
 
-                        "account.dueFrom": dueFrom,
+                        "account.advanceAmount":
+                            live.advanceAmount,
 
-                        "account.currentCycleStart": cycleStart,
-                        "account.currentCycleEnd": cycleEnd
+                        "account.dueAmount":
+                            live.dueAmount,
+
+                        "account.creditDays":
+                            live.creditDays,
+
+                        "account.dueDays":
+                            live.dueDays,
+
+                        "account.validTill":
+                            live.validTill,
+
+                        "account.dueFrom":
+                            live.dueFrom,
+
+                        "account.lastPaymentAt":
+                            lastInvoice.paymentDate
                     }
                 }
             );
@@ -116,6 +103,7 @@ export const repairMigratedStudents = async (req, res) => {
         });
 
     } catch (error) {
+
         console.error(error);
 
         return res.status(500).json({
