@@ -69,11 +69,6 @@ export const createNewStudentV2 = async (req, res) => {
         const admission = startOfDay(admissionDate);
         if (Number.isNaN(admission.getTime())) return res.status(400).json({ message: 'Valid admissionDate is required.' });
 
-        // No replica set / transactions available, so we check for an
-        // existing student up front instead of relying on a transactional
-        // re-check. There's a small race window here under concurrent
-        // requests for the same sid/email, but the unique indexes on
-        // StudentV2 (sid/email) are the real backstop against duplicates.
         const existing = await StudentV2.findOne({
             $or: [{ sid: resolvedSid }, { email: String(email || '').toLowerCase() }]
         });
@@ -95,20 +90,11 @@ export const createNewStudentV2 = async (req, res) => {
         const hashedPassword = await bcrypt.hash(plainPassword, 12);
         const imageFilename = req.file?.filename || req.savedFileName || req.body.image || null;
 
-        // Fee-paid logic:
-        // - feePaid checked   -> pay the full net cycle amount now.
-        // - feePaid unchecked -> use whatever amountPaid was entered, or 0
-        //   if it was left blank, and the rest becomes due as normal.
         const isFeePaid = parseBooleanFlag(feePaid);
         const amountToCharge = isFeePaid
             ? billing.netCycleAmount
             : Number(amountPaid || 0);
 
-        // No DB transaction here (single mongod, no replica set). We create
-        // the student first, then attempt the seat booking and (if any
-        // amount was paid) the payment/invoice; if any later step fails we
-        // manually roll back everything we created so far, so we never end
-        // up with a student stuck in a half-admitted state.
         const student = await StudentV2.create({
             sid: resolvedSid,
             name,
@@ -169,8 +155,6 @@ export const createNewStudentV2 = async (req, res) => {
                     validTo: cycle.cycleEnd
                 });
             } catch (bookingError) {
-                // Roll back the student we just created so a failed seat
-                // booking never leaves an orphan/half-admitted student doc.
                 await StudentV2.findByIdAndDelete(student._id);
                 throw bookingError;
             }
@@ -193,8 +177,6 @@ export const createNewStudentV2 = async (req, res) => {
                 invoice = result.invoice;
                 updatedStudent = result.student;
             } catch (paymentError) {
-                // Roll back the seat booking and student so a failed
-                // admission payment never leaves a half-admitted student.
                 if (booking) {
                     await vacateBookingV2({ bookingId: booking._id, reason: 'Admission payment failed' }).catch(() => { });
                 }
@@ -280,26 +262,98 @@ export const getStudentAccountV2 = async (req, res) => {
     }
 };
 
+// FIX (Bug 4 & 5): updateStudentV2 now:
+// 1. Blocks direct account.* and statuses.payment overrides
+// 2. Handles shift changes by recalculating billing
+// 3. Guards against setting 'active' when there is a due amount
 export const updateStudentV2 = async (req, res) => {
     try {
-        const { sid, status, fixedDiscountAmount, fixedDiscountReason, ...rest } = req.body;
+        const { sid, status, fixedDiscountAmount, fixedDiscountReason,
+            shiftCode, cycleAnchorDate, cycleDays, ...rest } = req.body;
+
         const student = await StudentV2.findOne({ sid: Number(sid) });
         if (!student) return res.status(404).json({ message: 'Student not found.' });
 
-        const update = { ...rest };
-        if (status) update['statuses.student'] = normalizeStatus(status);
+        const update = {};
 
-        if (fixedDiscountAmount !== undefined) {
+        // Safe fields — can be updated directly
+        const safeFields = ['name', 'email', 'mobile', 'father', 'guardian',
+            'gender', 'address', 'image', 'isOnline',
+            'instagram', 'facebook', 'youtube'];
+        for (const key of safeFields) {
+            if (rest[key] !== undefined) update[key] = rest[key];
+        }
+
+        // Student status — only allow manual transitions that make sense
+        // FIX (Bug 1): Don't allow manually setting 'active' if there is due amount
+        if (status) {
+            const normalized = normalizeStatus(status);
+            if (normalized === 'active' && student.account.dueAmount > 0) {
+                return res.status(400).json({
+                    message: `Cannot set student to active while there is a due amount of ₹${student.account.dueAmount}. Record a payment first.`
+                });
+            }
+            update['statuses.student'] = normalized;
+        }
+
+        // FIX (Bug 5): Shift change — must recalculate billing
+        if (shiftCode && shiftCode !== student.shift.code) {
+            const shiftDoc = await resolveShiftV2(shiftCode);
+            const discount = fixedDiscountAmount !== undefined
+                ? Number(fixedDiscountAmount)
+                : student.billing.fixedDiscountAmount;
+            const days = cycleDays ? Number(cycleDays) : student.billing.cycleDays;
             const billing = calculateStudentBilling({
-                shiftAmount: student.shift.amount,
-                fixedDiscountAmount: Number(fixedDiscountAmount || 0),
-                cycleDays: student.billing.cycleDays
+                shiftAmount: shiftDoc.price,
+                fixedDiscountAmount: discount,
+                cycleDays: days
             });
-            update['billing.fixedDiscountAmount'] = Number(fixedDiscountAmount || 0);
-            update['billing.fixedDiscountReason'] = fixedDiscountReason;
+            update['shift.shift'] = shiftDoc._id;
+            update['shift.code'] = shiftDoc.code;
+            update['shift.label'] = shiftDoc.label;
+            update['shift.displayTime'] = shiftDoc.displayTime;
+            update['shift.amount'] = shiftDoc.price;
             update['billing.netCycleAmount'] = billing.netCycleAmount;
             update['billing.dailyRate'] = billing.dailyRate;
         }
+
+        // Discount change — recalculate billing
+        if (fixedDiscountAmount !== undefined) {
+            const shiftAmount = update['shift.amount'] || student.shift.amount;
+            const days = cycleDays ? Number(cycleDays) : student.billing.cycleDays;
+            const billing = calculateStudentBilling({
+                shiftAmount,
+                fixedDiscountAmount: Number(fixedDiscountAmount),
+                cycleDays: days
+            });
+            update['billing.fixedDiscountAmount'] = Number(fixedDiscountAmount);
+            update['billing.fixedDiscountReason'] = fixedDiscountReason || '';
+            update['billing.netCycleAmount'] = billing.netCycleAmount;
+            update['billing.dailyRate'] = billing.dailyRate;
+        }
+
+        // Cycle days change — recalculate billing
+        if (cycleDays) {
+            const shiftAmount = update['shift.amount'] || student.shift.amount;
+            const discount = update['billing.fixedDiscountAmount'] ?? student.billing.fixedDiscountAmount;
+            const billing = calculateStudentBilling({
+                shiftAmount,
+                fixedDiscountAmount: discount,
+                cycleDays: Number(cycleDays)
+            });
+            update['billing.cycleDays'] = Number(cycleDays);
+            update['billing.netCycleAmount'] = billing.netCycleAmount;
+            update['billing.dailyRate'] = billing.dailyRate;
+        }
+
+        // Cycle anchor — only update the date, don't mess with balance
+        if (cycleAnchorDate) {
+            update['billing.cycleAnchorDate'] = new Date(cycleAnchorDate);
+        }
+
+        // BLOCKED (Bug 4): Do not allow direct account.* or statuses.payment overrides.
+        // If an admin needs to adjust balance, they must use POST /api/v2/payment/adjustment
+        // with a reason, which goes through recordPaymentV2 and creates a proper ledger entry.
 
         const updatedStudent = await StudentV2.findOneAndUpdate(
             { sid: Number(sid) },
@@ -308,6 +362,42 @@ export const updateStudentV2 = async (req, res) => {
         );
 
         res.status(200).json({ message: 'Student details updated successfully', student: updatedStudent });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// NEW: Manual balance adjustment endpoint — POST /api/v2/payment/adjustment
+// Replaces direct account.* editing in the UI. Goes through the full
+// recordPaymentV2 flow so every adjustment is in the ledger with a reason.
+export const makeAdjustmentV2 = async (req, res) => {
+    try {
+        const { sid, adjustmentAmount, reason, adminNote } = req.body;
+
+        if (!adjustmentAmount || !reason) {
+            return res.status(400).json({ message: 'adjustmentAmount and reason are required.' });
+        }
+
+        const amount = Number(adjustmentAmount);
+        if (isNaN(amount) || amount === 0) {
+            return res.status(400).json({ message: 'adjustmentAmount must be a non-zero number.' });
+        }
+
+        const result = await recordPaymentV2({
+            sid: Number(sid),
+            amountPaid: Math.max(amount, 0),
+            oneTimeDiscountAmount: 0,
+            discountReason: reason,
+            method: 'adjustment',
+            note: adminNote || `Manual adjustment: ${reason}`,
+            createdBy: req.body.createdBy
+        });
+
+        res.status(200).json({
+            message: 'Adjustment recorded',
+            payment: result.payment,
+            student: result.student
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
