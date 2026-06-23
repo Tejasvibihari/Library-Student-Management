@@ -11,7 +11,7 @@ import SeatV2, { SeatBookingV2 } from "../models/v2/seatModelV2.js";
 import ShiftV2 from "../models/v2/shiftModelV2.js";
 import Invoice from "../models/invoiceModel.js";        // OLD
 import {
-    deriveAccountFromBalance
+    deriveAccount
 } from "../services/v2/billingServiceV2.js";
 
 const router = express.Router();
@@ -228,7 +228,11 @@ router.post("/migrate-bihari-library", async (req, res) => {
 
             let lastPaymentAt =
                 oldStudent.lastPayment || null;
+            let currentCycleStart =
+                oldStudent.admissionDate;
 
+            let currentCycleEnd =
+                validTill;
             const hasInvoice =
                 await Invoice.exists({
                     sid: oldStudent.sid
@@ -242,6 +246,14 @@ router.post("/migrate-bihari-library", async (req, res) => {
                     }).sort({
                         cycleEnd: -1
                     });
+
+                currentCycleStart =
+                    latestInvoice.cycleStart ||
+                    currentCycleStart;
+
+                currentCycleEnd =
+                    latestInvoice.cycleEnd ||
+                    currentCycleEnd;
 
                 balanceAmount =
                     -(latestInvoice.remainingDue || 0);
@@ -265,40 +277,23 @@ router.post("/migrate-bihari-library", async (req, res) => {
             }
 
             const accountState =
-                deriveAccountFromBalance({
+                deriveAccount({
                     balanceAmount,
+                    validTill,
                     dailyRate:
-                        shift.price / 30,
-                    asOfDate:
-                        validTill
+                        Number(
+                            (shift.price / 30).toFixed(2)
+                        )
                 });
 
-            let paymentStatus = "paid";
+            let paymentStatus =
+                accountState.paymentStatus;
 
-            if (balanceAmount < 0) {
-                paymentStatus = "due";
-            }
-            else if (balanceAmount > 0) {
-                paymentStatus = "advance";
-            }
-            else if (
-                validTill &&
-                new Date(validTill) >= new Date()
-            ) {
-                paymentStatus = "paid";
-            }
-            else {
-                paymentStatus = "due";
-            }
+            let studentStatus =
+                accountState.studentStatus;
 
-            let studentStatus = "pending";
-
-            if (
-                validTill &&
-                new Date(validTill) >= new Date()
-            ) {
-                studentStatus = "active";
-            }
+            let renewalStatus =
+                accountState.renewal;
 
             let seatStatus =
                 oldStudent.seatNumber
@@ -374,12 +369,20 @@ router.post("/migrate-bihari-library", async (req, res) => {
                 statuses: {
                     student: studentStatus,
                     payment: paymentStatus,
-                    seat: seatStatus
+                    seat: seatStatus,
+                    renewal: renewalStatus
                 },
 
                 account: {
 
                     balanceAmount,
+
+                    validTill,
+
+                    dueFrom:
+                        accountState.dueFrom,
+
+                    lastPaymentAt,
 
                     advanceAmount:
                         accountState.advanceAmount,
@@ -387,24 +390,17 @@ router.post("/migrate-bihari-library", async (req, res) => {
                     dueAmount:
                         accountState.dueAmount,
 
-                    creditDays:
-                        accountState.creditDays,
+                    remainingDays:
+                        accountState.remainingDays,
+
+                    advanceDays:
+                        accountState.advanceDays,
 
                     dueDays:
                         accountState.dueDays,
+                    currentCycleStart,
 
-                    validTill,
-
-                    dueFrom:
-                        accountState.dueFrom,
-
-                    currentCycleStart:
-                        oldStudent.admissionDate,
-
-                    currentCycleEnd:
-                        validTill,
-
-                    lastPaymentAt
+                    currentCycleEnd
                 }
             });
 

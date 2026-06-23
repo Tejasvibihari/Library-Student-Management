@@ -49,23 +49,112 @@ const studentSchemaV2 = new Schema({
     },
 
     statuses: {
-        student: { type: String, enum: STUDENT_STATUS_V2, default: 'pending', index: true },
-        payment: { type: String, enum: PAYMENT_STATUS_V2, default: 'due', index: true },
-        seat: { type: String, enum: SEAT_STATUS_V2, default: 'not_allotted', index: true }
+
+        student: {
+            type: String,
+            enum: [
+                "active",
+                "pending",
+                "inactive",
+                "left",
+                "trash"
+            ]
+        },
+
+        payment: {
+            type: String,
+            enum: [
+                "paid",
+                "partial",
+                "due",
+                "advance"
+            ]
+        },
+
+        seat: {
+            type: String,
+            enum: [
+                "allotted",
+                "not_allotted",
+                "expired",
+                "vacated",
+                "cancelled"
+            ]
+        },
+
+        renewal: {
+            type: String,
+            enum: [
+                "safe",
+                "warning",
+                "urgent",
+                "expired"
+            ],
+            default: "safe"
+        }
     },
 
     account: {
-        balanceAmount: { type: Number, default: 0 },
-        advanceAmount: { type: Number, default: 0 },
-        dueAmount: { type: Number, default: 0 },
-        creditDays: { type: Number, default: 0 },
-        dueDays: { type: Number, default: 0 },
-        validTill: { type: Date },
-        dueFrom: { type: Date },
-        currentCycleStart: { type: Date },
-        currentCycleEnd: { type: Date },
-        lastPaymentAt: { type: Date },
-        lastInvoiceNumber: { type: Number }
+
+        // SINGLE SOURCE OF TRUTH
+
+        balanceAmount: {
+            type: Number,
+            default: 0
+        },
+
+        validTill: {
+            type: Date
+        },
+
+        dueFrom: {
+            type: Date
+        },
+
+        lastPaymentAt: {
+            type: Date
+        },
+
+        lastInvoiceNumber: {
+            type: Number
+        },
+
+        // SNAPSHOT FIELDS (cron updates)
+
+        advanceAmount: {
+            type: Number,
+            default: 0
+        },
+
+        dueAmount: {
+            type: Number,
+            default: 0
+        },
+
+        remainingDays: {
+            type: Number,
+            default: 0
+        },
+
+        advanceDays: {
+            type: Number,
+            default: 0
+        },
+
+        dueDays: {
+            type: Number,
+            default: 0
+        },
+
+        // cycle tracking
+
+        currentCycleStart: {
+            type: Date
+        },
+
+        currentCycleEnd: {
+            type: Date
+        }
     }
 }, {
     collection: 'students_v2',

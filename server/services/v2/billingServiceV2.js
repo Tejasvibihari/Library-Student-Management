@@ -1,10 +1,6 @@
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-export function startOfDay(dateInput) {
-    const date = new Date(dateInput);
-    date.setHours(0, 0, 0, 0);
-    return date;
-}
+
 
 export function addDays(dateInput, days) {
     const date = startOfDay(dateInput);
@@ -18,10 +14,106 @@ export function addMonths(dateInput, months = 1) {
     return date;
 }
 
-export function diffDays(fromDate, toDate) {
-    const from = startOfDay(fromDate);
-    const to = startOfDay(toDate);
-    return Math.floor((to.getTime() - from.getTime()) / MS_PER_DAY);
+
+
+export function startOfDay(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+export function diffDays(from, to) {
+    return Math.floor(
+        (startOfDay(to) - startOfDay(from)) / MS_PER_DAY
+    );
+}
+
+
+
+export function deriveAccount({
+    balanceAmount = 0,
+    validTill,
+    dailyRate,
+    today = new Date()
+}) {
+
+    const now = startOfDay(today);
+    const validDate = validTill
+        ? startOfDay(validTill)
+        : now;
+
+    const advanceAmount =
+        balanceAmount > 0
+            ? balanceAmount
+            : 0;
+
+    const dueAmount =
+        balanceAmount < 0
+            ? Math.abs(balanceAmount)
+            : 0;
+
+    const cycleDaysLeft =
+        validDate > now
+            ? diffDays(now, validDate)
+            : 0;
+
+    const advanceDays =
+        dailyRate > 0
+            ? Math.floor(
+                advanceAmount / dailyRate
+            )
+            : 0;
+
+    const dueDays =
+        dailyRate > 0
+            ? Math.ceil(
+                dueAmount / dailyRate
+            )
+            : 0;
+
+    const remainingDays =
+        cycleDaysLeft +
+        advanceDays;
+
+    let paymentStatus = "paid";
+
+    if (dueAmount > 0)
+        paymentStatus = "due";
+    else if (advanceAmount > 0)
+        paymentStatus = "advance";
+
+    let studentStatus =
+        paymentStatus === "due"
+            ? "pending"
+            : "active";
+
+    let renewal = "safe";
+
+    if (remainingDays <= 0)
+        renewal = "expired";
+    else if (remainingDays <= 3)
+        renewal = "urgent";
+    else if (remainingDays <= 7)
+        renewal = "warning";
+
+    return {
+
+        advanceAmount,
+        dueAmount,
+
+        remainingDays,
+        advanceDays,
+        dueDays,
+
+        dueFrom:
+            dueAmount > 0
+                ? validDate
+                : null,
+
+        paymentStatus,
+        studentStatus,
+        renewal
+    };
 }
 
 export function getCycleForDate(anchorDate, targetDate) {
