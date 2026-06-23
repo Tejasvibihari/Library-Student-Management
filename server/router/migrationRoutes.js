@@ -402,7 +402,7 @@ router.post("/migrate-bihari-library", async (req, res) => {
 
 router.post(
     "/repair-migrated-students",
-    repairStudentAccountConsistencyV2
+    repairMigratedStudents
 );
 
 
