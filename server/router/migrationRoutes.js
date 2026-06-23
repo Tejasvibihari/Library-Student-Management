@@ -10,6 +10,9 @@ import StudentV2 from "../models/v2/studentModelV2.js";
 import SeatV2, { SeatBookingV2 } from "../models/v2/seatModelV2.js";
 import ShiftV2 from "../models/v2/shiftModelV2.js";
 import Invoice from "../models/invoiceModel.js";        // OLD
+import {
+    deriveAccountFromBalance
+} from "../services/v2/billingServiceV2.js";
 
 const router = express.Router();
 
@@ -211,36 +214,110 @@ router.post("/migrate-bihari-library", async (req, res) => {
                 shiftCode = "fullday";
 
             const shift = shiftMap.get(shiftCode);
+            if (!shift) {
+                console.log(
+                    `Shift not found for SID ${oldStudent.sid}`
+                );
+                continue;
+            }
+            let balanceAmount = 0;
 
-            let studentStatus = "pending";
-            let seatStatus = "not_allotted";
+            let validTill =
+                oldStudent.nextPayment ||
+                oldStudent.admissionDate;
 
-            if (oldStudent.status === "Active") {
-                studentStatus = "active";
-                seatStatus = "allotted";
+            let lastPaymentAt =
+                oldStudent.lastPayment || null;
+
+            const hasInvoice =
+                await Invoice.exists({
+                    sid: oldStudent.sid
+                });
+
+            if (hasInvoice) {
+
+                const latestInvoice =
+                    await Invoice.findOne({
+                        sid: oldStudent.sid
+                    }).sort({
+                        cycleEnd: -1
+                    });
+
+                balanceAmount =
+                    -(latestInvoice.remainingDue || 0);
+
+                validTill =
+                    latestInvoice.cycleEnd ||
+                    validTill;
+
+                lastPaymentAt =
+                    latestInvoice.paymentDate ||
+                    lastPaymentAt;
+
+            } else {
+
+                const legacyDue =
+                    (oldStudent.paymentDue || 0) +
+                    (oldStudent.extraPaymentDue || 0);
+
+                balanceAmount =
+                    -legacyDue;
             }
 
-            if (oldStudent.status === "Pending") {
-                studentStatus = "pending";
-                seatStatus = "allotted";
-            }
-
-            if (oldStudent.status === "Trash") {
-                studentStatus = "trash";
-                seatStatus = "cancelled";
-            }
-
-            const due =
-                (oldStudent.paymentDue || 0) +
-                (oldStudent.extraPaymentDue || 0);
+            const accountState =
+                deriveAccountFromBalance({
+                    balanceAmount,
+                    dailyRate:
+                        shift.price / 30,
+                    asOfDate:
+                        validTill
+                });
 
             let paymentStatus = "paid";
 
-            if (due > 0)
+            if (balanceAmount < 0) {
                 paymentStatus = "due";
-
-            if (due < 0)
+            }
+            else if (balanceAmount > 0) {
                 paymentStatus = "advance";
+            }
+            else if (
+                validTill &&
+                new Date(validTill) >= new Date()
+            ) {
+                paymentStatus = "paid";
+            }
+            else {
+                paymentStatus = "due";
+            }
+
+            let studentStatus = "pending";
+
+            if (
+                validTill &&
+                new Date(validTill) >= new Date()
+            ) {
+                studentStatus = "active";
+            }
+
+            let seatStatus =
+                oldStudent.seatNumber
+                    ? "allotted"
+                    : "not_allotted";
+
+            if (oldStudent.status === "Trash") {
+
+                studentStatus = "trash";
+                seatStatus = "cancelled";
+
+            } else if (
+                oldStudent.status === "Pending"
+            ) {
+
+                studentStatus = "pending";
+            }
+
+
 
             const seatDoc =
                 seatMap.get(oldStudent.seatNumber);
@@ -251,7 +328,10 @@ router.post("/migrate-bihari-library", async (req, res) => {
 
                 sid: oldStudent.sid,
                 name: oldStudent.name,
-                email: oldStudent.email.toLowerCase(),
+                email:
+                    oldStudent.email
+                        ? oldStudent.email.toLowerCase()
+                        : `sid${oldStudent.sid}@migrated.local`,
                 password: oldStudent.password,
                 mobile: oldStudent.mobile,
                 father: oldStudent.father,
@@ -298,21 +378,33 @@ router.post("/migrate-bihari-library", async (req, res) => {
                 },
 
                 account: {
+
+                    balanceAmount,
+
                     advanceAmount:
-                        due < 0
-                            ? Math.abs(due)
-                            : 0,
+                        accountState.advanceAmount,
 
                     dueAmount:
-                        due > 0
-                            ? due
-                            : 0,
+                        accountState.dueAmount,
 
-                    validTill:
-                        oldStudent.nextPayment,
+                    creditDays:
+                        accountState.creditDays,
 
-                    lastPaymentAt:
-                        oldStudent.lastPayment
+                    dueDays:
+                        accountState.dueDays,
+
+                    validTill,
+
+                    dueFrom:
+                        accountState.dueFrom,
+
+                    currentCycleStart:
+                        oldStudent.admissionDate,
+
+                    currentCycleEnd:
+                        validTill,
+
+                    lastPaymentAt
                 }
             });
 
@@ -351,9 +443,7 @@ router.post("/migrate-bihari-library", async (req, res) => {
                         validFrom:
                             oldStudent.admissionDate,
 
-                        validTo:
-                            oldStudent.nextPayment ||
-                            oldStudent.admissionDate,
+                        validTo: validTill,
 
                         status:
                             oldStudent.status ===
@@ -401,10 +491,11 @@ router.post("/migrate-bihari-library", async (req, res) => {
 });
 
 
-router.post(
-    "/repair-migrated-students",
-    repairMigratedStudents
-);
+// router.post(
+//     "/repair-migrated-students",
+//     repairMigratedStudents
+// );
+
 
 
 export default router;
