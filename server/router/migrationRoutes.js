@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import Student from "../models/studentModel.js";          // OLD
 import Seat from "../models/seatModel.js";                // OLD
 
-import { repairMigratedStudents } from "../controllers/migrationControllerV2.js";
+import { repairStudentAccountConsistencyV2 } from "../controllers/migrationControllerV2.js";
 
 import StudentV2 from "../models/v2/studentModelV2.js";
 import SeatV2, { SeatBookingV2 } from "../models/v2/seatModelV2.js";
@@ -402,7 +402,7 @@ router.post("/migrate-bihari-library", async (req, res) => {
 
 router.post(
     "/repair-migrated-students",
-    repairMigratedStudents
+    repairStudentAccountConsistencyV2
 );
 
 
