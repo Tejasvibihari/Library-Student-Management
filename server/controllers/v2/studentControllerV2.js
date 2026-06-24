@@ -522,6 +522,7 @@ export const updateStudentProfileV2 = async (req, res) => {
 // Cycle Days Change
 // Anchor Date Change
 // Balance Adjustment
+// Shift Change / Discount Change / Cycle Days Change / Anchor Date Change / Balance Adjustment
 export const updateStudentAccountV2 = async (req, res) => {
     try {
         const { sid } = req.params;
@@ -536,13 +537,13 @@ export const updateStudentAccountV2 = async (req, res) => {
             fixedDiscountReason,
             cycleDays,
             cycleAnchorDate,
-            lastPaymentDate,      // ⬅️ admin‑provided start point
-            validTill,            // ⬅️ admin‑provided end point
+            validTill,             // ← admin‑provided target coverage end
+            lastPaymentAt,         // optional, stored directly for history
         } = req.body;
 
         const update = {};
 
-        // ── 1. Shift ─────────────────────────────────────────
+        // ── 1. Shift ──────────────────────────────────────
         let shiftAmount = student.shift.amount;
         if (shiftCode) {
             const shift = await resolveShiftV2(shiftCode);
@@ -554,7 +555,7 @@ export const updateStudentAccountV2 = async (req, res) => {
             update["shift.amount"] = shift.price;
         }
 
-        // ── 2. Billing parameters ────────────────────────────
+        // ── 2. Billing parameters ─────────────────────────
         const newCycleDays = cycleDays ?? student.billing.cycleDays;
         const newDiscount = fixedDiscountAmount ?? student.billing.fixedDiscountAmount;
         const newAnchor = cycleAnchorDate
@@ -574,29 +575,26 @@ export const updateStudentAccountV2 = async (req, res) => {
         update["billing.netCycleAmount"] = billing.netCycleAmount;
         update["billing.dailyRate"] = billing.dailyRate;
 
-        // ── 3. Compute balance from the two dates ────────────
-        const paymentDate = lastPaymentDate
-            ? startOfDay(new Date(lastPaymentDate))
-            : startOfDay(student.account.lastPaymentDate || student.account.currentCycleStart);  // fallback
-
+        // ── 3. Compute balance from today → validTill ────
+        const today = startOfDay(new Date());
         const targetValidTill = validTill
             ? startOfDay(new Date(validTill))
             : startOfDay(student.account.validTill);
 
-        const daysDifference = diffDays(paymentDate, targetValidTill); // positive if validTill later
-        const computedBalance = daysDifference * billing.dailyRate;
+        const daysDiff = diffDays(today, targetValidTill);   // positive if future, negative if past
+        const computedBalance = daysDiff * billing.dailyRate;
 
-        // ── 4. Derive all account fields ────────────────────
+        // ── 4. Derive all account fields ─────────────────
         const account = deriveAccount({
             balanceAmount: computedBalance,
-            cycleEnd: targetValidTill,          // for remainingDays we can use validTill as the "covered until"
+            validTill: targetValidTill,
             dailyRate: billing.dailyRate,
-            today: new Date(),
+            today,
         });
 
+        // store the calculated values
         update["account.balanceAmount"] = computedBalance;
         update["account.validTill"] = targetValidTill;
-        update["account.lastPaymentDate"] = paymentDate;       // store it for next time
         update["account.advanceAmount"] = account.advanceAmount;
         update["account.dueAmount"] = account.dueAmount;
         update["account.remainingDays"] = account.remainingDays;
@@ -604,16 +602,21 @@ export const updateStudentAccountV2 = async (req, res) => {
         update["account.dueDays"] = account.dueDays;
         update["account.dueFrom"] = account.dueFrom;
 
-        // keep cycle boundaries for display/reference
-        const now = startOfDay(new Date());
+        // optional: store lastPaymentAt for record‑keeping
+        if (lastPaymentAt) {
+            update["account.lastPaymentAt"] = new Date(lastPaymentAt);
+        }
+
+        // ── 5. Cycle boundaries (for reference) ───────────
         const anchor = startOfDay(newAnchor);
         let cycleStart = new Date(anchor);
-        while (addDays(cycleStart, newCycleDays) <= now) {
+        while (addDays(cycleStart, newCycleDays) <= today) {
             cycleStart = addDays(cycleStart, newCycleDays);
         }
         update["account.currentCycleStart"] = cycleStart;
         update["account.currentCycleEnd"] = addDays(cycleStart, newCycleDays);
 
+        // ── 6. Statuses ──────────────────────────────────
         update["statuses.payment"] = account.paymentStatus;
         update["statuses.student"] = account.studentStatus;
         update["statuses.renewal"] = account.renewal;
