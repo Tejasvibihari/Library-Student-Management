@@ -94,67 +94,26 @@ const studentSchemaV2 = new Schema({
         }
     },
 
-    account: {
-
-        // SINGLE SOURCE OF TRUTH
-
-        balanceAmount: {
-            type: Number,
-            default: 0
-        },
-
-        validTill: {
-            type: Date
-        },
-
-        dueFrom: {
-            type: Date
-        },
-
-        lastPaymentAt: {
-            type: Date
-        },
-
-        lastInvoiceNumber: {
-            type: Number
-        },
-
+    account:
+    {
+        // SINGLE SOURCE OF TRUTh
+        balanceAmount: { type: Number, default: 0 },
+        validTill: { type: Date },
+        dueFrom: { type: Date },
+        lastPaymentAt: { type: Date },
+        lastInvoiceNumber: { type: Number },
         // SNAPSHOT FIELDS (cron updates)
-
-        advanceAmount: {
-            type: Number,
-            default: 0
-        },
-
-        dueAmount: {
-            type: Number,
-            default: 0
-        },
-
-        remainingDays: {
-            type: Number,
-            default: 0
-        },
-
-        advanceDays: {
-            type: Number,
-            default: 0
-        },
-
+        advanceAmount: { type: Number, default: 0 },
+        dueAmount: { type: Number, default: 0 },
+        remainingDays: { type: Number, default: 0 },
+        advanceDays: { type: Number, default: 0 },
         dueDays: {
             type: Number,
             default: 0
         },
-
         // cycle tracking
-
-        currentCycleStart: {
-            type: Date
-        },
-
-        currentCycleEnd: {
-            type: Date
-        }
+        currentCycleStart: { type: Date },
+        currentCycleEnd: { type: Date }
     }
 }, {
     collection: 'students_v2',

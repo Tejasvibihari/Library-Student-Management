@@ -491,7 +491,142 @@ router.post("/migrate-bihari-library", async (req, res) => {
 //     "/repair-migrated-students",
 //     repairMigratedStudents
 // );
+router.post("/repair-active-students", async (req, res) => {
+    try {
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const students = await StudentV2.find({
+            "statuses.student": "active"
+        });
+
+        let updated = 0;
+
+        for (const student of students) {
+
+            if (!student.account?.validTill) {
+                continue;
+            }
+
+            const validTill = new Date(student.account.validTill);
+            validTill.setHours(0, 0, 0, 0);
+
+            const cycleDays =
+                student.billing?.cycleDays || 30;
+
+            const shiftAmount =
+                student.shift?.amount ||
+                student.billing?.netCycleAmount ||
+                0;
+
+            const dailyRate =
+                shiftAmount / cycleDays;
+
+            // days left till expiry
+
+            const remainingDays = Math.max(
+                0,
+                Math.ceil(
+                    (validTill - today) /
+                    (1000 * 60 * 60 * 24)
+                )
+            );
+
+            // money represented by remaining days
+
+            const balanceAmount = Number(
+                (remainingDays * dailyRate).toFixed(2)
+            );
+
+            const advanceAmount = balanceAmount;
+
+            const advanceDays = remainingDays;
+
+            const dueAmount = 0;
+            const dueDays = 0;
+
+            // rebuild cycle
+
+            const currentCycleEnd =
+                new Date(validTill);
+
+            const currentCycleStart =
+                new Date(validTill);
+
+            currentCycleStart.setDate(
+                currentCycleStart.getDate() - cycleDays
+            );
+
+            await StudentV2.updateOne(
+                { _id: student._id },
+                {
+                    $set: {
+
+                        "billing.dailyRate":
+                            Number(
+                                dailyRate.toFixed(2)
+                            ),
+
+                        "account.balanceAmount":
+                            balanceAmount,
+
+                        "account.advanceAmount":
+                            advanceAmount,
+
+                        "account.dueAmount":
+                            dueAmount,
+
+                        "account.remainingDays":
+                            remainingDays,
+
+                        "account.advanceDays":
+                            advanceDays,
+
+                        "account.dueDays":
+                            dueDays,
+
+                        "account.currentCycleStart":
+                            currentCycleStart,
+
+                        "account.currentCycleEnd":
+                            currentCycleEnd,
+
+                        "statuses.payment":
+                            remainingDays > 0
+                                ? "advance"
+                                : "paid",
+
+                        "statuses.renewal":
+                            remainingDays <= 0
+                                ? "expired"
+                                : remainingDays <= 3
+                                    ? "urgent"
+                                    : remainingDays <= 7
+                                        ? "warning"
+                                        : "safe"
+                    }
+                }
+            );
+
+            updated++;
+        }
+
+        return res.status(200).json({
+            success: true,
+            updated
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 
 
 export default router;
