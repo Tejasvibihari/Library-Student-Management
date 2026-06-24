@@ -1,0 +1,73 @@
+{
+    "success": true,
+    "updated": 52,
+    "skipped": 11,
+    "skippedStudents": [
+        {
+            "_id": "6a3b8d68df329897c773e40e",
+            "sid": 73,
+            "name": "Niranjan Kumar",
+            "email": "niranjank9131@gmail.cm"
+        },
+        {
+            "_id": "6a3b8d68df329897c773e449",
+            "sid": 124,
+            "name": "Ayush Kumar",
+            "email": "ayushkumar99848@gmail.com"
+        },
+        {
+            "_id": "6a3b8d69df329897c773e8e8",
+            "sid": 529,
+            "name": "Piyush Kumar",
+            "email": "oneshotpiyush67@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e935",
+            "sid": 543,
+            "name": "Shivam kumar",
+            "email": "kumarshivam97343@gmail.come"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e985",
+            "sid": 557,
+            "name": "Sweety kumari",
+            "email": "kumarisweety25778@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e989",
+            "sid": 558,
+            "name": "Ankita Raj",
+            "email": "rkumari44120@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e98d",
+            "sid": 559,
+            "name": "Jagriti singh",
+            "email": "7jagritisingh@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e9ab",
+            "sid": 564,
+            "name": "Manish raj",
+            "email": "kingmanishraj80109@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e9b2",
+            "sid": 565,
+            "name": "Ashish Kumar",
+            "email": "sunnytiwari0909@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e9d9",
+            "sid": 571,
+            "name": "Karan kushwaha",
+            "email": "karankushwaha5818@gmail.com"
+        },
+        {
+            "_id": "6a3b8d6adf329897c773e9ed",
+            "sid": 574,
+            "name": "Anjani kumari",
+            "email": "anjanisharma65631@gmail.com"
+        }
+    ]
+}

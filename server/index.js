@@ -37,7 +37,7 @@ mongoose.connect(process.env.MONGODB_URL)
         console.error(`Could not connect to MongoDB... + ${err}`);
     });
 
-const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.in'];
+const allowedOrigins = ['http://localhost:5173', 'https://biharilibrary.in', "http://localhost:8081"];
 
 // Add request timeout middleware
 app.use((req, res, next) => {
