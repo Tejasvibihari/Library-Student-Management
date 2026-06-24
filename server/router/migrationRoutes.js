@@ -628,5 +628,144 @@ router.post("/repair-active-students", async (req, res) => {
     }
 });
 
+router.post("/repair-pending-students", async (req, res) => {
+    try {
+
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const students = await StudentV2.find({
+            "statuses.student": "pending"
+        });
+
+        let updated = 0;
+        let skipped = 0;
+        let skippedStudents = [];
+        for (const student of students) {
+
+            const latestInvoice = await Invoice.findOne({
+                sid: student.sid
+            }).sort({
+                cycleEnd: -1
+            });
+
+            if (!latestInvoice) {
+                skipped++;
+                skippedStudents.push(student);
+                continue;
+            }
+
+            const validTill = new Date(
+                latestInvoice.cycleEnd
+            );
+
+            validTill.setHours(0, 0, 0, 0);
+
+            const dueDays = Math.max(
+                0,
+                Math.ceil(
+                    (today - validTill) /
+                    (1000 * 60 * 60 * 24)
+                )
+            );
+
+            const cycleDays =
+                student.billing?.cycleDays || 30;
+
+            const cycleAmount =
+                student.billing?.netCycleAmount ||
+                student.shift?.amount ||
+                0;
+
+            const dailyRate =
+                cycleAmount / cycleDays;
+
+            const dueAmount = Number(
+                (dueDays * dailyRate)
+                    .toFixed(2)
+            );
+
+            await StudentV2.updateOne(
+                {
+                    _id: student._id
+                },
+                {
+                    $set: {
+
+                        "statuses.student":
+                            "pending",
+
+                        "statuses.payment":
+                            "due",
+
+                        "statuses.renewal":
+                            "expired",
+
+                        "account.balanceAmount":
+                            -dueAmount,
+
+                        "account.advanceAmount":
+                            0,
+
+                        "account.advanceDays":
+                            0,
+
+                        "account.remainingDays":
+                            0,
+
+                        "account.dueAmount":
+                            dueAmount,
+
+                        "account.dueDays":
+                            dueDays,
+
+                        "account.validTill":
+                            latestInvoice.cycleEnd,
+
+                        "account.dueFrom":
+                            latestInvoice.cycleEnd,
+
+                        "account.lastPaymentAt":
+                            latestInvoice.paymentDate,
+
+                        "account.currentCycleStart":
+                            latestInvoice.cycleStart,
+
+                        "account.currentCycleEnd":
+                            latestInvoice.cycleEnd
+                    }
+                }
+            );
+
+            updated++;
+        }
+
+        return res.status(200).json({
+            success: true,
+            updated,
+            skipped,
+            skippedStudents: skippedStudents.map(
+                (s) => ({
+                    _id: s._id,
+                    sid: s.sid,
+                    name: s.name,
+                    email: s.email
+                })
+            )
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+
+
+});
 
 export default router;
