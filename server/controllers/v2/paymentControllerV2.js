@@ -19,7 +19,7 @@ export const makePaymentV2 = async (req, res) => {
             payment: result.payment,
             invoice: result.invoice,
             student: result.student,
-            booking: result.booking
+
         });
     } catch (error) {
         console.error('makePaymentV2 error:', error);

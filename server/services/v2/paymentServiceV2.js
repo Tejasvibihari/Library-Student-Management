@@ -114,7 +114,7 @@ export async function recordPaymentV2({
         advanceDaysBefore: liveBefore.advanceDays,
         advanceDaysAfter: liveAfter.advanceDays,
         validTillBefore: student.account?.validTill || student.admissionDate,
-
+        validTillAfter: liveAfter.validTill,
         dueFromBefore: liveBefore.dueFrom,
         dueFromAfter: liveAfter.dueFrom,
         amountUsedForDue,
@@ -155,7 +155,7 @@ export async function recordPaymentV2({
             dueAmountAfter: liveAfter.dueAmount,
             advanceAmountAfter: liveAfter.advanceAmount,
             dueDaysAfter: liveAfter.dueDays,
-            creditDaysAfter: liveAfter.creditDays,
+            advanceDaysAfter: liveAfter.advanceDays,
             status: classification.status
         });
     } catch (invoiceError) {
@@ -176,13 +176,14 @@ export async function recordPaymentV2({
                 $set: {
                     'statuses.student': liveAfter.studentStatus,
                     'statuses.payment': liveAfter.paymentStatus,
+                    'statuses.renewal': liveAfter.renewal,
                     'account.balanceAmount': balanceAfter,
                     'account.advanceAmount': liveAfter.advanceAmount,
                     'account.dueAmount': liveAfter.dueAmount,
                     'account.remainingDays': liveAfter.remainingDays,
                     'account.advanceDays': liveAfter.advanceDays,
                     'account.dueDays': liveAfter.dueDays,
-                    'account.validTill': cycleEnd,
+                    'account.validTill': liveAfter.validTill,
                     'account.dueFrom': liveAfter.dueFrom,
                     'account.currentCycleStart': cycleStart,
                     'account.currentCycleEnd': cycleEnd,

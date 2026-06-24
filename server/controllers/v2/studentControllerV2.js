@@ -525,16 +525,9 @@ export const updateStudentProfileV2 = async (req, res) => {
 export const updateStudentAccountV2 = async (req, res) => {
     try {
         const { sid } = req.params;
-
-        const student = await StudentV2.findOne({
-            sid: Number(sid)
-        });
-
+        const student = await StudentV2.findOne({ sid: Number(sid) });
         if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found"
-            });
+            return res.status(404).json({ success: false, message: "Student not found" });
         }
 
         const {
@@ -543,19 +536,17 @@ export const updateStudentAccountV2 = async (req, res) => {
             fixedDiscountReason,
             cycleDays,
             cycleAnchorDate,
-            balanceAmount
+            lastPaymentDate,      // ⬅️ admin‑provided start point
+            validTill,            // ⬅️ admin‑provided end point
         } = req.body;
 
         const update = {};
 
+        // ── 1. Shift ─────────────────────────────────────────
         let shiftAmount = student.shift.amount;
-
         if (shiftCode) {
-
             const shift = await resolveShiftV2(shiftCode);
-
             shiftAmount = shift.price;
-
             update["shift.shift"] = shift._id;
             update["shift.code"] = shift.code;
             update["shift.label"] = shift.label;
@@ -563,137 +554,79 @@ export const updateStudentAccountV2 = async (req, res) => {
             update["shift.amount"] = shift.price;
         }
 
+        // ── 2. Billing parameters ────────────────────────────
+        const newCycleDays = cycleDays ?? student.billing.cycleDays;
+        const newDiscount = fixedDiscountAmount ?? student.billing.fixedDiscountAmount;
+        const newAnchor = cycleAnchorDate
+            ? new Date(cycleAnchorDate)
+            : student.billing.cycleAnchorDate;
+
         const billing = calculateStudentBilling({
             shiftAmount,
-            fixedDiscountAmount:
-                fixedDiscountAmount ??
-                student.billing.fixedDiscountAmount,
-            cycleDays:
-                cycleDays ??
-                student.billing.cycleDays
+            fixedDiscountAmount: newDiscount,
+            cycleDays: newCycleDays,
         });
 
-        update["billing.fixedDiscountAmount"] =
-            fixedDiscountAmount ??
-            student.billing.fixedDiscountAmount;
+        update["billing.fixedDiscountAmount"] = newDiscount;
+        update["billing.fixedDiscountReason"] = fixedDiscountReason ?? student.billing.fixedDiscountReason;
+        update["billing.cycleDays"] = newCycleDays;
+        update["billing.cycleAnchorDate"] = newAnchor;
+        update["billing.netCycleAmount"] = billing.netCycleAmount;
+        update["billing.dailyRate"] = billing.dailyRate;
 
-        update["billing.fixedDiscountReason"] =
-            fixedDiscountReason ??
-            student.billing.fixedDiscountReason;
+        // ── 3. Compute balance from the two dates ────────────
+        const paymentDate = lastPaymentDate
+            ? startOfDay(new Date(lastPaymentDate))
+            : startOfDay(student.account.lastPaymentDate || student.account.currentCycleStart);  // fallback
 
-        update["billing.cycleDays"] =
-            cycleDays ??
-            student.billing.cycleDays;
+        const targetValidTill = validTill
+            ? startOfDay(new Date(validTill))
+            : startOfDay(student.account.validTill);
 
-        update["billing.cycleAnchorDate"] =
-            cycleAnchorDate
-                ? new Date(cycleAnchorDate)
-                : student.billing.cycleAnchorDate;
+        const daysDifference = diffDays(paymentDate, targetValidTill); // positive if validTill later
+        const computedBalance = daysDifference * billing.dailyRate;
 
-        update["billing.netCycleAmount"] =
-            billing.netCycleAmount;
-
-        update["billing.dailyRate"] =
-            billing.dailyRate;
+        // ── 4. Derive all account fields ────────────────────
         const account = deriveAccount({
-            balanceAmount:
-                balanceAmount !== undefined
-                    ? Number(balanceAmount)
-                    : student.account.balanceAmount,
-
-            validTill:
-                student.account.validTill,
-
-            dailyRate:
-                billing.dailyRate
+            balanceAmount: computedBalance,
+            cycleEnd: targetValidTill,          // for remainingDays we can use validTill as the "covered until"
+            dailyRate: billing.dailyRate,
+            today: new Date(),
         });
 
-        update["account.advanceAmount"] =
-            account.advanceAmount;
+        update["account.balanceAmount"] = computedBalance;
+        update["account.validTill"] = targetValidTill;
+        update["account.lastPaymentDate"] = paymentDate;       // store it for next time
+        update["account.advanceAmount"] = account.advanceAmount;
+        update["account.dueAmount"] = account.dueAmount;
+        update["account.remainingDays"] = account.remainingDays;
+        update["account.advanceDays"] = account.advanceDays;
+        update["account.dueDays"] = account.dueDays;
+        update["account.dueFrom"] = account.dueFrom;
 
-        update["account.dueAmount"] =
-            account.dueAmount;
-
-        update["account.remainingDays"] =
-            account.remainingDays;
-
-        update["account.advanceDays"] =
-            account.advanceDays;
-
-        update["account.dueDays"] =
-            account.dueDays;
-
-        update["account.dueFrom"] =
-            account.dueFrom;
-
-        update["statuses.payment"] =
-            account.paymentStatus;
-
-        update["statuses.student"] =
-            account.studentStatus;
-
-        update["statuses.renewal"] =
-            account.renewal;
-        if (balanceAmount !== undefined) {
-
-            const account = deriveAccount({
-                balanceAmount,
-                validTill:
-                    student.account.validTill,
-                dailyRate:
-                    billing.dailyRate
-            });
-
-            update["account.balanceAmount"] =
-                balanceAmount;
-
-            update["account.advanceAmount"] =
-                account.advanceAmount;
-
-            update["account.dueAmount"] =
-                account.dueAmount;
-
-            update["account.remainingDays"] =
-                account.remainingDays;
-
-            update["account.advanceDays"] =
-                account.advanceDays;
-
-            update["account.dueDays"] =
-                account.dueDays;
-
-            update["account.dueFrom"] =
-                account.dueFrom;
-
-            update["statuses.payment"] =
-                account.paymentStatus;
-
-            update["statuses.student"] =
-                account.studentStatus;
-
-            update["statuses.renewal"] =
-                account.renewal;
+        // keep cycle boundaries for display/reference
+        const now = startOfDay(new Date());
+        const anchor = startOfDay(newAnchor);
+        let cycleStart = new Date(anchor);
+        while (addDays(cycleStart, newCycleDays) <= now) {
+            cycleStart = addDays(cycleStart, newCycleDays);
         }
+        update["account.currentCycleStart"] = cycleStart;
+        update["account.currentCycleEnd"] = addDays(cycleStart, newCycleDays);
+
+        update["statuses.payment"] = account.paymentStatus;
+        update["statuses.student"] = account.studentStatus;
+        update["statuses.renewal"] = account.renewal;
 
         const updated = await StudentV2.findOneAndUpdate(
             { sid: Number(sid) },
             { $set: update },
-            {
-                new: true,
-                runValidators: true
-            }
+            { new: true, runValidators: true }
         );
 
-        return res.json({
-            success: true,
-            student: updated
-        });
-
+        return res.json({ success: true, student: updated });
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
