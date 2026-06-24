@@ -58,10 +58,8 @@ export function deriveAccount({
             : 0;
 
     const advanceDays =
-        dailyRate > 0
-            ? Math.floor(
-                advanceAmount / dailyRate
-            )
+        advanceAmount > 0
+            ? Math.floor(advanceAmount / rate)
             : 0;
 
     const dueDays =
@@ -156,55 +154,53 @@ export function deriveAccountFromBalance({ balanceAmount, dailyRate, asOfDate })
         return {
             advanceAmount,
             dueAmount,
-            creditDays: 0,
+            remainingDays: 0,
+            advanceDays: 0,
             dueDays: 0,
-            validTill: today,
             dueFrom: dueAmount > 0 ? today : null,
             paymentStatus: dueAmount > 0 ? 'due' : 'paid',
             studentStatus: dueAmount > 0 ? 'pending' : 'active'
         };
     }
 
-    const creditDays = advanceAmount > 0 ? Math.floor(advanceAmount / rate) : 0;
+    const creditDays =
+        advanceAmount > 0
+            ? Math.floor(advanceAmount / rate)
+            : 0;
     const dueDays = dueAmount > 0 ? Math.ceil(dueAmount / rate) : 0;
 
     let paymentStatus;
     if (dueAmount > 0) paymentStatus = 'due';
     else if (advanceAmount >= rate) paymentStatus = 'advance'; // enough for at least one more day
-    else if (creditDays > 0) paymentStatus = 'paid';    // has some days left
+    else if (advanceDays > 0) paymentStatus = 'paid';    // has some days left
     else paymentStatus = 'due';     // balance is exactly 0
 
     return {
         advanceAmount,
         dueAmount,
-        creditDays,
+        remainingDays: advanceDays,
+        advanceDays,
         dueDays,
-        validTill: addDays(today, creditDays),
         dueFrom: dueDays > 0 ? addDays(today, -dueDays) : null,
         paymentStatus,
         studentStatus: paymentStatus === 'due' ? 'pending' : 'active'
     };
 }
 
-export function getLiveStudentAccount(student, asOfDate = new Date()) {
-    const rate = Number(student.billing?.dailyRate || 0);
-    const storedBalance = Number(student.account?.balanceAmount || 0);
-    const validTill = student.account?.validTill || student.admissionDate;
-    const dayDelta = diffDays(validTill, asOfDate);
-
-    let liveBalance = storedBalance;
-    if (dayDelta > 0 && rate > 0) {
-        liveBalance -= dayDelta * rate;
-    }
-
-    return {
-        balanceAmount: liveBalance,
-        ...deriveAccountFromBalance({
-            balanceAmount: liveBalance,
-            dailyRate: rate,
+export function getLiveStudentAccount(
+    student,
+    asOfDate = new Date()
+) {
+    return deriveAccount({
+        balanceAmount:
+            student.account.balanceAmount,
+        validTill:
+            student.account.validTill,
+        dailyRate:
+            student.billing.dailyRate,
+        today:
             asOfDate
-        })
-    };
+    });
 }
 
 export function classifyPayment({ amountPaid, oneTimeDiscountAmount, dueAmountBefore, dueAmountAfter, advanceAmountAfter }) {

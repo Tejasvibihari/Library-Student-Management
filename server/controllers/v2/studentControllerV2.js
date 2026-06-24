@@ -9,7 +9,8 @@ import {
     deriveAccountFromBalance,
     getCycleForDate,
     getLiveStudentAccount,
-    startOfDay
+    startOfDay,
+    deriveAccount
 } from '../../services/v2/billingServiceV2.js';
 
 function normalizeStatus(status) {
@@ -135,7 +136,8 @@ export const createNewStudentV2 = async (req, res) => {
                 balanceAmount: 0,
                 advanceAmount: initialAccount.advanceAmount,
                 dueAmount: initialAccount.dueAmount,
-                creditDays: initialAccount.creditDays,
+                remainingDays: initialAccount.remainingDays,
+                advanceDays: initialAccount.advanceDays,
                 dueDays: initialAccount.dueDays,
                 validTill: admission,
                 dueFrom: null,
@@ -449,5 +451,386 @@ export const trashStudentV2 = async (req, res) => {
         res.status(200).json({ message: 'Student deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+
+// Updation Controller 
+// Only personal information.
+export const updateStudentProfileV2 = async (req, res) => {
+    try {
+        const { sid } = req.params;
+
+        const allowedFields = [
+            "name",
+            "email",
+            "mobile",
+            "father",
+            "guardian",
+            "gender",
+            "address",
+            "image",
+            "instagram",
+            "facebook",
+            "youtube",
+            "isOnline"
+        ];
+
+        const update = {};
+
+        for (const field of allowedFields) {
+            if (req.body[field] !== undefined) {
+                update[field] = req.body[field];
+            }
+        }
+
+        const student = await StudentV2.findOneAndUpdate(
+            { sid: Number(sid) },
+            { $set: update },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
+        return res.json({
+            success: true,
+            student
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// Shift Change
+// Discount Change
+// Cycle Days Change
+// Anchor Date Change
+// Balance Adjustment
+export const updateStudentAccountV2 = async (req, res) => {
+    try {
+        const { sid } = req.params;
+
+        const student = await StudentV2.findOne({
+            sid: Number(sid)
+        });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
+        const {
+            shiftCode,
+            fixedDiscountAmount,
+            fixedDiscountReason,
+            cycleDays,
+            cycleAnchorDate,
+            balanceAmount
+        } = req.body;
+
+        const update = {};
+
+        let shiftAmount = student.shift.amount;
+
+        if (shiftCode) {
+
+            const shift = await resolveShiftV2(shiftCode);
+
+            shiftAmount = shift.price;
+
+            update["shift.shift"] = shift._id;
+            update["shift.code"] = shift.code;
+            update["shift.label"] = shift.label;
+            update["shift.displayTime"] = shift.displayTime;
+            update["shift.amount"] = shift.price;
+        }
+
+        const billing = calculateStudentBilling({
+            shiftAmount,
+            fixedDiscountAmount:
+                fixedDiscountAmount ??
+                student.billing.fixedDiscountAmount,
+            cycleDays:
+                cycleDays ??
+                student.billing.cycleDays
+        });
+
+        update["billing.fixedDiscountAmount"] =
+            fixedDiscountAmount ??
+            student.billing.fixedDiscountAmount;
+
+        update["billing.fixedDiscountReason"] =
+            fixedDiscountReason ??
+            student.billing.fixedDiscountReason;
+
+        update["billing.cycleDays"] =
+            cycleDays ??
+            student.billing.cycleDays;
+
+        update["billing.cycleAnchorDate"] =
+            cycleAnchorDate
+                ? new Date(cycleAnchorDate)
+                : student.billing.cycleAnchorDate;
+
+        update["billing.netCycleAmount"] =
+            billing.netCycleAmount;
+
+        update["billing.dailyRate"] =
+            billing.dailyRate;
+        const account = deriveAccount({
+            balanceAmount:
+                balanceAmount !== undefined
+                    ? Number(balanceAmount)
+                    : student.account.balanceAmount,
+
+            validTill:
+                student.account.validTill,
+
+            dailyRate:
+                billing.dailyRate
+        });
+
+        update["account.advanceAmount"] =
+            account.advanceAmount;
+
+        update["account.dueAmount"] =
+            account.dueAmount;
+
+        update["account.remainingDays"] =
+            account.remainingDays;
+
+        update["account.advanceDays"] =
+            account.advanceDays;
+
+        update["account.dueDays"] =
+            account.dueDays;
+
+        update["account.dueFrom"] =
+            account.dueFrom;
+
+        update["statuses.payment"] =
+            account.paymentStatus;
+
+        update["statuses.student"] =
+            account.studentStatus;
+
+        update["statuses.renewal"] =
+            account.renewal;
+        if (balanceAmount !== undefined) {
+
+            const account = deriveAccount({
+                balanceAmount,
+                validTill:
+                    student.account.validTill,
+                dailyRate:
+                    billing.dailyRate
+            });
+
+            update["account.balanceAmount"] =
+                balanceAmount;
+
+            update["account.advanceAmount"] =
+                account.advanceAmount;
+
+            update["account.dueAmount"] =
+                account.dueAmount;
+
+            update["account.remainingDays"] =
+                account.remainingDays;
+
+            update["account.advanceDays"] =
+                account.advanceDays;
+
+            update["account.dueDays"] =
+                account.dueDays;
+
+            update["account.dueFrom"] =
+                account.dueFrom;
+
+            update["statuses.payment"] =
+                account.paymentStatus;
+
+            update["statuses.student"] =
+                account.studentStatus;
+
+            update["statuses.renewal"] =
+                account.renewal;
+        }
+
+        const updated = await StudentV2.findOneAndUpdate(
+            { sid: Number(sid) },
+            { $set: update },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        return res.json({
+            success: true,
+            student: updated
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// Assign Seat
+// Change Seat
+// Remove Seat
+
+export const updateStudentSeatV2 = async (req, res) => {
+    try {
+
+        const { sid } = req.params;
+        const { seatNumber } = req.body;
+
+        const student =
+            await StudentV2.findOne({
+                sid: Number(sid)
+            });
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
+        if (
+            seatNumber === "Other" ||
+            seatNumber === ""
+        ) {
+
+            if (student.seat.activeAllotment) {
+
+                await vacateBookingV2({
+                    bookingId:
+                        student.seat.activeAllotment,
+                    reason:
+                        "Seat removed by admin"
+                });
+            }
+
+            student.seat = {
+                seat: null,
+                seatNumber: "Other",
+                activeAllotment: null,
+                status: "not_allotted"
+            };
+
+            student.statuses.seat =
+                "not_allotted";
+
+            await student.save();
+
+            return res.json({
+                success: true,
+                student
+            });
+        }
+
+        const seat =
+            await SeatV2.findOne({
+                seatNumber
+            });
+
+        if (!seat) {
+            return res.status(404).json({
+                success: false,
+                message: "Seat not found"
+            });
+        }
+
+        if (student.seat.activeAllotment) {
+
+            await SeatBookingV2.findByIdAndUpdate(
+                student.seat.activeAllotment,
+                {
+                    status: "vacated"
+                }
+            );
+        }
+
+        const booking = await bookSeatV2({
+            studentId: student._id,
+            seatNumber,
+            shiftCode: student.shift.code,
+            validFrom: new Date(),
+            validTo:
+                student.account.currentCycleEnd
+        });
+
+        return res.json({
+            success: true,
+            booking
+        });
+
+
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// No restrictions.
+export const adminUpdateStudentV2 = async (req, res) => {
+    try {
+
+        const { sid } = req.params;
+
+        const student =
+            await StudentV2.findOneAndUpdate(
+                {
+                    sid: Number(sid)
+                },
+                {
+                    $set: req.body
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
+        return res.json({
+            success: true,
+            student
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
