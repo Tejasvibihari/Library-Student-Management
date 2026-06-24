@@ -219,6 +219,7 @@ export const getAllStudentsV2 = async (req, res) => {
     }
 };
 
+
 export const getStudentV2 = async (req, res) => {
     try {
         const student = await StudentV2.findById(req.query._id);
