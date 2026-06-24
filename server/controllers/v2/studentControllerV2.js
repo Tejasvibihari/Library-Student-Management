@@ -232,8 +232,11 @@ export const getStudentV2 = async (req, res) => {
 
 export const getStudentBySidV2 = async (req, res) => {
     try {
-        const student = await StudentV2.findOne({ sid: Number(req.params.sid) });
+        // Change from req.params.sid to req.query.sid
+        const student = await StudentV2.findOne({ sid: Number(req.query.sid) });
+
         if (!student) return res.status(404).json({ message: 'Student not found.' });
+
         const summary = getLiveStudentAccount(student, new Date());
         res.status(200).json(publicStudentPayload(student, summary));
     } catch (error) {

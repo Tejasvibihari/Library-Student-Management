@@ -21,7 +21,7 @@ const router = express.Router();
 router.post('/create-new-student', generateSidMiddlewareV2, studentUploadV2.single('image'), createNewStudentV2);
 router.get('/getallstudent', getAllStudentsV2);
 router.get('/getstudent', getStudentV2);
-router.get('/getstudentbysid/:sid', getStudentBySidV2);
+router.get('/getstudentbysid', getStudentBySidV2);
 router.get('/account/:sid', getStudentAccountV2);
 
 router.post('/allot-seat', allotSeatToStudentV2);
