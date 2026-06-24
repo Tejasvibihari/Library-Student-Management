@@ -29,7 +29,6 @@ export function diffDays(from, to) {
 }
 
 
-
 export function deriveAccount({
     balanceAmount = 0,
     validTill,
@@ -57,9 +56,10 @@ export function deriveAccount({
             ? diffDays(now, validDate)
             : 0;
 
+    // Fixed line below: changed 'rate' to 'dailyRate'
     const advanceDays =
-        advanceAmount > 0
-            ? Math.floor(advanceAmount / rate)
+        advanceAmount > 0 && dailyRate > 0
+            ? Math.floor(advanceAmount / dailyRate)
             : 0;
 
     const dueDays =
@@ -95,25 +95,20 @@ export function deriveAccount({
         renewal = "warning";
 
     return {
-
         advanceAmount,
         dueAmount,
-
         remainingDays,
         advanceDays,
         dueDays,
-
         dueFrom:
             dueAmount > 0
                 ? validDate
                 : null,
-
         paymentStatus,
         studentStatus,
         renewal
     };
 }
-
 export function getCycleForDate(anchorDate, targetDate) {
     const anchor = startOfDay(anchorDate);
     const target = startOfDay(targetDate);
