@@ -123,9 +123,12 @@ export async function recordPaymentV2({
             amount: student.shift.amount
         },
 
-        dailyRate: student.billing.dailyRate,
-        netCycleAmount: student.billing.netCycleAmount,
+        // ── Billing snapshot ──
+        grossCycleAmount: student.shift.amount,      // ✅ ADD THIS LINE
         fixedDiscountAmount: student.billing.fixedDiscountAmount,
+        netCycleAmount: student.billing.netCycleAmount,
+        dailyRate: student.billing.dailyRate,
+
         amountPaid: paid,
 
         // Day tracking
@@ -135,7 +138,7 @@ export async function recordPaymentV2({
         remainingDaysBefore: liveBefore.remainingDays,
         remainingDaysAfter: newRemainingDays,
 
-        // For audit trail
+        // Audit trail
         validTillBefore: liveBefore.validTill,
         validTillAfter: result.validTill,
         dueFromBefore: liveBefore.dueFrom,
