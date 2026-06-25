@@ -27,7 +27,7 @@ router.get('/getallstudent', getAllStudentsV2);
 router.get('/getstudent', getStudentV2);
 router.get('/getstudentbysid', getStudentBySidV2);
 router.get('/account/:sid', getStudentAccountV2);
-router.get("gettrashstudent", gettrashV2);
+router.get("/gettrashstudent", gettrashV2);
 // ── Update ────────────────────────────────────────────────────────────────────
 router.put('/profile/:sid', updateStudentProfileV2);   // personal info only
 router.put('/account/:sid', updateStudentAccountV2);   // shift / discount / validTill
