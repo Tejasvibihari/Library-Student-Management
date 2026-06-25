@@ -273,6 +273,29 @@ export const getStudentAccountV2 = async (req, res) => {
     }
 };
 
+export const gettrashV2 = async (req, res) => {
+    try {
+        const { search } = req.query;
+        const filter = { 'statuses.student': 'trash' };
+
+        if (search && search.trim() !== '') {
+            const term = search.trim();
+            // If term is a valid integer, search by SID (exact match)
+            if (!isNaN(term) && Number.isInteger(Number(term))) {
+                filter.sid = Number(term);
+            } else {
+                // Otherwise search by name (case-insensitive partial match)
+                filter.name = { $regex: term, $options: 'i' };
+            }
+        }
+
+        const trashstudent = await StudentV2.find(filter).sort({ sid: -1 });
+        res.status(200).json(trashstudent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // ─── UPDATE — personal info only ──────────────────────────────────────────────
 
 export const updateStudentProfileV2 = async (req, res) => {
