@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
-export const INVOICE_STATUS_V2 = ['paid', 'partial', 'due', 'advance', 'cancelled'];
+export const INVOICE_STATUS_V2 = ['paid', 'due', 'cancelled'];
 
 const invoiceCounterSchemaV2 = new Schema({
     name: { type: String, required: true, unique: true },
@@ -17,7 +17,12 @@ const invoiceItemSchemaV2 = new Schema({
     amount: { type: Number, required: true },
     kind: {
         type: String,
-        enum: ['fee', 'fixed_discount', 'one_time_discount', 'previous_due', 'payment', 'advance'],
+        enum: [
+            'fee',              // shift cycle charge
+            'fixed_discount',  // recurring shift discount
+            'due_settlement',  // overdue days cleared by this payment
+            'payment'          // cash received
+        ],
         required: true
     }
 }, { _id: false });
@@ -32,19 +37,23 @@ const invoiceSchemaV2 = new Schema({
     issuedAt: { type: Date, default: Date.now },
     cycleStart: { type: Date, required: true },
     cycleEnd: { type: Date, required: true },
-    validTillAfter: { type: Date },
-    dueFromAfter: { type: Date },
 
+    // ── Line items ────────────────────────────────────────────────────────────
     items: { type: [invoiceItemSchemaV2], default: [] },
+
+    // ── Billing snapshot ──────────────────────────────────────────────────────
     grossCycleAmount: { type: Number, required: true },
     fixedDiscountAmount: { type: Number, default: 0 },
-    oneTimeDiscountAmount: { type: Number, default: 0 },
     netCycleAmount: { type: Number, required: true },
     amountPaid: { type: Number, required: true },
-    dueAmountAfter: { type: Number, default: 0 },
-    advanceAmountAfter: { type: Number, default: 0 },
-    dueDaysAfter: { type: Number, default: 0 },
-    creditDaysAfter: { type: Number, default: 0 },
+
+    // ── Day summary (what the student actually got) ───────────────────────────
+    purchasedDays: { type: Number, required: true }, // days bought by this payment
+    remainingDaysAfter: { type: Number, required: true }, // total days left after payment (can be negative)
+
+    // ── Resulting dates ───────────────────────────────────────────────────────
+    validTillAfter: { type: Date },   // new coverage end date
+    dueFromAfter: { type: Date },   // null if now paid
 
     status: { type: String, enum: INVOICE_STATUS_V2, required: true, index: true },
     pdfUrl: { type: String }
@@ -53,12 +62,10 @@ const invoiceSchemaV2 = new Schema({
     timestamps: true
 });
 
-const InvoiceCounterV2 = mongoose.models.InvoiceCounterV2 || mongoose.model('InvoiceCounterV2', invoiceCounterSchemaV2);
+const InvoiceCounterV2 = mongoose.models.InvoiceCounterV2
+    || mongoose.model('InvoiceCounterV2', invoiceCounterSchemaV2);
 
-// No DB transaction/session here (single mongod, no replica set). This is a
-// single atomic findOneAndUpdate with $inc + upsert, which Mongo guarantees
-// is atomic on its own even without a multi-document transaction, so it's
-// still safe to call concurrently without a session.
+// Atomic counter — safe without a transaction on single mongod
 invoiceSchemaV2.statics.getNextInvoiceNumber = async function () {
     const counter = await InvoiceCounterV2.findOneAndUpdate(
         { name: 'invoiceNumber' },
