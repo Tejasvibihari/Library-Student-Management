@@ -40,14 +40,12 @@ export const getDashboardOverviewV2 = async (req, res) => {
             pendingStudents,
             newTodayStudents,
             dueStudents,
-            advanceStudents,
         ] = await Promise.all([
             StudentV2.countDocuments(),
             StudentV2.countDocuments({ 'statuses.student': 'active' }),
             StudentV2.countDocuments({ 'statuses.student': 'pending' }),
             StudentV2.countDocuments({ createdAt: { $gte: todayStart, $lte: todayEnd } }),
             StudentV2.countDocuments({ 'statuses.payment': 'due' }),
-            StudentV2.countDocuments({ 'statuses.payment': 'advance' }),
         ]);
 
         // ── seats ─────────────────────────────────────────────────────────
@@ -114,7 +112,7 @@ export const getDashboardOverviewV2 = async (req, res) => {
                 pending: pendingStudents,
                 newToday: newTodayStudents,
                 due: dueStudents,
-                advance: advanceStudents,
+                // 'advance' removed – no longer in model
             },
             seats: {
                 total: totalSeats,
@@ -326,7 +324,12 @@ export const getStudentBreakdownV2 = async (req, res) => {
             ]),
         ]);
 
-        res.json({ gender: genderAgg, studentStatus: statusAgg, paymentStatus: paymentStatusAgg, byShift: shiftAgg });
+        res.json({
+            gender: genderAgg,
+            studentStatus: statusAgg,
+            paymentStatus: paymentStatusAgg, // only 'paid' and 'due' will appear
+            byShift: shiftAgg,
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
