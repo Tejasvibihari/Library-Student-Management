@@ -106,7 +106,7 @@ export async function recordPaymentV2({
         amountPaid: paid
     });
 
-    const { cycleStart, cycleEnd } = getCycleForDate(student.billing.cycleAnchorDate, asOfDate);
+    const { cycleStart, cycleEnd } = getCycleForDate(student.billing.cycleAnchorDate, result.validTill);
 
     // ── 3. Create Payment record ─────────────────────────────────────────────
     const payment = await PaymentV2.create({
