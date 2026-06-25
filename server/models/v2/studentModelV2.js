@@ -1,10 +1,21 @@
+/**
+ * studentModelV2.js
+ *
+ * Day-based billing model. Key changes from old model:
+ *   - account.remainingDays  = single source of truth for coverage
+ *   - account.validTill      = derived (today + remainingDays) and stored as cache
+ *   - No advanceAmount / advanceDays fields (removed)
+ *   - Payment status: only "paid" | "due"
+ */
+
 import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
 export const STUDENT_STATUS_V2 = ['active', 'pending', 'inactive', 'left', 'trash'];
-export const PAYMENT_STATUS_V2 = ['paid', 'partial', 'due', 'advance'];
+export const PAYMENT_STATUS_V2 = ['paid', 'due'];
 export const SEAT_STATUS_V2 = ['allotted', 'not_allotted', 'expired', 'vacated', 'cancelled'];
+export const RENEWAL_STATUS_V2 = ['safe', 'warning', 'urgent', 'expired'];
 
 const studentSchemaV2 = new Schema({
     legacyStudent: { type: Schema.Types.ObjectId, ref: 'Student', index: true },
@@ -49,69 +60,45 @@ const studentSchemaV2 = new Schema({
     },
 
     statuses: {
-
         student: {
             type: String,
-            enum: [
-                "active",
-                "pending",
-                "inactive",
-                "left",
-                "trash"
-            ]
+            enum: STUDENT_STATUS_V2,
+            default: 'pending'
         },
-
         payment: {
             type: String,
-            enum: [
-                "paid",
-                "partial",
-                "due",
-                "advance"
-            ]
+            enum: PAYMENT_STATUS_V2,   // ONLY "paid" | "due"
+            default: 'due'
         },
-
         seat: {
             type: String,
-            enum: [
-                "allotted",
-                "not_allotted",
-                "expired",
-                "vacated",
-                "cancelled"
-            ]
+            enum: SEAT_STATUS_V2,
+            default: 'not_allotted'
         },
-
         renewal: {
             type: String,
-            enum: [
-                "safe",
-                "warning",
-                "urgent",
-                "expired"
-            ],
-            default: "safe"
+            enum: RENEWAL_STATUS_V2,
+            default: 'expired'
         }
     },
 
-    account:
-    {
-        // SINGLE SOURCE OF TRUTh
-        balanceAmount: { type: Number, default: 0 },
-        validTill: { type: Date },
-        dueFrom: { type: Date },
+    account: {
+        // ── PRIMARY FIELD ────────────────────────────────────────────────────
+        // remainingDays is the ONLY field you ever manually update.
+        // All other account fields are derived from it + dailyRate.
+        remainingDays: { type: Number, default: 0 },
+
+        // ── DERIVED CACHE FIELDS (synced on every payment / cron) ───────────
+        validTill: { type: Date },   // today + remainingDays  (when coverage ends)
+        dueFrom: { type: Date },   // when coverage expired  (null if paid)
+        dueDays: { type: Number, default: 0 },
+        dueAmount: { type: Number, default: 0 },
+
+        // ── AUDIT / HISTORY FIELDS ───────────────────────────────────────────
         lastPaymentAt: { type: Date },
         lastInvoiceNumber: { type: Number },
-        // SNAPSHOT FIELDS (cron updates)
-        advanceAmount: { type: Number, default: 0 },
-        dueAmount: { type: Number, default: 0 },
-        remainingDays: { type: Number, default: 0 },
-        advanceDays: { type: Number, default: 0 },
-        dueDays: {
-            type: Number,
-            default: 0
-        },
-        // cycle tracking
+
+        // ── CYCLE REFERENCE (cosmetic) ───────────────────────────────────────
         currentCycleStart: { type: Date },
         currentCycleEnd: { type: Date }
     }
@@ -122,6 +109,7 @@ const studentSchemaV2 = new Schema({
 
 studentSchemaV2.index({ 'statuses.student': 1, 'statuses.payment': 1, 'statuses.seat': 1 });
 studentSchemaV2.index({ 'account.validTill': 1 });
+studentSchemaV2.index({ 'account.remainingDays': 1 });
 
 const StudentV2 = mongoose.models.StudentV2 || mongoose.model('StudentV2', studentSchemaV2);
 

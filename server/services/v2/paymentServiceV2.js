@@ -1,50 +1,71 @@
+/**
+ * paymentServiceV2.js
+ *
+ * Records a payment, creates an invoice, and syncs the student's account.
+ *
+ * Day-based flow:
+ *   1. Look up student + get live account state
+ *   2. Convert amountPaid → purchasedDays
+ *   3. Apply to currentRemainingDays (settling overdue first)
+ *   4. Derive new validTill, paymentStatus, renewal
+ *   5. Create Payment → Invoice → Update Student (with rollback on failure)
+ */
+
 import PaymentV2 from '../../models/v2/paymentModelV2.js';
 import InvoiceV2 from '../../models/v2/invoiceModelV2.js';
 import StudentV2 from '../../models/v2/studentModelV2.js';
 import {
+    applyPayment,
     classifyPayment,
-    deriveAccountFromBalance,
+    daysFromAmount,
     getCycleForDate,
     getLiveStudentAccount,
     startOfDay
 } from './billingServiceV2.js';
 
-function buildInvoiceItems({ student, oneTimeDiscountAmount, amountPaid, dueAmountBefore, advanceAmountAfter }) {
+// ─── Invoice item builder ─────────────────────────────────────────────────────
+
+function buildInvoiceItems({ student, amountPaid, purchasedDays, dueDaysSettled, newDaysAdded }) {
     const items = [
-        { label: `${student.shift.label} cycle amount`, amount: student.shift.amount, kind: 'fee' }
+        {
+            label: `${student.shift.label} – ${student.billing.cycleDays}-day cycle`,
+            amount: student.shift.amount,
+            kind: 'fee'
+        }
     ];
 
     if (student.billing.fixedDiscountAmount > 0) {
         items.push({
-            label: `Fixed shift discount${student.billing.fixedDiscountReason ? ` - ${student.billing.fixedDiscountReason}` : ''}`,
+            label: `Fixed discount${student.billing.fixedDiscountReason ? ` (${student.billing.fixedDiscountReason})` : ''}`,
             amount: -student.billing.fixedDiscountAmount,
             kind: 'fixed_discount'
         });
     }
 
-    if (oneTimeDiscountAmount > 0) {
-        items.push({ label: 'One-time payment discount', amount: -oneTimeDiscountAmount, kind: 'one_time_discount' });
-    }
-
-    if (dueAmountBefore > 0) {
-        items.push({ label: 'Previous due', amount: dueAmountBefore, kind: 'previous_due' });
+    if (dueDaysSettled > 0) {
+        items.push({
+            label: `Overdue days settled (${dueDaysSettled} days)`,
+            amount: -(dueDaysSettled * student.billing.dailyRate),
+            kind: 'due_settlement'
+        });
     }
 
     if (amountPaid > 0) {
-        items.push({ label: 'Payment received', amount: -amountPaid, kind: 'payment' });
-    }
-
-    if (advanceAmountAfter > 0) {
-        items.push({ label: 'Advance balance carried forward', amount: advanceAmountAfter, kind: 'advance' });
+        items.push({
+            label: `Payment received – ${purchasedDays} days purchased`,
+            amount: -amountPaid,
+            kind: 'payment'
+        });
     }
 
     return items;
 }
 
+// ─── Main payment recorder ────────────────────────────────────────────────────
+
 export async function recordPaymentV2({
     sid,
     amountPaid = 0,
-    oneTimeDiscountAmount = 0,
     discountReason,
     paymentDate = new Date(),
     method = 'cash',
@@ -52,81 +73,83 @@ export async function recordPaymentV2({
     createdBy
 }) {
     const student = await StudentV2.findOne({ sid });
-    if (!student) throw new Error('Student not found in v2 collection.');
+    if (!student) throw new Error('Student not found.');
 
     const paid = Number(amountPaid || 0);
-    const oneTimeDiscount = Number(oneTimeDiscountAmount || 0);
     const asOfDate = startOfDay(paymentDate);
+
+    // ── 1. Get current live state ────────────────────────────────────────────
     const liveBefore = getLiveStudentAccount(student, asOfDate);
-    const effectiveCreditAmount = paid + oneTimeDiscount;
-    const balanceAfter = liveBefore.balanceAmount + effectiveCreditAmount;
-    const liveAfter = deriveAccountFromBalance({
-        balanceAmount: balanceAfter,
-        dailyRate: student.billing.dailyRate,
-        asOfDate
-    });
-    const { cycleStart, cycleEnd } = getCycleForDate(student.billing.cycleAnchorDate, asOfDate);
-    const classification = classifyPayment({
+
+    // ── 2. Apply the payment ─────────────────────────────────────────────────
+    const result = applyPayment({
+        currentRemainingDays: liveBefore.remainingDays,
+        currentValidTill: liveBefore.validTill,
         amountPaid: paid,
-        oneTimeDiscountAmount: oneTimeDiscount,
-        dueAmountBefore: liveBefore.dueAmount,
-        dueAmountAfter: liveAfter.dueAmount,
-        advanceAmountAfter: liveAfter.advanceAmount
+        dailyRate: student.billing.dailyRate,
+        asOfDate,
+        dueFromDate: liveBefore.dueFrom
     });
 
-    const amountUsedForDue = Math.min(effectiveCreditAmount, liveBefore.dueAmount);
-    const amountUsedForSubscription = Math.max(Math.min(effectiveCreditAmount - amountUsedForDue, student.billing.netCycleAmount), 0);
-    const amountMovedToAdvance = Math.max(liveAfter.advanceAmount, 0);
+    const { purchasedDays, effectiveCurrentDays, newRemainingDays } = result;
 
-    // No DB transaction here (single mongod, no replica set). We create the
-    // payment first, then the invoice, then sync the student. If a later
-    // step fails, the caller is responsible for any compensating cleanup
-    // (see createStudentV2, which deletes the student + payment + invoice
-    // it just created if anything in the admission flow fails).
+    // How many of the purchased days went to settling overdue
+    const previousDueDays = liveBefore.dueDays || 0;
+    const dueDaysSettled = effectiveCurrentDays < 0
+        ? Math.min(purchasedDays, Math.abs(effectiveCurrentDays))
+        : 0;
+    const newDaysAdded = purchasedDays - dueDaysSettled;
+
+    const classification = classifyPayment({
+        newRemainingDays,
+        previousRemainingDays: liveBefore.remainingDays,
+        amountPaid: paid
+    });
+
+    const { cycleStart, cycleEnd } = getCycleForDate(student.billing.cycleAnchorDate, asOfDate);
+
+    // ── 3. Create Payment record ─────────────────────────────────────────────
     const payment = await PaymentV2.create({
         student: student._id,
         sid: student.sid,
         paymentDate: asOfDate,
         cycleStart,
         cycleEnd,
+
         shiftSnapshot: {
             code: student.shift.code,
             label: student.shift.label,
             displayTime: student.shift.displayTime,
             amount: student.shift.amount
         },
-        grossCycleAmount: student.shift.amount,
-        fixedDiscountAmount: student.billing.fixedDiscountAmount,
-        oneTimeDiscountAmount: oneTimeDiscount,
-        discountReason,
-        netCycleAmount: student.billing.netCycleAmount,
+
         dailyRate: student.billing.dailyRate,
+        netCycleAmount: student.billing.netCycleAmount,
+        fixedDiscountAmount: student.billing.fixedDiscountAmount,
         amountPaid: paid,
-        effectiveCreditAmount,
-        balanceBefore: liveBefore.balanceAmount,
-        balanceAfter,
-        dueAmountBefore: liveBefore.dueAmount,
-        dueAmountAfter: liveAfter.dueAmount,
-        advanceAmountBefore: liveBefore.advanceAmount,
-        advanceAmountAfter: liveAfter.advanceAmount,
-        dueDaysBefore: liveBefore.dueDays,
-        dueDaysAfter: liveAfter.dueDays,
-        advanceDaysBefore: liveBefore.advanceDays,
-        advanceDaysAfter: liveAfter.advanceDays,
-        validTillBefore: student.account?.validTill || student.admissionDate,
-        validTillAfter: liveAfter.validTill,
+
+        // Day tracking
+        purchasedDays,
+        dueDaysSettled,
+        newDaysAdded,
+        remainingDaysBefore: liveBefore.remainingDays,
+        remainingDaysAfter: newRemainingDays,
+
+        // For audit trail
+        validTillBefore: liveBefore.validTill,
+        validTillAfter: result.validTill,
         dueFromBefore: liveBefore.dueFrom,
-        dueFromAfter: liveAfter.dueFrom,
-        amountUsedForDue,
-        amountUsedForSubscription,
-        amountMovedToAdvance,
+        dueFromAfter: result.dueFrom,
+
         paymentType: classification.paymentType,
         status: classification.status,
+        discountReason,
         method,
         note,
         createdBy
     });
 
+    // ── 4. Create Invoice ────────────────────────────────────────────────────
     let invoice;
     try {
         const invoiceNumber = await InvoiceV2.getNextInvoiceNumber();
@@ -138,29 +161,26 @@ export async function recordPaymentV2({
             issuedAt: asOfDate,
             cycleStart,
             cycleEnd,
-            validTillAfter: liveAfter.validTill,
-            dueFromAfter: liveAfter.dueFrom,
+
             items: buildInvoiceItems({
                 student,
-                oneTimeDiscountAmount: oneTimeDiscount,
                 amountPaid: paid,
-                dueAmountBefore: liveBefore.dueAmount,
-                advanceAmountAfter: liveAfter.advanceAmount
+                purchasedDays,
+                dueDaysSettled,
+                newDaysAdded
             }),
+
             grossCycleAmount: student.shift.amount,
             fixedDiscountAmount: student.billing.fixedDiscountAmount,
-            oneTimeDiscountAmount: oneTimeDiscount,
             netCycleAmount: student.billing.netCycleAmount,
             amountPaid: paid,
-            dueAmountAfter: liveAfter.dueAmount,
-            advanceAmountAfter: liveAfter.advanceAmount,
-            dueDaysAfter: liveAfter.dueDays,
-            advanceDaysAfter: liveAfter.advanceDays,
+            purchasedDays,
+            remainingDaysAfter: newRemainingDays,
+            validTillAfter: result.validTill,
+            dueFromAfter: result.dueFrom,
             status: classification.status
         });
     } catch (invoiceError) {
-        // Roll back the payment we just created so a failed invoice step
-        // never leaves a payment ledger entry without its invoice.
         await PaymentV2.deleteOne({ _id: payment._id });
         throw invoiceError;
     }
@@ -168,35 +188,31 @@ export async function recordPaymentV2({
     payment.invoice = invoice._id;
     await payment.save();
 
+    // ── 5. Sync student account ──────────────────────────────────────────────
     let syncedStudent;
     try {
         syncedStudent = await StudentV2.findByIdAndUpdate(
             student._id,
             {
                 $set: {
-                    'statuses.student': liveAfter.studentStatus,
-                    'statuses.payment': liveAfter.paymentStatus,
-                    'statuses.renewal': liveAfter.renewal,
-                    'account.balanceAmount': balanceAfter,
-                    'account.advanceAmount': liveAfter.advanceAmount,
-                    'account.dueAmount': liveAfter.dueAmount,
-                    'account.remainingDays': liveAfter.remainingDays,
-                    'account.advanceDays': liveAfter.advanceDays,
-                    'account.dueDays': liveAfter.dueDays,
-                    'account.validTill': liveAfter.validTill,
-                    'account.dueFrom': liveAfter.dueFrom,
-                    'account.currentCycleStart': cycleStart,
-                    'account.currentCycleEnd': cycleEnd,
+                    'statuses.student': result.studentStatus,
+                    'statuses.payment': result.paymentStatus,
+                    'statuses.renewal': result.renewal,
+
+                    'account.remainingDays': newRemainingDays,
+                    'account.dueDays': result.dueDays,
+                    'account.dueAmount': result.dueAmount,
+                    'account.validTill': result.validTill,
+                    'account.dueFrom': result.dueFrom,
                     'account.lastPaymentAt': asOfDate,
-                    'account.lastInvoiceNumber': invoice.invoiceNumber
+                    'account.lastInvoiceNumber': invoice.invoiceNumber,
+                    'account.currentCycleStart': cycleStart,
+                    'account.currentCycleEnd': cycleEnd
                 }
             },
             { new: true }
         );
     } catch (syncError) {
-        // Roll back payment + invoice if we couldn't sync the student's
-        // account fields, since a payment must never exist unless the
-        // student record actually reflects it.
         await InvoiceV2.deleteOne({ _id: invoice._id });
         await PaymentV2.deleteOne({ _id: payment._id });
         throw syncError;
@@ -205,9 +221,12 @@ export async function recordPaymentV2({
     return { payment, invoice, student: syncedStudent };
 }
 
+// ─── Summary helper (for payment screen pre-fill) ─────────────────────────────
+
 export async function getStudentPaymentSummaryV2(student, asOfDate = new Date()) {
     const live = getLiveStudentAccount(student, asOfDate);
     const { cycleStart, cycleEnd } = getCycleForDate(student.billing.cycleAnchorDate, asOfDate);
+
     return {
         cycleStart,
         cycleEnd,
@@ -215,6 +234,7 @@ export async function getStudentPaymentSummaryV2(student, asOfDate = new Date())
         fixedDiscountAmount: student.billing.fixedDiscountAmount,
         netCycleAmount: student.billing.netCycleAmount,
         dailyRate: student.billing.dailyRate,
+        cycleDays: student.billing.cycleDays,
         ...live
     };
 }

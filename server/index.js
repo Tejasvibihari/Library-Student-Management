@@ -17,7 +17,7 @@ import invoiceRouterV2 from './router/v2/invoiceRouteV2.js';
 import migrationRouter from "./router/migrationRoutes.js"
 import dashboardRouterV2 from './router/v2/dashboardRouterV2.js';
 import './utils/scheduler/PaymentStatus.js';
-import './utils/scheduler/paymentStatusV2.js';
+// import './utils/scheduler/paymentStatusV2.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
