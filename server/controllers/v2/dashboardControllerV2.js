@@ -45,9 +45,11 @@ export const getDashboardOverviewV2 = async (req, res) => {
             StudentV2.countDocuments({ 'statuses.student': 'active' }),
             StudentV2.countDocuments({ 'statuses.student': 'pending' }),
             StudentV2.countDocuments({ createdAt: { $gte: todayStart, $lte: todayEnd } }),
-            StudentV2.countDocuments({ 'statuses.payment': 'due' }),
+            StudentV2.countDocuments({
+                'statuses.payment': 'due',
+                'statuses.student': { $ne: 'trash' },
+            }),
         ]);
-
         // ── seats ─────────────────────────────────────────────────────────
         const [totalSeats, activeSeats] = await Promise.all([
             SeatV2.countDocuments({ isActive: true, deletedAt: null }),
@@ -91,11 +93,22 @@ export const getDashboardOverviewV2 = async (req, res) => {
         ]);
         const monthCollection = monthPaymentsAgg[0] || { totalCollected: 0, count: 0 };
 
-        // ── total dues outstanding ────────────────────────────────────────
+        // ── Total outstanding due (excluding trash students) ────────────────
         const dueAgg = await StudentV2.aggregate([
-            { $match: { 'statuses.payment': 'due' } },
-            { $group: { _id: null, totalDue: { $sum: '$account.dueAmount' } } },
+            {
+                $match: {
+                    'statuses.payment': 'due',
+                    'statuses.student': { $ne: 'trash' },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalDue: { $sum: '$account.dueAmount' },
+                },
+            },
         ]);
+
         const totalOutstandingDue = dueAgg[0]?.totalDue ?? 0;
 
         // ── seat occupancy breakdown by shift ─────────────────────────────
