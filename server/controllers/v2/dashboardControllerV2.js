@@ -207,13 +207,13 @@ export const getDueStudentsV2 = async (req, res) => {
         }[sortBy] || 'account.dueAmount';
 
         const [students, total] = await Promise.all([
-            StudentV2.find({ 'statuses.payment': 'due' })
+            StudentV2.find({ 'statuses.payment': 'due', 'statuses.student': { $nin: ['trash', 'left', 'inactive'] } })
                 .select('sid name mobile gender account.dueAmount account.dueFrom account.validTill seat.seatNumber shift.label image')
                 .sort({ [sortField]: sortDir })
                 .skip((page - 1) * limit)
                 .limit(limit)
                 .lean(),
-            StudentV2.countDocuments({ 'statuses.payment': 'due' }),
+            StudentV2.countDocuments({ 'statuses.payment': 'due', 'statuses.student': { $nin: ['trash', 'left', 'inactive'] } }),
         ]);
 
         res.json({ students, total, page, limit, pages: Math.ceil(total / limit) });
