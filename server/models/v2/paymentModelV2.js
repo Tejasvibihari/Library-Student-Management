@@ -57,18 +57,38 @@ const paymentSchemaV2 = new Schema({
     // ── Reversal ──────────────────────────────────────────────────────────────
     isReversed: { type: Boolean, default: false, index: true },
     reversedAt: { type: Date },
-    reversedReason: { type: String }
+    reversedReason: { type: String },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+
+    deletedAt: Date,
+
+    deletedBy: {
+        type: Schema.Types.ObjectId,
+        ref: "Admin"
+    },
+
+    deleteReason: {
+        type: String,
+        trim: true
+    }
 }, {
     collection: 'payments_v2',
     timestamps: true
 });
-
-paymentSchemaV2.index({ sid: 1, paymentDate: -1, createdAt: -1 });
-paymentSchemaV2.index({ sid: 1, cycleStart: 1, cycleEnd: 1 });
-
-paymentSchemaV2.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function () {
-    throw new Error('PaymentV2 is an append-only ledger. Create a reversal entry instead of updating.');
+paymentSchemaV2.index({
+    student: 1,
+    isDeleted: 1,
+    paymentDate: -1,
+    createdAt: -1
 });
+paymentSchemaV2.index({
+    invoice: 1
+});
+
 
 const PaymentV2 = mongoose.models.PaymentV2 || mongoose.model('PaymentV2', paymentSchemaV2);
 

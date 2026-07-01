@@ -8,8 +8,8 @@
  */
 
 import PaymentV2 from '../../models/v2/paymentModelV2.js';
-import { recordPaymentV2 } from '../../services/v2/paymentServiceV2.js';
-import { daysFromAmount } from '../../services/v2/billingServiceV2.js';
+import { recordPaymentV2, deletePaymentServiceV2 } from '../../services/v2/paymentServiceV2.js';
+import { daysFromAmount, deriveAccountFromDays } from '../../services/v2/billingServiceV2.js';
 import StudentV2 from '../../models/v2/studentModelV2.js';
 
 export const makePaymentV2 = async (req, res) => {
@@ -104,5 +104,44 @@ export const getPaymentBySidV2 = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+export const deletePaymentV2 = async (req, res) => {
+    try {
 
+        if (!req.params.paymentId) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment ID is required."
+            });
+        }
+
+        if (!req.body.reason?.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Delete reason is required."
+            });
+        }
+
+        const result = await deletePaymentServiceV2({
+            paymentId: req.params.paymentId,
+            reason: req.body.reason.trim(),
+            deletedBy: req.body.deletedBy
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment deleted successfully.",
+            data: result
+        });
+
+    } catch (error) {
+
+        console.error("deletePaymentV2:", error);
+
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+};
 export const getPaymentHistoryV2 = getPaymentBySidV2;

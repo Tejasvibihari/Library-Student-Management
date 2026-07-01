@@ -56,7 +56,22 @@ const invoiceSchemaV2 = new Schema({
     dueFromAfter: { type: Date },   // null if now paid
 
     status: { type: String, enum: INVOICE_STATUS_V2, required: true, index: true },
-    pdfUrl: { type: String }
+    pdfUrl: { type: String },
+
+    isDeleted: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+
+    deletedAt: Date,
+
+    deletedBy: {
+        type: Schema.Types.ObjectId,
+        ref: "Admin"
+    },
+
+    deleteReason: String
 }, {
     collection: 'invoices_v2',
     timestamps: true

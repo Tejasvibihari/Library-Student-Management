@@ -20,6 +20,7 @@ import {
     daysFromAmount,
     getCycleForDate,
     getLiveStudentAccount,
+    deriveAccountFromDays,
     startOfDay
 } from './billingServiceV2.js';
 
@@ -240,4 +241,170 @@ export async function getStudentPaymentSummaryV2(student, asOfDate = new Date())
         cycleDays: student.billing.cycleDays,
         ...live
     };
+}
+async function getLatestPayment(studentId) {
+    return await PaymentV2.findOne({
+        student: studentId,
+        isDeleted: false,
+        isReversed: false
+    }).sort({
+        paymentDate: -1,
+        createdAt: -1
+    });
+}
+
+async function getLatestInvoice(studentId) {
+    return await InvoiceV2.findOne({
+        student: studentId,
+        isDeleted: false
+    }).sort({
+        issuedAt: -1,
+        createdAt: -1
+    });
+}
+
+export async function deletePaymentServiceV2({
+    paymentId,
+    deletedBy,
+    reason
+}) {
+
+    if (!reason?.trim()) {
+        throw new Error("Delete reason is required.");
+    }
+
+    const payment = await PaymentV2.findById(paymentId);
+
+    if (!payment)
+        throw new Error("Payment not found.");
+
+    if (payment.isDeleted)
+        throw new Error("Payment already deleted.");
+    if (payment.isReversed) {
+        throw new Error("Reversed payment cannot be deleted.");
+    }
+
+    const student = await StudentV2.findById(payment.student);
+
+    if (!student)
+        throw new Error("Student not found.");
+
+    const invoice = await InvoiceV2.findOne({
+        _id: payment.invoice,
+        isDeleted: false
+    });
+
+    if (!invoice)
+        throw new Error("Invoice not found.");
+    const latestPayment = await getLatestPayment(student._id);
+
+    if (!latestPayment)
+        throw new Error("Latest payment not found.");
+
+    if (
+        latestPayment._id.toString() !==
+        payment._id.toString()
+    ) {
+        throw new Error(
+            "Only the latest payment can be deleted."
+        );
+    }
+
+    const latestInvoice = await getLatestInvoice(student._id);
+
+    if (
+        !latestInvoice ||
+        latestInvoice._id.toString() !==
+        invoice._id.toString()
+    ) {
+        throw new Error(
+            "Only the latest invoice can be deleted."
+        );
+    }
+    const restored = deriveAccountFromDays({
+        remainingDays: payment.remainingDaysBefore,
+        dailyRate: payment.dailyRate,
+        asOfDate: startOfDay(new Date()),
+        dueFromDate: payment.dueFromBefore
+    });
+
+    student.statuses.student = restored.studentStatus;
+    student.statuses.payment = restored.paymentStatus;
+    student.statuses.renewal = restored.renewal;
+
+    student.account.remainingDays = restored.remainingDays;
+    student.account.validTill = restored.validTill;
+    student.account.dueFrom = restored.dueFrom;
+    student.account.dueDays = restored.dueDays;
+    student.account.dueAmount = restored.dueAmount;
+
+    const previousPayment = await PaymentV2.findOne({
+        student: student._id,
+        isDeleted: false,
+        isReversed: false,
+        _id: { $ne: payment._id }
+    })
+        .sort({
+            paymentDate: -1,
+            createdAt: -1
+        });
+
+    if (previousPayment) {
+
+        const previousInvoice = await InvoiceV2.findOne({
+            payment: previousPayment._id,
+            isDeleted: false
+        });
+
+        student.account.lastPaymentAt =
+            previousPayment.paymentDate;
+
+        student.account.lastInvoiceNumber =
+            previousInvoice?.invoiceNumber || null;
+
+        student.account.currentCycleStart =
+            previousPayment.cycleStart;
+
+        student.account.currentCycleEnd =
+            previousPayment.cycleEnd;
+
+    } else {
+
+        student.account.lastPaymentAt = null;
+        student.account.lastInvoiceNumber = null;
+        student.account.currentCycleStart = null;
+        student.account.currentCycleEnd = null;
+
+    }
+
+    await student.save();
+
+    payment.isDeleted = true;
+    payment.deletedAt = new Date();
+    payment.deletedBy = deletedBy;
+    payment.deleteReason = reason;
+
+    invoice.isDeleted = true;
+    invoice.deletedAt = new Date();
+    invoice.deletedBy = deletedBy;
+    invoice.deleteReason = reason;
+
+    await invoice.save();
+
+    payment.isDeleted = true;
+    payment.deletedAt = new Date();
+    payment.deletedBy = deletedBy;
+    payment.deleteReason = reason;
+
+    await payment.save();
+    return {
+
+        student,
+
+        payment,
+
+        invoice
+
+    };
+
 }
