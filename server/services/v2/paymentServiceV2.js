@@ -288,14 +288,16 @@ export async function deletePaymentServiceV2({
 
     if (!student)
         throw new Error("Student not found.");
-
+    console.log("Student found:", student);
+    console.log("Payment found:", payment);
     const invoice = await InvoiceV2.findOne({
         _id: payment.invoice,
         isDeleted: false
     });
-
+    console.log("Invoice found:", invoice);
     if (!invoice)
         throw new Error("Invoice not found.");
+
     const latestPayment = await getLatestPayment(student._id);
 
     if (!latestPayment)

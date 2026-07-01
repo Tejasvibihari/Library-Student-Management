@@ -106,7 +106,7 @@ export const getPaymentBySidV2 = async (req, res) => {
 };
 export const deletePaymentV2 = async (req, res) => {
     try {
-
+        console.log("deletePaymentV2 called with params:", req.params, "and body:", req.body);
         if (!req.params.paymentId) {
             return res.status(400).json({
                 success: false,
