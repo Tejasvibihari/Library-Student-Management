@@ -26,6 +26,7 @@ import StudentIdCard from './components/StudentIdCard'
 import StudentProtectedRoute from './pages/StudentProtectedRoute'
 import UpdateSeat from './pages/UpdateSeat'
 import LandingPage from './pages/LandingPage'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import TrashStudent from './pages/TrashStudent'
 import SuccessReview from './components/SuccessReview'
 import AddTestimonial from './pages/AddTestimonial'
@@ -57,6 +58,7 @@ export default function App() {
           </Route>
 
           <Route path="/" element={<LandingPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           {/* Sidebar menu Start  */}
           <Route path="/success-review" element={<SuccessReview />} />

@@ -33,6 +33,9 @@ export default function Footer() {
                                 <Link to="/student-admission">
                                     <li className='flex mb-4'><Link2 size={20} className='text-primary mr-3' />Student Admission</li>
                                 </Link>
+                                <Link to="/privacy-policy">
+                                    <li className='flex mb-4'><Link2 size={20} className='text-primary mr-3' />Privacy Policy</li>
+                                </Link>
                                 <Link to="/admin-dashboard">
                                     <li className='flex mb-4'><LayoutDashboard size={20} className='text-primary mr-3' />Dashboard</li>
                                 </Link>
