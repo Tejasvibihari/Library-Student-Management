@@ -272,7 +272,7 @@ export async function deletePaymentServiceV2({
     if (!reason?.trim()) {
         throw new Error("Delete reason is required.");
     }
-
+    console.log(paymentId, deletedBy, reason, "deletePaymentServiceV2 called");
     const payment = await PaymentV2.findById(paymentId);
 
     if (!payment)
