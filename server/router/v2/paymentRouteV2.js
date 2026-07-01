@@ -1,3 +1,6 @@
+
+
+import express from 'express';
 import {
     getAllPaymentsV2,
     getPaymentBySidV2,
@@ -7,6 +10,7 @@ import {
     deletePaymentV2
 } from '../../controllers/v2/paymentControllerV2.js';
 
+const router = express.Router();
 router.post('/makepayment', makePaymentV2);
 
 router.post('/delete/:paymentId', deletePaymentV2);
